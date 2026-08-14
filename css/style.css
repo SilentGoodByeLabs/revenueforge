@@ -168,3 +168,21 @@ h1,h2,h3,h4{font-family:var(--head);color:var(--navy);line-height:1.2}
 .portal-banner{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:18px;color:#fff;padding:36px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:28px}
 .portal-banner h1{color:#fff;font-size:26px}
 .portal-banner p{color:#C7D6E8;margin-top:6px}
+
+/* ===== MOBILE FIX (phones) ===== */
+@media (max-width: 768px) {
+  h1, .page-hero h1 { font-size: 1.7rem !important; line-height: 1.2 !important; }
+  h2 { font-size: 1.4rem !important; }
+  h3 { font-size: 1.15rem !important; }
+  p, li, label, span { font-size: 0.95rem !important; }
+  .page-hero { padding: 40px 0 !important; }
+  .page-hero p { font-size: 1rem !important; }
+  .container { padding-left: 16px !important; padding-right: 16px !important; }
+  .cards, .cards.two, .cards.three { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .card { padding: 18px !important; }
+  .section { padding: 30px 0 !important; }
+  .btn { font-size: 0.9rem !important; padding: 10px 16px !important; }
+  input, select, textarea { font-size: 1rem !important; }
+  table { font-size: 0.8rem !important; }
+  header .btn { padding: 8px 12px !important; font-size: 0.8rem !important; }
+}
