@@ -34,18 +34,16 @@
   </div>
   <div class="auth-form">
     <h1>Create your account</h1>
-    <p class="sub">Use your <strong>email</strong> or your <strong>phone</strong> — whichever you prefer.</p>
-    <label>Email (recommended)</label>
-    <input id="su_email" type="email" placeholder="you@gmail.com" autocomplete="email">
-    <label>Or phone number</label>
-    <input id="su_phone" type="tel" placeholder="+234 800 000 0000" autocomplete="tel">
+    <p class="sub">One box — your <strong>email</strong> or your <strong>phone</strong>.</p>
+    <label>Email or phone</label>
+    <input id="su_id" type="text" placeholder="you@gmail.com or +234 800 000 0000" autocomplete="username">
     <label>Password</label>
     <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
-    <label>Human check</label>
-    <div class="cap-box"><span class="q" id="cap_q">…</span><input id="cap_a" type="text" inputmode="numeric" placeholder="Answer"><button onclick="loadCaptcha()" title="New question"><i class="fa-solid fa-rotate"></i></button></div>
+    <label>Anti-robot check</label>
+    <div class="cap-box"><span class="q" id="cap_q">…</span><input id="cap_a" type="text" inputmode="numeric" placeholder="Type the answer"><button onclick="loadCaptcha()" title="New question"><i class="fa-solid fa-rotate"></i></button></div>
     <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
     <p id="su_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
-    <button class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
+    <button id="su_btn" class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
     <p class="alt">Already have an account? <a href="login.html">Log in</a></p>
     <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
   </div>
