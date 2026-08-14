@@ -1,16 +1,53 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Create Account | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css"></head><body><div id="header"></div>
-<section class="page-hero"><div class="container"><h1>Create your account</h1><p>Free to join. Pay only when you activate a plan.</p></div></section>
-<section class="section"><div class="container" style="max-width:460px"><div class="card">
-<label style="font-size:13px;font-weight:600">Email</label>
-<input id="su_email" type="email" placeholder="you@example.com">
-<label style="font-size:13px;font-weight:600">Phone (WhatsApp preferred)</label>
-<input id="su_phone" type="tel" placeholder="+234 800 000 0000">
-<label style="font-size:13px;font-weight:600">Password (6+ characters)</label>
-<input id="su_pass" type="password" placeholder="••••••••">
-<label style="font-size:13px;font-weight:600;color:var(--muted)">Staff code (optional — leave blank)</label>
-<input id="su_code" type="text" placeholder="Only for team members">
-<p id="su_msg" style="color:#B91C1C;min-height:20px"></p>
-<button class="btn btn-primary" style="width:100%" onclick="rfSignup()">Create my account</button>
-<p style="margin-top:12px;color:var(--muted);font-size:13px">Already have an account? <a href="login.html">Log in</a></p>
-</div></div></section><div id="footer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Create Account | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
+<style>
+.auth-sec{min-height:calc(100vh - 140px);display:flex;align-items:center;padding:40px 16px}
+.auth-card{max-width:920px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(11,34,57,.18);background:#fff}
+.auth-brand{background:linear-gradient(160deg,#0B2239,#123B5C);color:#fff;padding:44px 36px;display:flex;flex-direction:column;gap:18px}
+.auth-brand h2{font-family:'Sora';font-size:1.6rem;line-height:1.25}
+.auth-brand .pt{display:flex;gap:12px;align-items:flex-start;color:#CBD5E1;font-size:.95rem}
+.auth-brand .pt i{color:#4ADE80;margin-top:3px}
+.auth-brand .tag{margin-top:auto;font-size:.8rem;color:#7C93A8}
+.auth-form{padding:40px 36px}
+.auth-form h1{font-family:'Sora';font-size:1.5rem}
+.auth-form .sub{color:var(--muted);font-size:.92rem;margin:6px 0 20px}
+.auth-form label{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.auth-form input{width:100%;margin:6px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
+.auth-form input:focus{outline:none;border-color:var(--accent)}
+.cap-box{display:flex;gap:10px;align-items:center;background:#F1F5F9;border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 14px}
+.cap-box .q{font-weight:800;font-size:1.05rem;white-space:nowrap}
+.cap-box input{margin:0;flex:1;background:#fff}
+.cap-box button{background:none;border:0;color:var(--accent);font-size:1.1rem;cursor:pointer}
+.auth-form .btn{width:100%;padding:13px;font-size:1rem;border-radius:12px}
+.auth-form .alt{margin-top:14px;font-size:13.5px;color:var(--muted);text-align:center}
+.auth-form .trust{margin-top:16px;font-size:12px;color:var(--muted);display:flex;gap:14px;justify-content:center}
+.hp{display:none!important}
+@media (max-width:820px){.auth-card{grid-template-columns:1fr}.auth-brand{padding:30px 24px}.auth-brand .tag{display:none}.auth-form{padding:30px 22px}}
+</style></head><body><div id="header"></div>
+<section class="auth-sec"><div class="auth-card">
+  <div class="auth-brand">
+    <span class="rf-logo" style="color:#fff"><img src="assets/logo.png" alt=""><span>Revenue<b>Forge</b></span></span>
+    <h2>Your revenue, on autopilot.</h2>
+    <div class="pt"><i class="fa-solid fa-briefcase"></i> Job radar scans boards and scores the best fits for you.</div>
+    <div class="pt"><i class="fa-solid fa-paper-plane"></i> Outreach engine finds and contacts your ideal clients.</div>
+    <div class="pt"><i class="fa-solid fa-bell"></i> WhatsApp &amp; Telegram alerts the moment you win or sell.</div>
+    <div class="tag">FREE TO JOIN · PAY ONLY WHEN YOU ACTIVATE A PLAN</div>
+  </div>
+  <div class="auth-form">
+    <h1>Create your account</h1>
+    <p class="sub">Use your <strong>email</strong> or your <strong>phone</strong> — whichever you prefer.</p>
+    <label>Email (recommended)</label>
+    <input id="su_email" type="email" placeholder="you@gmail.com" autocomplete="email">
+    <label>Or phone number</label>
+    <input id="su_phone" type="tel" placeholder="+234 800 000 0000" autocomplete="tel">
+    <label>Password</label>
+    <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
+    <label>Human check</label>
+    <div class="cap-box"><span class="q" id="cap_q">…</span><input id="cap_a" type="text" inputmode="numeric" placeholder="Answer"><button onclick="loadCaptcha()" title="New question"><i class="fa-solid fa-rotate"></i></button></div>
+    <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
+    <p id="su_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
+    <button class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
+    <p class="alt">Already have an account? <a href="login.html">Log in</a></p>
+    <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
+  </div>
+</div></section><div id="footer"></div>
 <script src="js/config.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
