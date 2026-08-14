@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Create Account | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 .auth-sec{min-height:calc(100vh - 140px);display:flex;align-items:center;padding:40px 16px}
 .auth-card{max-width:920px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(11,34,57,.18);background:#fff}
@@ -13,13 +14,8 @@
 .auth-form label{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .auth-form input{width:100%;margin:6px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
 .auth-form input:focus{outline:none;border-color:var(--accent)}
-.slide-track{position:relative;height:48px;background:#F1F5F9;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin:6px 0 14px;touch-action:none;user-select:none}
-.slide-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:#DCFCE7}
-.slide-handle{position:absolute;left:4px;top:4px;width:44px;height:38px;background:#fff;border:1.5px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--accent);cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.slide-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;font-size:.9rem;pointer-events:none}
-.slide-cap.ok .slide-handle{border-color:#16A34A;color:#16A34A;background:#F0FDF4}
-.slide-cap.ok .slide-fill{background:#BBF7D0}
-.slide-cap.ok .slide-label{color:#15803D}
+.g-recaptcha{margin:6px 0 14px}
+#capnote{display:none;font-size:12px;color:var(--muted);margin:-6px 0 12px}
 .auth-form .btn{width:100%;padding:13px;font-size:1rem;border-radius:12px}
 .auth-form .alt{margin-top:14px;font-size:13.5px;color:var(--muted);text-align:center}
 .auth-form .trust{margin-top:16px;font-size:12px;color:var(--muted);display:flex;gap:14px;justify-content:center}
@@ -42,12 +38,20 @@
     <input id="su_email" type="email" autocomplete="email">
     <label>Password</label>
     <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
-        <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
-        <div id="captchaBoxSignup" style="margin:6px 0 14px"></div>
+    <label>Human verification</label>
+    <div class="g-recaptcha" data-sitekey="SITE_KEY_PLACEHOLDER"></div>
+    <p id="capnote">Security check not configured yet — you can still create your account.</p>
+    <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
     <p id="su_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
     <button id="su_btn" class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
     <p class="alt">Already have an account? <a href="login.html">Log in</a></p>
     <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
   </div>
 </div></section><div id="footer"></div>
-<script src="js/config.js?v=5"></script><script src="js/layout.js?v=4"></script><script src="js/auth.js?v=7"></script>"></script></body></html>
+<script>
+setTimeout(function(){
+  var w=document.querySelector('.g-recaptcha');
+  if(w && !w.querySelector('iframe')){ var n=document.getElementById('capnote'); if(n) n.style.display='block'; }
+},4000);
+</script>
+<script src="js/config.js?v=4"></script><script src="js/layout.js?v=4"></script><script src="js/auth.js?v=7"></script></body></html>

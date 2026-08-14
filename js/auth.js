@@ -9,12 +9,15 @@ function rfSignup() {
   var btn = document.getElementById('su_btn');
   if (!email || email.indexOf('@') < 0) { msg.textContent = 'Enter your email address.'; return; }
   if (pass.length < 6) { msg.textContent = 'Password must be 6+ characters.'; return; }
+  var token = (window.grecaptcha && grecaptcha.getResponse) ? grecaptcha.getResponse() : '';
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Creating your account…';
-  fetch(API + '/api/join-get?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass))
+  fetch(API + '/api/join-get?email=' + encodeURIComponent(email) +
+        '&password=' + encodeURIComponent(pass) +
+        '&captcha=' + encodeURIComponent(token))
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
-      else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
+      else { msg.textContent = d.message; if (window.grecaptcha && grecaptcha.reset) grecaptcha.reset(); btn.disabled = false; btn.textContent = 'Create my account →'; }
     })
     .catch(function (e) { msg.textContent = 'Failed: ' + e.name + ' ' + e.message; btn.disabled = false; btn.textContent = 'Create my account →'; });
 }
