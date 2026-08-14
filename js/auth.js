@@ -1,16 +1,21 @@
 var API = window.RF_API || 'http://localhost:8502';
 var CAP_OK = false, SLIDE_MS = 0;
 
+// WARM-UP: ping the server as soon as the page loads (wakes it up before user clicks)
+(function warmup() {
+  fetch(API + '/health', { method: 'GET' }).catch(function () {});
+})();
+
 function apiFetch(path, opts, tries) {
   tries = tries || 0;
   return fetch(API + path, opts).then(function (r) {
-    if ((r.status === 502 || r.status === 503) && tries < 2) {
-      return new Promise(function (res) { setTimeout(res, 5000); }).then(function () { return apiFetch(path, opts, tries + 1); });
+    if ((r.status === 502 || r.status === 503) && tries < 3) {
+      return new Promise(function (res) { setTimeout(res, 8000); }).then(function () { return apiFetch(path, opts, tries + 1); });
     }
     return r;
   }).catch(function (e) {
-    if (tries < 2) {
-      return new Promise(function (res) { setTimeout(res, 5000); }).then(function () { return apiFetch(path, opts, tries + 1); });
+    if (tries < 3) {
+      return new Promise(function (res) { setTimeout(res, 8000); }).then(function () { return apiFetch(path, opts, tries + 1); });
     }
     throw e;
   });
@@ -64,7 +69,7 @@ function rfSignup() {
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
     })
     .catch(function () {
-      msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
+      msg.textContent = 'Connection failed. Wait 10 seconds and try again.';
       btn.disabled = false; btn.textContent = 'Create my account →';
     });
 }
@@ -84,7 +89,7 @@ function rfLogin() {
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Log in →'; }
     })
     .catch(function () {
-      msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
+      msg.textContent = 'Connection failed. Wait 10 seconds and try again.';
       btn.disabled = false; btn.textContent = 'Log in →';
     });
 }
