@@ -68,8 +68,8 @@ function rfSignup() {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
     })
-    .catch(function () {
-      msg.textContent = 'Connection failed. Wait 10 seconds and try again.';
+    .catch(function (e) {
+      msg.textContent = 'Failed: ' + e.name + ' ' + e.message;
       btn.disabled = false; btn.textContent = 'Create my account →';
     });
 }
@@ -88,8 +88,8 @@ function rfLogin() {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Log in →'; }
     })
-    .catch(function () {
-      msg.textContent = 'Connection failed. Wait 10 seconds and try again.';
+    .catch(function (e) {
+      msg.textContent = 'Failed: ' + e.name + ' ' + e.message;
       btn.disabled = false; btn.textContent = 'Log in →';
     });
 }
