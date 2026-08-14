@@ -1,25 +1,7 @@
 var API = window.RF_API || 'http://localhost:8502';
 var CAP_OK = false, SLIDE_MS = 0;
 
-// WARM-UP: ping the server as soon as the page loads (wakes it up before user clicks)
-(function warmup() {
-  fetch(API + '/health', { method: 'GET' }).catch(function () {});
-})();
-
-function apiFetch(path, opts, tries) {
-  tries = tries || 0;
-  return fetch(API + path, opts).then(function (r) {
-    if ((r.status === 502 || r.status === 503) && tries < 3) {
-      return new Promise(function (res) { setTimeout(res, 8000); }).then(function () { return apiFetch(path, opts, tries + 1); });
-    }
-    return r;
-  }).catch(function (e) {
-    if (tries < 3) {
-      return new Promise(function (res) { setTimeout(res, 8000); }).then(function () { return apiFetch(path, opts, tries + 1); });
-    }
-    throw e;
-  });
-}
+(function warmup() { fetch(API + '/health').catch(function () {}); })();
 
 (function initSlider() {
   var wrap = document.getElementById('cap_wrap');
@@ -59,19 +41,15 @@ function rfSignup() {
   if (pass.length < 6) { msg.textContent = 'Password must be 6+ characters.'; return; }
   if (!CAP_OK) { msg.textContent = 'Slide the bar to verify you are human.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Creating your account…';
-  apiFetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ email: email, password: pass,
-      slide_ms: Math.max(SLIDE_MS, 500),
-      website: document.getElementById('su_web').value }) })
+  fetch(API + '/api/join-get?email=' + encodeURIComponent(email) +
+        '&password=' + encodeURIComponent(pass) +
+        '&slide_ms=' + Math.max(SLIDE_MS, 500))
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
     })
-    .catch(function (e) {
-      msg.textContent = 'Failed: ' + e.name + ' ' + e.message;
-      btn.disabled = false; btn.textContent = 'Create my account →';
-    });
+    .catch(function (e) { msg.textContent = 'Failed: ' + e.name + ' ' + e.message; btn.disabled = false; btn.textContent = 'Create my account →'; });
 }
 
 function rfLogin() {
@@ -81,15 +59,11 @@ function rfLogin() {
   var btn = document.getElementById('li_btn');
   if (!email || email.indexOf('@') < 0) { msg.textContent = 'Enter your email address.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Logging in…';
-  apiFetch('/api/member-login', { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ identifier: email, password: pass }) })
+  fetch(API + '/api/login-get?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(pass))
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Log in →'; }
     })
-    .catch(function (e) {
-      msg.textContent = 'Failed: ' + e.name + ' ' + e.message;
-      btn.disabled = false; btn.textContent = 'Log in →';
-    });
+    .catch(function (e) { msg.textContent = 'Failed: ' + e.name + ' ' + e.message; btn.disabled = false; btn.textContent = 'Log in →'; });
 }
