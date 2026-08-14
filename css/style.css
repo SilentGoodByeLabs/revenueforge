@@ -186,3 +186,21 @@ h1,h2,h3,h4{font-family:var(--head);color:var(--navy);line-height:1.2}
   table { font-size: 0.8rem !important; }
   header .btn { padding: 8px 12px !important; font-size: 0.8rem !important; }
 }
+
+/* ===== MOBILE v2 ===== */
+@media (max-width: 768px){
+  html,body{overflow-x:hidden}
+  img,table,pre{max-width:100%}
+  table{display:block;overflow-x:auto}
+  .grid{grid-template-columns:1fr !important}
+  header{flex-wrap:wrap;gap:8px}
+  .page-hero{padding:36px 0 !important}
+  .page-hero h1{font-size:1.6rem !important}
+  details.fold{margin-bottom:14px}
+  details.fold summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+  details.fold summary::after{content:"+";font-size:1.3rem;color:var(--accent)}
+  details.fold[open] summary::after{content:"–"}
+  .paybar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 16px;z-index:99}
+}
+.paybar{display:none}
+@media (max-width:768px){.paybar{display:flex}}
