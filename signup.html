@@ -13,6 +13,9 @@
 .auth-form label{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .auth-form input{width:100%;margin:6px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
 .auth-form input:focus{outline:none;border-color:var(--accent)}
+.id-row{display:flex;gap:8px}
+.id-row select{width:128px;margin:6px 0 14px;padding:12px 8px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
+.id-row input{flex:1}
 .cap-box{display:flex;gap:10px;align-items:center;background:#F1F5F9;border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 14px}
 .cap-box .q{font-weight:800;font-size:1.05rem;white-space:nowrap}
 .cap-box input{margin:0;flex:1;background:#fff}
@@ -36,7 +39,7 @@
     <h1>Create your account</h1>
     <p class="sub">One box — your <strong>email</strong> or your <strong>phone</strong>.</p>
     <label>Email or phone</label>
-    <input id="su_id" type="text" placeholder="you@gmail.com or +234 800 000 0000" autocomplete="username">
+    <div class="id-row"><select id="su_cc" title="Country (for phone signup)"></select><input id="su_id" type="text" placeholder="you@gmail.com or 800 000 0000" autocomplete="username"></div>
     <label>Password</label>
     <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
     <label>Anti-robot check</label>
@@ -48,4 +51,4 @@
     <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
   </div>
 </div></section><div id="footer"></div>
-<script src="js/config.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
+<script src="js/config.js"></script><script src="js/countries.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
