@@ -7,22 +7,19 @@
 .auth-card label{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .auth-card input{width:100%;margin:6px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
 .auth-card input:focus{outline:none;border-color:var(--accent)}
-.id-row{display:flex;gap:8px}
-.id-row select{width:128px;margin:6px 0 14px;padding:12px 8px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
-.id-row input{flex:1}
 .auth-card .btn{width:100%;padding:13px;font-size:1rem;border-radius:12px}
 .auth-card .alt{margin-top:14px;font-size:13.5px;color:var(--muted);text-align:center}
 @media (max-width:520px){.auth-card{padding:30px 20px}}
 </style></head><body><div id="header"></div>
 <section class="auth-sec"><div class="auth-card">
   <h1>Welcome back</h1>
-  <p class="sub">Log in with your <strong>email</strong> or <strong>phone</strong>.</p>
-  <label>Email or phone</label>
-  <div class="id-row"><select id="li_cc" title="Country (for phone login)"></select><input id="li_id" type="text" placeholder="you@gmail.com or 800 000 0000" autocomplete="username"></div>
+  <p class="sub">Log in with your email.</p>
+  <label>Email</label>
+  <input id="li_email" type="email" autocomplete="username">
   <label>Password</label>
   <input id="li_pass" type="password" placeholder="••••••••" autocomplete="current-password">
   <p id="li_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
   <button id="li_btn" class="btn btn-primary" onclick="rfLogin()">Log in →</button>
   <p class="alt">New here? <a href="signup.html">Create a free account</a></p>
 </div></section><div id="footer"></div>
-<script src="js/config.js"></script><script src="js/countries.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
+<script src="js/config.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>

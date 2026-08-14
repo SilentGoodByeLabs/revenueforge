@@ -13,13 +13,13 @@
 .auth-form label{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 .auth-form input{width:100%;margin:6px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:15px}
 .auth-form input:focus{outline:none;border-color:var(--accent)}
-.id-row{display:flex;gap:8px}
-.id-row select{width:128px;margin:6px 0 14px;padding:12px 8px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
-.id-row input{flex:1}
-.cap-box{display:flex;gap:10px;align-items:center;background:#F1F5F9;border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px;margin:6px 0 14px}
-.cap-box .q{font-weight:800;font-size:1.05rem;white-space:nowrap}
-.cap-box input{margin:0;flex:1;background:#fff}
-.cap-box button{background:none;border:0;color:var(--accent);font-size:1.1rem;cursor:pointer}
+.slide-track{position:relative;height:48px;background:#F1F5F9;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin:6px 0 14px;touch-action:none;user-select:none}
+.slide-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:#DCFCE7}
+.slide-handle{position:absolute;left:4px;top:4px;width:44px;height:38px;background:#fff;border:1.5px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--accent);cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.slide-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;font-size:.9rem;pointer-events:none}
+.slide-cap.ok .slide-handle{border-color:#16A34A;color:#16A34A;background:#F0FDF4}
+.slide-cap.ok .slide-fill{background:#BBF7D0}
+.slide-cap.ok .slide-label{color:#15803D}
 .auth-form .btn{width:100%;padding:13px;font-size:1rem;border-radius:12px}
 .auth-form .alt{margin-top:14px;font-size:13.5px;color:var(--muted);text-align:center}
 .auth-form .trust{margin-top:16px;font-size:12px;color:var(--muted);display:flex;gap:14px;justify-content:center}
@@ -37,13 +37,13 @@
   </div>
   <div class="auth-form">
     <h1>Create your account</h1>
-    <p class="sub">One box — your <strong>email</strong> or your <strong>phone</strong>.</p>
-    <label>Email or phone</label>
-    <div class="id-row"><select id="su_cc" title="Country (for phone signup)"></select><input id="su_id" type="text" placeholder="you@gmail.com or 800 000 0000" autocomplete="username"></div>
+    <p class="sub">Sign up with your <strong>email</strong>. Add WhatsApp/Telegram alerts inside your portal.</p>
+    <label>Email</label>
+    <input id="su_email" type="email" autocomplete="email">
     <label>Password</label>
     <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
-    <label>Anti-robot check</label>
-    <div class="cap-box"><span class="q" id="cap_q">…</span><input id="cap_a" type="text" inputmode="numeric" placeholder="Type the answer"><button onclick="loadCaptcha()" title="New question"><i class="fa-solid fa-rotate"></i></button></div>
+    <label>Human verification</label>
+    <div class="slide-cap" id="cap_wrap"><div class="slide-track"><div class="slide-fill" id="cap_fill"></div><span class="slide-label" id="cap_label">Slide to verify →</span><div class="slide-handle" id="cap_handle"><i class="fa-solid fa-angles-right"></i></div></div></div>
     <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
     <p id="su_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
     <button id="su_btn" class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
@@ -51,4 +51,4 @@
     <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
   </div>
 </div></section><div id="footer"></div>
-<script src="js/config.js"></script><script src="js/countries.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
+<script src="js/config.js"></script><script src="js/layout.js"></script><script src="js/auth.js"></script></body></html>
