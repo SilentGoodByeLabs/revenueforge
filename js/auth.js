@@ -1,12 +1,28 @@
 var API = window.RF_API || 'http://localhost:8502';
-var CAP_ID = '', CAP_OK = false;
+var CAP_OK = false, SLIDE_MS = 0;
 
+/* Auto-retry wrapper: survives free-server cold starts (up to 2 retries) */
+function apiFetch(path, opts, tries) {
+  tries = tries || 0;
+  return fetch(API + path, opts).then(function (r) {
+    if ((r.status === 503 || r.status === 502) && tries < 2) {
+      return new Promise(function (res) { setTimeout(res, 5000); }).then(function () { return apiFetch(path, opts, tries + 1); });
+    }
+    return r;
+  }).catch(function (e) {
+    if (tries < 2) {
+      return new Promise(function (res) { setTimeout(res, 5000); }).then(function () { return apiFetch(path, opts, tries + 1); });
+    }
+    throw e;
+  });
+}
+
+/* Slide-to-verify (touch + mouse) */
 (function initSlider() {
   var wrap = document.getElementById('cap_wrap');
   if (!wrap) return;
   var track = wrap.querySelector('.slide-track'), handle = document.getElementById('cap_handle'),
       fill = document.getElementById('cap_fill'), label = document.getElementById('cap_label');
-  fetch(API + '/api/captcha').then(function (r) { return r.json(); }).then(function (d) { CAP_ID = d.id; }).catch(function () {});
   var dragging = false, startX = 0, x = 0, max = 0, t0 = 0;
   handle.addEventListener('pointerdown', function (e) {
     if (CAP_OK) return;
@@ -24,9 +40,8 @@ var CAP_ID = '', CAP_OK = false;
     if (!dragging) return;
     dragging = false;
     if (x >= max - 6) {
-      CAP_OK = true; label.textContent = '✔ Verified'; wrap.classList.add('ok');
-      fetch(API + '/api/captcha/pass', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: CAP_ID, ms: Date.now() - t0 }) }).catch(function () {});
+      CAP_OK = true; SLIDE_MS = Date.now() - t0;
+      label.textContent = '✔ Verified'; wrap.classList.add('ok');
     } else { handle.style.left = '4px'; fill.style.width = '0'; }
     x = 0;
   });
@@ -41,14 +56,23 @@ function rfSignup() {
   if (pass.length < 6) { msg.textContent = 'Password must be 6+ characters.'; return; }
   if (!CAP_OK) { msg.textContent = 'Slide the bar to verify you are human.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Creating your account…';
-  fetch(API + '/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, password: pass, captcha_id: CAP_ID, website: document.getElementById('su_web').value }) })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
-      else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
-    })
-    .catch(function () { msg.textContent = 'Connection problem — wait 10 seconds and try again.'; btn.disabled = false; btn.textContent = 'Create my account →'; });
+  var H = { 'Content-Type': 'application/json' };
+  apiFetch('/api/captcha').then(function (r) { return r.json(); }).then(function (c) {
+    btn.textContent = 'Verifying…';
+    return apiFetch('/api/captcha/pass', { method: 'POST', headers: H,
+      body: JSON.stringify({ id: c.id, ms: Math.max(SLIDE_MS, 500) }) }).then(function () { return c.id; });
+  }).then(function (cid) {
+    btn.textContent = 'Creating your account…';
+    return apiFetch('/api/join', { method: 'POST', headers: H,
+      body: JSON.stringify({ email: email, password: pass, captcha_id: cid,
+        website: document.getElementById('su_web').value }) });
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
+    else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
+  }).catch(function () {
+    msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
+    btn.disabled = false; btn.textContent = 'Create my account →';
+  });
 }
 
 function rfLogin() {
@@ -58,12 +82,15 @@ function rfLogin() {
   var btn = document.getElementById('li_btn');
   if (!email || email.indexOf('@') < 0) { msg.textContent = 'Enter your email address.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Logging in…';
-  fetch(API + '/api/member-login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  apiFetch('/api/member-login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ identifier: email, password: pass }) })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
       else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Log in →'; }
     })
-    .catch(function () { msg.textContent = 'Connection problem — wait 10 seconds and try again.'; btn.disabled = false; btn.textContent = 'Log in →'; });
+    .catch(function () {
+      msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
+      btn.disabled = false; btn.textContent = 'Log in →';
+    });
 }
