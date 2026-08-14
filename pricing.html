@@ -104,7 +104,7 @@ function pay() {
       key: cfg.key, email: email, amount: amountLocal * 100, currency: cfg.currency || 'USD',
       ref: 'RF-' + Date.now(),
       callback: function (resp) {
-        fetch(API + '/api/subscribe/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        fetch(API + '/api/subscribe/confirm', { method: 'POST', headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ reference: resp.reference, email: email, price: current.price, modules: current.modules, volume: current.volume, plan_label: current.label })
         }).then(function (r) { return r.json(); }).then(function (d) {
           alert(d.ok ? '🎉 Payment verified! Your subscription is active. Log in to your portal to start.' : 'Payment could not be verified: ' + d.message);

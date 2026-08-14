@@ -59,7 +59,7 @@ function rfSignup() {
   if (pass.length < 6) { msg.textContent = 'Password must be 6+ characters.'; return; }
   if (!CAP_OK) { msg.textContent = 'Slide the bar to verify you are human.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Creating your account…';
-  apiFetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  apiFetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ email: email, password: pass,
       slide_ms: Math.max(SLIDE_MS, 500),
       website: document.getElementById('su_web').value }) })
@@ -81,7 +81,7 @@ function rfLogin() {
   var btn = document.getElementById('li_btn');
   if (!email || email.indexOf('@') < 0) { msg.textContent = 'Enter your email address.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Logging in…';
-  apiFetch('/api/member-login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  apiFetch('/api/member-login', { method: 'POST', headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ identifier: email, password: pass }) })
     .then(function (r) { return r.json(); })
     .then(function (d) {

@@ -80,7 +80,7 @@ function sendMail(event) {
   out.textContent = 'Sending...';
   fetch('https://formsubmit.co/ajax/adeolaayodeji4666@gmail.com', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    headers: { 'Content-Type': 'text/plain', 'Accept': 'application/json' },
     body: JSON.stringify({ 
       _subject: 'Project inquiry from ' + name, 
       name: name, 
