@@ -43,16 +43,17 @@
     <label>Password</label>
     <input id="su_pass" type="password" placeholder="6+ characters" autocomplete="new-password">
     <label>Human verification</label>
-    <div class="g-recaptcha" data-sitekey="6LeeFIYtAAAAALrKH0iC4xqRygsHTZWI70Egnw86"></div>
+    
     <input class="hp" id="su_web" type="text" tabindex="-1" autocomplete="off">
     <pre id="dbg" style="white-space:pre-wrap;font-size:11px;color:#64748B;margin:8px 0"></pre>
+    <div id="captchaBoxSignup" style="margin:6px 0 14px"></div>
     <p id="su_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
     <button id="su_btn" class="btn btn-primary" onclick="rfSignup()">Create my account →</button>
     <p class="alt">Already have an account? <a href="login.html">Log in</a></p>
     <p class="trust"><span><i class="fa-solid fa-shield-halved"></i> No spam</span><span><i class="fa-solid fa-envelope-circle-check"></i> Real inboxes only</span></p>
   </div>
 </div></section><div id="footer"></div>
-<script src="js/config.js?v=4"></script><script src="js/layout.js?v=4"></script><script src="js/auth.js?v=6"></script><script>
+<script src="js/config.js?v=5"></script><script src="js/layout.js?v=4"></script><script src="js/auth.js?v=7"></script>"></script><script>
 (function(){var d=document.getElementById('dbg');if(!d)return;var API=window.RF_API||'NONE';
 d.textContent='API: '+API+'  |  probing…';
 fetch(API+'/health').then(function(r){d.textContent='API: '+API+'  |  GET /health → HTTP '+r.status;return r.json();})

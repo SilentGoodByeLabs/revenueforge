@@ -1,15 +1,18 @@
 var API = window.RF_API || 'http://localhost:8502';
-var CAP_WIDGETS = [];
+var CAP_WIDGETS = [], CAP_DONE = false;
 
-window.renderCaps = function () {
-  if (!window.grecaptcha) return;
-  ['captchaBoxSignup', 'captchaBoxLogin'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el && window.RF_RECAPTCHA_SITE) {
-      CAP_WIDGETS.push(grecaptcha.render(id, { sitekey: window.RF_RECAPTCHA_SITE }));
-    }
-  });
-};
+function tryRenderCaps() {
+  if (CAP_DONE) return;
+  if (window.grecaptcha && window.grecaptcha.render && window.RF_RECAPTCHA_SITE) {
+    ['captchaBoxSignup', 'captchaBoxLogin'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) { try { CAP_WIDGETS.push(grecaptcha.render(id, { sitekey: window.RF_RECAPTCHA_SITE })); } catch (e) { el.textContent = 'reCAPTCHA key problem: ' + e.message; } }
+    });
+    CAP_DONE = true;
+  }
+}
+var capTimer = setInterval(function () { tryRenderCaps(); if (CAP_DONE) clearInterval(capTimer); }, 400);
+tryRenderCaps();
 
 function capToken() {
   if (!window.grecaptcha || !CAP_WIDGETS.length) return '';
