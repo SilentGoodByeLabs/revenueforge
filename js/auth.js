@@ -1,11 +1,10 @@
 var API = window.RF_API || 'http://localhost:8502';
 var CAP_OK = false, SLIDE_MS = 0;
 
-/* Auto-retry wrapper: survives free-server cold starts (up to 2 retries) */
 function apiFetch(path, opts, tries) {
   tries = tries || 0;
   return fetch(API + path, opts).then(function (r) {
-    if ((r.status === 503 || r.status === 502) && tries < 2) {
+    if ((r.status === 502 || r.status === 503) && tries < 2) {
       return new Promise(function (res) { setTimeout(res, 5000); }).then(function () { return apiFetch(path, opts, tries + 1); });
     }
     return r;
@@ -17,7 +16,6 @@ function apiFetch(path, opts, tries) {
   });
 }
 
-/* Slide-to-verify (touch + mouse) */
 (function initSlider() {
   var wrap = document.getElementById('cap_wrap');
   if (!wrap) return;
@@ -56,23 +54,19 @@ function rfSignup() {
   if (pass.length < 6) { msg.textContent = 'Password must be 6+ characters.'; return; }
   if (!CAP_OK) { msg.textContent = 'Slide the bar to verify you are human.'; return; }
   msg.textContent = ''; btn.disabled = true; btn.textContent = 'Creating your account…';
-  var H = { 'Content-Type': 'application/json' };
-  apiFetch('/api/captcha').then(function (r) { return r.json(); }).then(function (c) {
-    btn.textContent = 'Verifying…';
-    return apiFetch('/api/captcha/pass', { method: 'POST', headers: H,
-      body: JSON.stringify({ id: c.id, ms: Math.max(SLIDE_MS, 500) }) }).then(function () { return c.id; });
-  }).then(function (cid) {
-    btn.textContent = 'Creating your account…';
-    return apiFetch('/api/join', { method: 'POST', headers: H,
-      body: JSON.stringify({ email: email, password: pass, captcha_id: cid,
-        website: document.getElementById('su_web').value }) });
-  }).then(function (r) { return r.json(); }).then(function (d) {
-    if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
-    else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
-  }).catch(function () {
-    msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
-    btn.disabled = false; btn.textContent = 'Create my account →';
-  });
+  apiFetch('/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: pass,
+      slide_ms: Math.max(SLIDE_MS, 500),
+      website: document.getElementById('su_web').value }) })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.ok) { localStorage.setItem('rf_session', JSON.stringify({ email: d.key })); window.location.href = 'portal.html'; }
+      else { msg.textContent = d.message; btn.disabled = false; btn.textContent = 'Create my account →'; }
+    })
+    .catch(function () {
+      msg.textContent = 'Server is waking up — wait 30 seconds and try again.';
+      btn.disabled = false; btn.textContent = 'Create my account →';
+    });
 }
 
 function rfLogin() {
