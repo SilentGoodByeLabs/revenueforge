@@ -1,67 +1,76 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pricing | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css"><script src="https://js.paystack.co/v1/inline.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>Pricing | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css"><script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;margin:0 auto}
-.tier{border:1.5px solid var(--line);border-radius:18px;padding:26px;background:#fff;position:relative}
-.tier.pop{border-color:var(--accent);box-shadow:0 16px 40px rgba(37,99,235,.15)}
-.tier .pop-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:99px;padding:4px 12px}
+body{background:#F4F6FA}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.hero{background:linear-gradient(160deg,#0B2239,#123B5C);color:#fff;padding:56px 0 90px;text-align:center}
+.hero h1{font-family:'Sora';font-size:2rem}
+.hero p{color:#CBD5E1;margin-top:8px}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:-60px}
+.tier{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 22px;position:relative;display:flex;flex-direction:column}
+.tier.pop{border:2px solid var(--accent);box-shadow:0 20px 50px rgba(37,99,235,.18)}
+.pop-tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:99px;padding:4px 14px}
 .tier h3{font-family:'Sora'}
-.tier .price{font-size:2.2rem;font-weight:800;font-family:'Sora'}
-.tier .price span{font-size:.9rem;color:var(--muted);font-weight:600}
-.tier ul{list-style:none;margin:16px 0}
-.tier li{padding:7px 0;color:var(--muted);font-size:.92rem}
-.tier li i{color:#16A34A;margin-right:8px}
-@media (max-width:860px){.tiers{grid-template-columns:1fr}}
+.price{font-family:'Sora';font-size:2.1rem;font-weight:800;margin:6px 0}
+.price span{font-size:.85rem;color:var(--muted);font-weight:600}
+.tier ul{list-style:none;margin:14px 0;flex:1}
+.tier li{padding:7px 0;color:var(--muted);font-size:.9rem;display:flex;gap:9px}
+.tier li i{color:#16A34A;margin-top:3px}
+.tier li strong{color:var(--ink)}
+.tier .btn{width:100%}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:44px 0}
+.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+.step .n{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.step p{font-size:.8rem;color:var(--muted)}
+.co{max-width:520px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px}
+.co h3{font-family:'Sora';text-align:center}
+.co input{width:100%;margin:8px 0 14px;padding:12px;border:1.5px solid var(--line);border-radius:10px}
+.trust{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;color:var(--muted);font-size:.8rem;margin-top:16px}
+@media (max-width:900px){.tiers{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.hero h1{font-size:1.5rem}}
 </style></head><body><div id="header"></div>
-<section class="page-hero"><div class="container"><h1>Simple packages. Real results.</h1><p>Pick a plan — everything it covers is listed. No surprises.</p></div></section>
-<section class="section"><div class="container">
+<div class="hero"><div class="wrap"><h1>Simple packages. Real results.</h1><p>Every plan is cumulative — the higher you go, the more you get. Agency includes everything.</p></div></div>
+<div class="wrap">
 <div class="tiers">
   <div class="tier"><h3>Starter</h3><div class="price">$29<span>/mo</span></div>
-    <ul><li><i class="fa-solid fa-check"></i>10 matched jobs / month</li><li><i class="fa-solid fa-check"></i>AI proposal drafts</li><li><i class="fa-solid fa-check"></i>Job radar (3 boards)</li><li><i class="fa-solid fa-check"></i>Portal + results dashboard</li><li><i class="fa-solid fa-check"></i>Email support</li></ul>
-    <button class="btn btn-ghost" style="width:100%" onclick="buy('Starter','v50',29)">Start with Starter</button></div>
+    <ul><li><i class="fa-solid fa-check"></i>10 matched jobs / month</li><li><i class="fa-solid fa-check"></i>AI proposal drafts</li><li><i class="fa-solid fa-check"></i>Job radar (3 boards)</li><li><i class="fa-solid fa-check"></i>Dashboard + progress tracking</li><li><i class="fa-solid fa-check"></i>Publish your services</li><li><i class="fa-solid fa-check"></i>Email support</li></ul>
+    <button class="btn btn-g" onclick="buy('Starter','v50',29)">Start with Starter</button></div>
   <div class="tier pop"><span class="pop-tag">MOST POPULAR</span><h3>Growth</h3><div class="price">$79<span>/mo</span></div>
-    <ul><li><i class="fa-solid fa-check"></i>50 actions / month</li><li><i class="fa-solid fa-check"></i>Everything in Starter</li><li><i class="fa-solid fa-check"></i>Client outreach engine</li><li><i class="fa-solid fa-check"></i><strong>WhatsApp + Telegram alerts</strong></li><li><i class="fa-solid fa-check"></i>Priority support</li></ul>
-    <button class="btn btn-primary" style="width:100%" onclick="buy('Growth','v300',79)">Choose Growth</button></div>
+    <ul><li><i class="fa-solid fa-check"></i><strong>Everything in Starter</strong></li><li><i class="fa-solid fa-check"></i>50 actions / month</li><li><i class="fa-solid fa-check"></i>Client outreach engine</li><li><i class="fa-solid fa-check"></i><strong>WhatsApp + Telegram alerts</strong></li><li><i class="fa-solid fa-check"></i>Unlimited services</li><li><i class="fa-solid fa-check"></i>Priority support</li></ul>
+    <button class="btn btn-p" onclick="buy('Growth','v300',79)">Choose Growth</button></div>
   <div class="tier"><h3>Agency</h3><div class="price">$199<span>/mo</span></div>
-    <ul><li><i class="fa-solid fa-check"></i>150 actions / month</li><li><i class="fa-solid fa-check"></i>Everything in Growth</li><li><i class="fa-solid fa-check"></i>Dedicated autonomous robot</li><li><i class="fa-solid fa-check"></i>Weekly strategy report</li><li><i class="fa-solid fa-check"></i>1-on-1 onboarding call</li></ul>
-    <button class="btn btn-ghost" style="width:100%" onclick="buy('Agency','v1000',199)">Go Agency</button></div>
+    <ul><li><i class="fa-solid fa-check"></i><strong>Everything in Growth</strong></li><li><i class="fa-solid fa-check"></i>150 actions / month</li><li><i class="fa-solid fa-check"></i>Dedicated autonomous robot</li><li><i class="fa-solid fa-check"></i>Weekly strategy report</li><li><i class="fa-solid fa-check"></i>1-on-1 onboarding call</li><li><i class="fa-solid fa-check"></i><strong>All current + future features</strong></li></ul>
+    <button class="btn btn-g" onclick="buy('Agency','v1000',199)">Go Agency</button></div>
 </div>
-<div class="card" style="max-width:520px;margin:34px auto 0">
-<h3 style="text-align:center">Checkout</h3>
-<label style="font-size:13px;font-weight:700">Your account email</label>
-<input id="payEmail" type="email" placeholder="you@example.com">
-<p id="paySel" style="color:var(--muted);font-size:.9rem">Selected plan: <strong>Growth — $79/mo</strong></p>
-<p id="payMsg" style="color:#B91C1C;min-height:20px"></p>
-<button class="btn btn-primary" style="width:100%" onclick="payNow()">Pay securely →</button>
-<p style="text-align:center;color:var(--muted);font-size:12px;margin-top:10px"><i class="fa-solid fa-lock"></i> Payments by Paystack · card, bank, USSD</p>
+<div class="steps">
+  <div class="step"><div class="n">1</div><p>Create free account</p></div>
+  <div class="step"><div class="n">2</div><p>Run free audit</p></div>
+  <div class="step"><div class="n">3</div><p>Set up robot + services</p></div>
+  <div class="step"><div class="n">4</div><p>Pick a plan</p></div>
+  <div class="step"><div class="n">5</div><p>Get jobs + alerts</p></div>
 </div>
-</div></section><div id="footer"></div>
+<div class="co" id="checkout">
+  <h3>Secure checkout</h3>
+  <label style="font-size:12px;font-weight:700;color:var(--muted)">YOUR ACCOUNT EMAIL</label>
+  <input id="payEmail" type="email" placeholder="you@example.com">
+  <p id="paySel" style="color:var(--muted);font-size:.9rem;text-align:center">Selected: <strong>Growth — $79/mo</strong></p>
+  <p id="payMsg" style="color:#B91C1C;min-height:18px;text-align:center"></p>
+  <button class="btn btn-p" style="width:100%" onclick="payNow()"><i class="fa-solid fa-lock"></i> Pay securely →</button>
+  <div class="trust"><span><i class="fa-solid fa-shield-halved"></i> Paystack secured</span><span><i class="fa-solid fa-credit-card"></i> Card · Bank · USSD</span><span><i class="fa-solid fa-rotate-left"></i> Cancel anytime</span></div>
+</div>
+</div>
+<div style="height:50px"></div><div id="footer"></div>
 <script src="js/config.js?v=4"></script><script src="js/layout.js?v=11"></script>
 <script>
 var SEL={plan:'Growth',vol:'v300',price:79};
-function buy(plan,vol,price){ SEL={plan:plan,vol:vol,price:price};
-  document.getElementById('paySel').innerHTML='Selected plan: <strong>'+plan+' — $'+price+'/mo</strong>';
-  document.getElementById('payEmail').scrollIntoView({behavior:'smooth'}); }
+function buy(p,v,pr){SEL={plan:p,vol:v,price:pr};document.getElementById('paySel').innerHTML='Selected: <strong>'+p+' — $'+pr+'/mo</strong>';document.getElementById('checkout').scrollIntoView({behavior:'smooth'});}
 function payNow(){
-  var email=document.getElementById('payEmail').value.trim().toLowerCase();
-  var msg=document.getElementById('payMsg');
-  if(!email||email.indexOf('@')<0){ msg.textContent='Enter your account email first.'; return; }
-  var API=window.RF_API||'';
-  msg.textContent=''; fetch(API+'/api/paystack-public').then(function(r){return r.json();}).then(function(cfg){
-    var amount = cfg.currency==='USD' ? SEL.price*100 : Math.round(SEL.price*cfg.rate)*100;
-    var handler = PaystackPop.setup({
-      key: cfg.key, email: email, amount: amount, currency: cfg.currency==='USD'?'USD':cfg.currency,
-      callback: function(resp){
-        fetch(API+'/api/subscribe',{method:'POST',headers:{'Content-Type':'text/plain'},
-          body:JSON.stringify({email:email,plan:SEL.plan,volume:SEL.vol,modules:SEL.plan,ref:resp.reference})})
-        .then(function(){ window.location.href='portal.html?authed='+encodeURIComponent(email); });
-      },
-      onClose: function(){}
-    });
-    handler.openIframe();
-  }).catch(function(){ msg.textContent='Server waking up — try again in 20s.'; });
+  var email=document.getElementById('payEmail').value.trim().toLowerCase();var msg=document.getElementById('payMsg');
+  if(!email||email.indexOf('@')<0){msg.textContent='Enter your account email first.';return;}
+  var API=window.RF_API||'';msg.textContent='';
+  fetch(API+'/api/paystack-public').then(r=>r.json()).then(function(cfg){
+    var amount=cfg.currency==='USD'?SEL.price*100:Math.round(SEL.price*cfg.rate)*100;
+    PaystackPop.setup({key:cfg.key,email:email,amount:amount,currency:cfg.currency==='USD'?'USD':cfg.currency,
+      callback:function(resp){fetch(API+'/api/subscribe',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:email,plan:SEL.plan,volume:SEL.vol,modules:SEL.plan,ref:resp.reference})}).then(function(){location.href='portal.html?authed='+encodeURIComponent(email);});},
+      onClose:function(){}}).openIframe();
+  }).catch(function(){msg.textContent='Server waking up — try again in 20s.';});
 }
 </script></body></html>
