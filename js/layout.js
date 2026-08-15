@@ -6,10 +6,10 @@
   function links(cls){ return pages.map(function(p){ return '<a class="'+cls+'" href="'+L(p[0])+'">'+p[1]+'</a>'; }).join(''); }
   var cta = sess
     ? '<a class="rf-btn ghost" href="'+L('portal.html')+'">My Portal</a><a class="rf-btn solid" id="rfLogout" href="index.html">Log out</a>'
-    : '<a class="rf-btn ghost" href="'+L('login.html')+'">Log in</a><a class="rf-btn solid" href="'+L('signup.html')+'">Get started</a>';
+    : '<a class="rf-btn ghost" href="'+L('signin.html')+'">Log in</a><a class="rf-btn solid" href="'+L('register.html')+'">Get started</a>';
   var mcta = sess
     ? '<a class="rf-btn ghost" href="'+L('portal.html')+'">My Portal</a><a class="rf-btn solid" id="rfLogoutM" href="index.html">Log out</a>'
-    : '<a class="rf-btn ghost" href="'+L('login.html')+'">Log in</a><a class="rf-btn solid" href="'+L('signup.html')+'">Get started</a>';
+    : '<a class="rf-btn ghost" href="'+L('signin.html')+'">Log in</a><a class="rf-btn solid" href="'+L('register.html')+'">Get started</a>';
   var header = document.getElementById('header');
   if (header) header.innerHTML =
     '<header class="rf-header"><div class="rf-wrap">' +
