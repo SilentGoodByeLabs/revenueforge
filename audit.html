@@ -17,8 +17,10 @@ function runAudit(){
   var API=window.RF_API||'';
   var out=document.getElementById('au_out');
   out.innerHTML='<p style="color:var(--muted)">Scanning live job feeds…</p>';
-  fetch(API+'/api/audit?skills='+encodeURIComponent(document.getElementById('au_skills').value)+'&target='+encodeURIComponent(document.getElementById('au_target').value))
+  var sess=null;try{sess=JSON.parse(localStorage.getItem('rf_session')||'null');}catch(e){}
+  fetch(API+'/api/audit?skills='+encodeURIComponent(document.getElementById('au_skills').value)+'&target='+encodeURIComponent(document.getElementById('au_target').value)+(sess&&sess.email?'&member='+encodeURIComponent(sess.email):''))
   .then(function(r){return r.json();}).then(function(d){
+    if(d.used){ out.innerHTML='<div class="card" style="text-align:center"><h3>Free audit already used on this network</h3><p style="color:var(--muted)">Create a free verified account to unlock unlimited audits.</p><a class="btn btn-primary" href="signup.html">Create account</a></div>'; return; }
     var h='<h3 style="margin-bottom:12px"><i class="fa-solid fa-briefcase"></i> Top matches for you right now</h3>';
     if(!d.jobs||!d.jobs.length) h+='<p style="color:var(--muted)">The radar is warming up — create a free account and it will scan for you every 30 minutes.</p>';
     d.jobs.forEach(function(j){ h+='<div class="a-job"><strong>'+j.title+'</strong><span class="score">'+j.score+'% match</span><br><span style="color:var(--muted);font-size:13px">'+(j.platform||'')+'</span><br><a style="color:var(--accent)" href="'+j.url+'" target="_blank">View job →</a></div>'; });
