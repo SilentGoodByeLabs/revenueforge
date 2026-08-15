@@ -1,6 +1,6 @@
 (function () {
   var sess = null; try { sess = JSON.parse(localStorage.getItem('rf_session') || 'null'); } catch (e) {}
-  var pages = [['index.html','Home'],['pricing.html','Pricing'],['portal.html','My Portal']];
+  var pages = [['index.html','Home'],['pricing.html','Pricing'],['audit.html','Free Audit'],['portal.html','My Portal']];
   function links(cls){ return pages.map(function(p){ return '<a class="'+cls+'" href="'+p[0]+'">'+p[1]+'</a>'; }).join(''); }
   var cta = sess
     ? '<a class="rf-btn ghost" href="portal.html">My Portal</a><a class="rf-btn solid" id="rfLogout" href="index.html">Log out</a>'
