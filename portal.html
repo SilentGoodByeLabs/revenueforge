@@ -42,6 +42,7 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
   <button class="nav-i" data-p="robot"><i class="fa-solid fa-robot"></i> My Robot</button>
   <button class="nav-i" data-p="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
   <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
+  <button class="nav-i" data-p="social"><i class="fa-solid fa-share-nodes"></i> Social Selling</button>
   <button class="nav-i" data-p="plan"><i class="fa-solid fa-crown"></i> Plan & Billing</button>
   <button class="nav-i" data-p="set"><i class="fa-solid fa-sliders"></i> Settings & Alerts</button>
   <button class="nav-i" data-p="help"><i class="fa-solid fa-life-ring"></i> Help & Guide</button>
@@ -89,6 +90,13 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
     </div>
     <div class="card"><h3><i class="fa-solid fa-list"></i> Published services</h3><div id="servBody" class="muted">Loading…</div></div>
   </section>
+  <section id="p-social" class="panel">
+  <div class="crumb">Dashboard / Social Selling</div><div class="ptitle">Sell on every platform</div>
+  <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts</h3>
+    <p class="muted">Pick a service, then post it to any platform — the caption is written for you.</p>
+    <div id="socialBody" class="muted">Loading your services…</div>
+  </div>
+</section>
   <section id="p-plan" class="panel">
     <div class="crumb">Dashboard / Plan</div><div class="ptitle">Plan & Billing</div>
     <div class="card"><div id="planBody" class="muted">Loading…</div></div>
@@ -135,4 +143,18 @@ loadServ();
 function addServ(){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:sv_name.value,price:sv_price.value,description:sv_desc.value})}).then(function(){sv_name.value='';sv_price.value='';sv_desc.value='';loadServ();});}
 fetch(API+'/api/subscriber/'+E+'/profile').then(r=>r.json()).then(function(d){if(d.has){ob_mode.value=d.mode||'jobs';ob_skills.value=d.skills||'';ob_target.value=d.target||'';ob_wa.value=d.whatsapp||'';ob_tg.value=d.telegram||'';}});
 function saveSet(){fetch(API+'/api/subscriber/profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:ob_mode.value,skills:ob_skills.value,target:ob_target.value,whatsapp:ob_wa.value,telegram:ob_tg.value})}).then(function(){document.getElementById('setMsg').textContent='✓ Saved — your robot remembers this forever.';});}
-</script></body></html>
+</script>
+function loadSocial(){fetch(API+'/api/my/products?email='+E).then(function(r){return r.json();}).then(function(d){
+  var l=d.products||[];var box=document.getElementById('socialBody');
+  if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
+  box.innerHTML=l.map(function(p,i){var cap=encodeURIComponent('I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/');var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
+    return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +'<a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+cap+'">X</a>'
+    +'<a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+cap+'">FB</a>'
+    +'<a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a>'
+    +'<a class="btn btn-g" target="_blank" href="https://wa.me/?text='+cap+'">WA</a>'
+    +'<a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+cap+'">TG</a>'
+    +'</div></div>';}).join('');
+});}
+loadSocial();
+</body></html>
