@@ -41,13 +41,14 @@ function runAudit(){
     var h='<div class="sec"><i class="fa-solid fa-briefcase"></i> Top job matches for you</div><div class="grid">';
     (d.jobs||[]).forEach(function(j){h+='<div class="card"><div class="t">'+j.title+'</div><div class="muted">'+(j.platform||'')+'</div><div style="margin-top:8px"><span class="score">'+j.score+'% match</span> <a style="color:var(--accent);font-size:.8rem" href="'+j.url+'" target="_blank">View →</a></div></div>';});
     h+='</div><div class="sec"><i class="fa-solid fa-boxes-stacked"></i> Services you could sell</div><div class="grid">';
-    (d.services||[]).forEach(function(sv,i){h+='<div class="card"><div class="t">'+sv+'</div><button class="mini" onclick="addServ(this,\''+sv.replace(/'/g,"")+'\')"><i class="fa-solid fa-plus"></i> Add to my services</button></div>';});
+    (d.services||[]).forEach(function(sv,i){var o=(typeof sv==='string')?{name:sv,desc:''}:sv;h+='<div class="card"><div class="t">'+o.name+'</div><div class="muted">'+(o.desc||'')+'</div>'<button class="mini" onclick="addServ(this,\''+sv.replace(/'/g,"")+'\')"><i class="fa-solid fa-plus"></i> Add to my services</button></div>';});
     h+='</div><div class="sec"><i class="fa-solid fa-building"></i> Companies that want you</div><div class="grid">';
     (d.leads||[]).forEach(function(l){h+='<div class="card"><div class="t"><i class="fa-solid fa-building" style="color:var(--accent)"></i> '+l+'</div><div class="muted">Outreach target — our engine can contact them for you on Growth+.</div></div>';});
-    h+='</div><div class="card" style="margin-top:26px;text-align:center"><h3>Put it all on autopilot</h3><p class="muted">Create a free account — your robot delivers these results for you.</p><a class="btn btn-p" href="register.html">Create free account</a> <a class="btn btn-g" href="pricing.html">See packages</a></div>';
+    h+='</div><div class="sec"><i class="fa-solid fa-globe"></i> Search more platforms</div><div class="grid">'+platLinks()+'</div><div class="card" style="margin-top:26px;text-align:center"><h3>Put it all on autopilot</h3><p class="muted">Create a free account — your robot delivers these results for you.</p><a class="btn btn-p" href="register.html">Create free account</a> <a class="btn btn-g" href="pricing.html">See packages</a></div>';
     out.innerHTML=h;
   }).catch(function(){out.innerHTML='<p class="muted">Server waking up — try again in 20s.</p>';});
 }
+function platLinks(){var q=encodeURIComponent(au_skills.value||'developer');var P=[['RemoteOK','https://remoteok.com/remote-'],['We Work Remotely','https://weworkremotely.com/remote-jobs/search?term='],['Upwork','https://www.upwork.com/nx/search/jobs/?term='],['LinkedIn','https://www.linkedin.com/jobs/search/?keywords='],['Reddit','https://www.reddit.com/search/?q=']];return P.map(function(p){return '<div class="card"><div class="t"><i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--accent)"></i> '+p[0]+'</div><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+p[1]+q+'">Live '+p[0]+' matches →</a></div>';}).join('');}
 function addServ(btn,name){
   if(!sess||!sess.email){location.href='register.html';return;}
   var API=window.RF_API||'';
