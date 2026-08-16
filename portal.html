@@ -73,15 +73,13 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
     </div>
   </section>
   <section id="p-robot" class="panel">
-  <div class="crumb">Dashboard / My Robot</div><div class="ptitle">My Robot</div>
+  <div class="crumb">Dashboard / My Robot</div><div class="ptitle">My Autonomous Robot</div>
   <div class="card"><h3><i class="fa-solid fa-robot"></i> Your autonomous robot</h3>
-    <p id="robotStatus" style="color:var(--muted)">Loading…</p>
-    <button id="runBtn" class="btn btn-p" style="width:100%;margin-top:10px" onclick="runRobot()"><i class="fa-solid fa-play"></i> Run my robot now</button>
-    <p id="runMsg" style="color:#16A34A;min-height:20px;margin-top:8px"></p>
+    <p class="muted" id="robotTier">Scans job boards and delivers matches to you.</p>
+    <button class="btn btn-p" id="runBtn" onclick="runRobot()"><i class="fa-solid fa-play"></i> Run my robot now</button>
+    <div id="robotStatus" style="margin-top:10px;color:var(--muted);font-size:.85rem"></div>
   </div>
-  <div class="card"><h3><i class="fa-solid fa-circle-info"></i> How it works</h3>
-    <p style="color:var(--muted);line-height:1.7">1 · Set skills/target in <b>Settings</b>. 2 · Press <b>Run</b> — the robot scans job boards & finds clients for you. 3 · Results land in <b>Jobs & Progress</b> with ready proposal drafts. 4 · Free = a few runs/day; paid plans get many more + alerts.</p>
-  </div>
+  <div class="card"><h3><i class="fa-solid fa-briefcase"></i> Latest matches</h3><div id="robotJobs" style="color:var(--muted)">Press “Run my robot now” to scan.</div></div>
 </section>
 <section id="p-jobs" class="panel">
     <div class="crumb">Dashboard / Jobs</div><div class="ptitle">Jobs & Progress</div>
