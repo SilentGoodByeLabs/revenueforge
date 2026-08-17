@@ -20,26 +20,28 @@ body{background:#F4F6FA}
 .kpi .ic{float:right;color:var(--accent)}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
 .card h3{font-family:'Sora';font-size:1rem;margin-bottom:12px}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .row:last-child{border-bottom:0}
 .badge{font-size:.7rem;font-weight:700;border-radius:99px;padding:3px 10px}
-.b-green{background:#DCFCE7;color:#15803D}.b-blue{background:#DBEAFE;color:#1D4ED8}.b-amber{background:#FEF3C7;color:#B45309}
+.b-green{background:#DCFCE7;color:#15803D}.b-blue{background:#DBEAFE;color:#1D4ED8}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16A34A;margin-right:6px;animation:pulse 1.6s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px}
-.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
 .muted{color:var(--muted);font-size:.85rem}
 @media (max-width:900px){.dash{grid-template-columns:1fr}.side{position:static}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
 </style></head><body><div id="header"></div>
-<script>(function(){var q=new URLSearchParams(location.search);var a=q.get('authed');if(a){localStorage.setItem('rf_session',JSON.stringify({email:a}));history.replaceState(null,'',location.pathname);}})();</script>
+<script>
+(function(){var q=new URLSearchParams(location.search);var a=q.get('authed');if(a){localStorage.setItem('rf_session',JSON.stringify({email:a}));history.replaceState(null,'',location.pathname);}})();
+</script>
 <div class="dash">
 <aside class="side">
   <div class="brand"><img src="assets/logo.png" alt="">Revenue<b style="color:var(--accent)">Forge</b></div>
   <div class="user" id="uEmail">…</div>
   <button class="nav-i active" data-p="ov"><i class="fa-solid fa-chart-line"></i> Overview</button>
-  <button class="nav-i" data-p="robot"><i class="fa-solid fa-robot"></i> My Robot</button>
+  <button class="nav-i" data-p="robot"><i class="fa-solid fa-robot"></i> My Engine</button>
   <button class="nav-i" data-p="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
   <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
   <button class="nav-i" data-p="social"><i class="fa-solid fa-share-nodes"></i> Social Selling</button>
@@ -54,25 +56,25 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
       <div class="kpi"><i class="ic fa-solid fa-briefcase"></i><div class="n" id="kJobs">0</div><div class="l">Jobs delivered</div></div>
       <div class="kpi"><i class="ic fa-solid fa-boxes-stacked"></i><div class="n" id="kServ">0</div><div class="l">Active services</div></div>
       <div class="kpi"><i class="ic fa-solid fa-crown"></i><div class="n" id="kPlan" style="font-size:1.05rem">Free</div><div class="l">Current plan</div></div>
-      <div class="kpi"><i class="ic fa-solid fa-robot"></i><div class="n" style="font-size:1.05rem"><span class="dot"></span>Active</div><div class="l">Robot status</div></div>
+      <div class="kpi"><i class="ic fa-solid fa-robot"></i><div class="n" style="font-size:1.05rem"><span class="dot"></span>Active</div><div class="l">Engine status</div></div>
     </div>
     <div class="grid2">
       <div class="card"><h3><i class="fa-solid fa-rocket"></i> Quick start</h3>
-        <div class="row"><span>1 · Configure robot</span><button class="btn btn-g" onclick="go('set')">Open</button></div>
+        <div class="row"><span>1 · Configure engine</span><button class="btn btn-g" onclick="go('set')">Open</button></div>
         <div class="row"><span>2 · Add services</span><button class="btn btn-g" onclick="go('serv')">Open</button></div>
         <div class="row"><span>3 · Activate a plan</span><button class="btn btn-p" onclick="go('plan')">Upgrade</button></div>
       </div>
-      <div class="card"><h3><i class="fa-solid fa-robot"></i> Your robot</h3>
-        <p class="muted"><span class="dot"></span>Running autonomously — scans every 10 minutes, delivers matches to you. No action needed.</p>
-        <button class="btn btn-p" onclick="go('robot')">View my robot</button>
+      <div class="card"><h3><i class="fa-solid fa-robot"></i> Your engine</h3>
+        <p class="muted"><span class="dot"></span>Running autonomously — it searches jobs and sells for you every 10 minutes. No action needed.</p>
+        <button class="btn btn-p" onclick="go('robot')">Open my engine</button>
       </div>
     </div>
   </section>
   <section id="p-robot" class="panel">
-    <div class="crumb">Dashboard / My Robot</div><div class="ptitle">My Autonomous Robot</div>
-    <div class="card"><h3><span class="dot"></span> Your autonomous robot</h3>
-      <p class="muted" id="robotTier">Running in the cloud — it never stops. It scans job boards and delivers matches to you automatically.</p>
-      <button class="btn btn-p" onclick="runRobot()"><i class="fa-solid fa-bolt"></i> Scan now (instant)</button>
+    <div class="crumb">Dashboard / My Engine</div><div class="ptitle">My Autonomous Engine</div>
+    <div class="card"><h3><span class="dot"></span> Your autonomous engine</h3>
+      <p class="muted" id="robotTier">It never stops. It searches job boards & social platforms and delivers matches to you automatically.</p>
+      <button class="btn btn-p" onclick="runRobot()"><i class="fa-solid fa-bolt"></i> Search now (instant)</button>
       <div id="robotStatus" class="muted" style="margin-top:10px"></div>
     </div>
     <div class="card"><h3><i class="fa-solid fa-briefcase"></i> Latest matches</h3><div id="robotJobs" class="muted">Loading…</div></div>
@@ -91,19 +93,19 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
     <div class="card"><h3><i class="fa-solid fa-list"></i> Published services</h3><div id="servBody" class="muted">Loading…</div></div>
   </section>
   <section id="p-social" class="panel">
-  <div class="crumb">Dashboard / Social Selling</div><div class="ptitle">Sell on every platform</div>
-  <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts</h3>
-    <p class="muted">Pick a service, then post it to any platform — the caption is written for you.</p>
-    <div id="socialBody" class="muted">Loading your services…</div>
-  </div>
-</section>
+    <div class="crumb">Dashboard / Social Selling</div><div class="ptitle">Sell on every platform</div>
+    <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts</h3>
+      <p class="muted">Pick a service — the caption is written for you. Post it anywhere.</p>
+      <div id="socialBody" class="muted">Loading your services…</div>
+    </div>
+  </section>
   <section id="p-plan" class="panel">
     <div class="crumb">Dashboard / Plan</div><div class="ptitle">Plan & Billing</div>
     <div class="card"><div id="planBody" class="muted">Loading…</div></div>
   </section>
   <section id="p-set" class="panel">
     <div class="crumb">Dashboard / Settings</div><div class="ptitle">Settings & Alerts</div>
-    <div class="card"><h3><i class="fa-solid fa-robot"></i> Robot configuration</h3>
+    <div class="card"><h3><i class="fa-solid fa-robot"></i> Engine configuration</h3>
       <label class="muted">MODE</label><select id="ob_mode"><option value="jobs">Find me jobs</option><option value="outreach">Find me clients</option><option value="both">Both</option></select>
       <label class="muted">SKILLS</label><textarea id="ob_skills" rows="2"></textarea>
       <label class="muted">TARGET</label><textarea id="ob_target" rows="2"></textarea>
@@ -116,10 +118,10 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
   <section id="p-help" class="panel">
     <div class="crumb">Dashboard / Help</div><div class="ptitle">Help & Guide</div>
     <div class="card"><h3><i class="fa-solid fa-book"></i> How it works</h3>
-      <div class="row"><span>1 · Configure your robot (Settings) — it remembers forever</span></div>
-      <div class="row"><span>2 · Your robot scans every 10 min and delivers matches</span></div>
-      <div class="row"><span>3 · Add services so we know what to sell for you</span></div>
-      <div class="row"><span>4 · Upgrade for more daily matches + WhatsApp/Telegram alerts</span></div>
+      <div class="row"><span>1 · Configure your engine — it remembers forever</span></div>
+      <div class="row"><span>2 · It searches jobs & social platforms every 10 min</span></div>
+      <div class="row"><span>3 · Add services; sell them everywhere with one tap</span></div>
+      <div class="row"><span>4 · Upgrade for more matches + WhatsApp/Telegram alerts</span></div>
     </div>
   </section>
 </main>
@@ -131,30 +133,19 @@ var sess=null;try{sess=JSON.parse(localStorage.getItem('rf_session')||'null');}c
 if(!sess||!sess.email)location.href='signin.html';
 var API=window.RF_API||'';var E=encodeURIComponent(sess.email);
 document.getElementById('uEmail').textContent=sess.email;
-function go(p){document.querySelectorAll('.nav-i').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');}
-document.querySelectorAll('.nav-i').forEach(b=>b.addEventListener('click',()=>go(b.dataset.p)));
-function renderJobs(list,el){el.innerHTML=list.length?list.map(function(r){return '<div class="row"><div><strong>'+r.title+'</strong><br><span class="muted">'+(r.platform||'')+'</span></div><div style="text-align:right"><span class="badge b-blue">'+r.score+'%</span><br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+r.url+'">View →</a></div></div>';}).join(''):'No matches yet — your robot is scanning; results appear within minutes.';}
-function loadResults(){fetch(API+'/api/subscriber/'+E+'/results').then(r=>r.json()).then(function(d){var l=d.results||[];document.getElementById('kJobs').textContent=l.length;renderJobs(l,document.getElementById('jobsBody'));renderJobs(l,document.getElementById('robotJobs'));});}
-loadResults();
-function runRobot(){var st=document.getElementById('robotStatus');st.textContent='Scanning job boards…';fetch(API+'/api/run-robot?email='+E).then(r=>r.json()).then(function(d){st.textContent='✓ Done — '+(d.results||[]).length+' match(es).';renderJobs(d.results||[],document.getElementById('robotJobs'));loadResults();}).catch(function(){st.textContent='Scanner busy — try again shortly.';});}
-fetch(API+'/api/sub/'+E).then(r=>r.json()).then(function(d){document.getElementById('kPlan').textContent=d.has?d.plan:'Free';document.getElementById('robotTier').textContent=(d.has?('Plan: '+d.plan+' — '):'Free tier — ')+'your robot runs autonomously in the cloud.';document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>You are on the free tier (2 matches/day).</p><a class="btn btn-p" href="pricing.html">View packages</a>';});
-function loadServ(){fetch(API+'/api/my/products?email='+E).then(r=>r.json()).then(function(d){var l=d.products||[];document.getElementById('kServ').textContent=l.length;document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+p.description+'</span></div><div style="text-align:right"><strong>$'+p.price+'</strong><br><span class="badge b-green">'+p.status+'</span></div></div>';}).join(''):'No services yet — publish your first one above.';});}
+function go(p){document.querySelectorAll('.nav-i').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');}
+document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.p);});});
+function renderJobs(list,el){el.innerHTML=list.length?list.map(function(r){return '<div class="row"><div><strong>'+r.title+'</strong><br><span class="muted">'+(r.platform||'')+'</span></div><div style="text-align:right"><span class="badge b-blue">'+r.score+'%</span><br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+r.url+'">View →</a></div></div>';}).join(''):'No matches yet — your engine is searching; results appear within minutes.';}
+function loadResults(auto){fetch(API+'/api/subscriber/'+E+'/results').then(function(r){return r.json();}).then(function(d){var l=d.results||[];document.getElementById('kJobs').textContent=l.length;renderJobs(l,document.getElementById('jobsBody'));renderJobs(l,document.getElementById('robotJobs'));if(!l.length&&auto)runRobot(true);}).catch(function(){});}
+loadResults(true);
+function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching job boards & social platforms…';fetch(API+'/api/run-robot?email='+E).then(function(r){return r.json();}).then(function(d){if(!silent)st.textContent='✓ Done — '+(d.results||[]).length+' match(es).';renderJobs(d.results||[],document.getElementById('robotJobs'));loadResults(false);}).catch(function(){if(!silent)st.textContent='Engine warming up — try again in a few seconds.';});}
+fetch(API+'/api/sub/'+E).then(function(r){return r.json();}).then(function(d){document.getElementById('kPlan').textContent=d.has?d.plan:'Free';document.getElementById('robotTier').textContent=(d.has?('Plan: '+d.plan+' — '):'Free tier — ')+'your engine runs autonomously in the cloud.';document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>You are on the free tier (2 matches/day).</p><a class="btn btn-p" href="pricing.html">View packages</a>';}).catch(function(){});
+function loadServ(){fetch(API+'/api/my/products?email='+E).then(function(r){return r.json();}).then(function(d){var l=d.products||[];document.getElementById('kServ').textContent=l.length;document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+p.description+'</span></div><div style="text-align:right"><strong>$'+p.price+'</strong><br><span class="badge b-green">'+p.status+'</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}).catch(function(){});}
 loadServ();
-function addServ(){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:sv_name.value,price:sv_price.value,description:sv_desc.value})}).then(function(){sv_name.value='';sv_price.value='';sv_desc.value='';loadServ();});}
-fetch(API+'/api/get-profile?email='+E).then(r=>r.json()).then(function(d){if(d.has){ob_mode.value=d.mode||'jobs';ob_skills.value=d.skills||'';ob_target.value=d.target||'';ob_wa.value=d.whatsapp||'';ob_tg.value=d.telegram||'';}});
-function saveSet(){fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:ob_mode.value,skills:ob_skills.value,target:ob_target.value,whatsapp:ob_wa.value,telegram:ob_tg.value})}).then(function(){document.getElementById('setMsg').textContent='✓ Saved — your robot remembers this forever.';});}
-</script>
-function loadSocial(){fetch(API+'/api/my/products?email='+E).then(function(r){return r.json();}).then(function(d){
-  var l=d.products||[];var box=document.getElementById('socialBody');
-  if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
-  box.innerHTML=l.map(function(p,i){var cap=encodeURIComponent('I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/');var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
-    return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap">'
-    +'<a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+cap+'">X</a>'
-    +'<a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+cap+'">FB</a>'
-    +'<a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a>'
-    +'<a class="btn btn-g" target="_blank" href="https://wa.me/?text='+cap+'">WA</a>'
-    +'<a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+cap+'">TG</a>'
-    +'</div></div>';}).join('');
-});}
-loadSocial();
-</body></html>
+function addServ(){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).then(function(){document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();});}
+function loadSocial(l){var box=document.getElementById('socialBody');l=l||[];if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
+box.innerHTML=l.map(function(p){var cap=encodeURIComponent('I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/');var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
+return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+cap+'">X</a><a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+cap+'">FB</a><a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-g" target="_blank" href="https://wa.me/?text='+cap+'">WA</a><a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+cap+'">TG</a></div></div>';}).join('');}
+fetch(API+'/api/get-profile?email='+E).then(function(r){return r.json();}).then(function(d){if(d.has){document.getElementById('ob_mode').value=d.mode||'jobs';document.getElementById('ob_skills').value=d.skills||'';document.getElementById('ob_target').value=d.target||'';document.getElementById('ob_wa').value=d.whatsapp||'';document.getElementById('ob_tg').value=d.telegram||'';}}).catch(function(){});
+function saveSet(){fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value})}).then(function(){document.getElementById('setMsg').textContent='✓ Saved — your engine remembers this forever.';});}
+</script></body></html>
