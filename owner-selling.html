@@ -1,9 +1,18 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Owner Selling | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
-<style>body{background:#F4F6FA}.wrap{max-width:900px;margin:0 auto;padding:24px 16px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}.card h3{font-family:'Sora';margin-bottom:12px}input,select,textarea{width:100%;margin:6px 0 12px;padding:11px;border:1.5px solid var(--line);border-radius:10px}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}.btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn-s{background:#EFF4FF;color:var(--accent);font-size:.8rem;padding:6px 10px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.badge{background:#DCFCE7;color:#15803D;font-size:.7rem;padding:3px 8px;border-radius:99px}@media(max-width:700px){.grid{grid-template-columns:1fr}}</style></head>
+<style>body{background:#F4F6FA}.wrap{max-width:900px;margin:0 auto;padding:24px 16px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}.card h3{font-family:'Sora';margin-bottom:12px}input,select,textarea{width:100%;margin:6px 0 12px;padding:11px;border:1.5px solid var(--line);border-radius:10px}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}.btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn-s{background:#EFF4FF;color:var(--accent);font-size:.8rem;padding:6px 10px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.badge{background:#DCFCE7;color:#15803D;font-size:.7rem;padding:3px 8px;border-radius:99px}.switch{position:relative;width:56px;height:30px;background:#ccc;border-radius:99px;cursor:pointer;transition:.2s;display:inline-block;vertical-align:middle}.switch.on{background:#16A34A}.switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:.2s}.switch.on .knob{left:29px}.muted{color:var(--muted);font-size:.85rem}@media(max-width:700px){.grid{grid-template-columns:1fr}}</style></head>
 <body>
 <div class="wrap">
 <h1 style="font-family:'Sora'"><i class="fa-solid fa-crown"></i> Owner Selling Engine</h1>
-<p class="muted">Publish your products with media, advertise on all platforms, sell directly.</p>
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center">
+  <div><h3 style="margin:0"><i class="fa-solid fa-robot"></i> Auto-Advertise Engine</h3>
+  <div id="engStatus" class="muted">Engine OFF — turn ON to advertise everywhere automatically.</div></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn btn-p" onclick="advertiseNow()"><i class="fa-solid fa-bullhorn"></i> Advertise Now</button>
+    <div class="switch" id="engSwitch" onclick="toggleEngine()"><div class="knob"></div></div>
+  </div>
+</div>
+<p class="muted">When ON, the engine advertises your products on Marketplace + Telegram + 9 platforms and keeps running even if you close this page. You just wait for messages on your chosen contact (WhatsApp/Telegram/Email/Phone).</p>
 
 <div class="card">
 <h3><i class="fa-solid fa-plus"></i> Publish Your Product</h3>
@@ -27,7 +36,13 @@
 </div>
 
 <script>
-var API='http://localhost:8502';
+var OWNER='admin@gmail.com';var ENGINE_ON=false;var API='http://localhost:8502';var PRODS=[];
+
+function loadEngine(){fetch(API+'/api/get-profile?email='+OWNER).then(function(r){return r.json();}).then(function(d){ENGINE_ON=!!(d&&d.engine_on);paint();});}
+function paint(){document.getElementById('engSwitch').classList.toggle('on',ENGINE_ON);document.getElementById('engStatus').innerHTML=ENGINE_ON?'<span style="color:#16A34A">●</span> Engine ON — advertising everywhere. Waiting for messages on your contact.':'Engine OFF — turn ON to advertise everywhere automatically.';}
+function toggleEngine(){ENGINE_ON=!ENGINE_ON;paint();fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:OWNER,on:ENGINE_ON})}).catch(function(){});}
+function advertiseNow(){fetch(API+'/api/owner/advertise-now',{method:'POST'}).then(function(r){return r.json();}).then(function(d){alert('✓ Advertised '+d.advertised+' product(s) everywhere.');loadProducts();});}
+
 function allPlatforms(){return ['X (Twitter)','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit'];}
 function adCopy(p,pl){return pl+' ad: '+p.name+' — '+(p.description||'')+' Only $'+p.price+'! Contact: '+(p.contact_value||'');}
 function shareLinks(p){var cap=p.name+' — '+(p.description||'')+' $'+p.price+'. Contact: '+(p.contact_value||'');var ce=encodeURIComponent(cap);
@@ -42,12 +57,11 @@ function shareLinks(p){var cap=p.name+' — '+(p.description||'')+' $'+p.price+'
  +'<a class="btn btn-g" target="_blank" href="https://www.pinterest.com/pin/create/button/?description='+ce+'">Pin</a>'
  +'<a class="btn btn-g" target="_blank" href="https://www.snapchat.com/">Snap</a>'
  +'<a class="btn btn-g" target="_blank" href="https://www.reddit.com/submit?title='+ce+'">Reddit</a>';}
-function copyAds(i){var p=window.PRODS[i];var ads=allPlatforms().map(function(pl){return adCopy(p,pl);}).join('\n\n');
+function copyAds(i){var p=PRODS[i];var ads=allPlatforms().map(function(pl){return adCopy(p,pl);}).join('\n\n');
  if(navigator.clipboard){navigator.clipboard.writeText(ads).then(function(){alert('All ads copied!');});}else{prompt('Copy:',ads);}}
-function advertiseNow(){fetch(API+'/api/owner/advertise-now',{method:'POST'}).then(function(r){return r.json();}).then(function(d){alert('✓ Advertised '+d.advertised+' product(s) everywhere.');loadProducts();});}
 function loadProducts(){fetch(API+'/api/owner/products').then(function(r){return r.json();}).then(function(d){
- window.PRODS=d.products||[];var b=document.getElementById('prodList');
- b.innerHTML=window.PRODS.length?window.PRODS.map(function(p,i){
+ PRODS=d.products||[];var b=document.getElementById('prodList');
+ b.innerHTML=PRODS.length?PRODS.map(function(p,i){
   var media=p.image?'<img src="'+p.image+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px">':p.video?'<video src="'+p.video+'" style="width:60px;height:60px;border-radius:6px"></video>':'';
   return '<div class="row">'+(media||'')+'<div style="flex:1;margin-left:10px"><strong>'+p.name+'</strong> <span class="badge">$'+p.price+'</span><br><span class="muted">'+(p.description||'')+'</span><br><span class="muted">'+(p.contact_method||'email')+': '+(p.contact_value||'')+'</span>'
    +'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">'+shareLinks(p)+' <button class="btn btn-s" onclick="copyAds('+i+')">Copy all ads</button></div>'
@@ -59,6 +73,6 @@ function addProduct(){var img=document.getElementById('p_image').files[0];var vi
  if(img||vid){var fd=new FormData();if(img)fd.append('file',img);if(vid)fd.append('file',vid);
   fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){finish(d.link||'',vid?d.link:'');}).catch(function(){finish('','');});}
  else finish('','');}
-loadProducts();
+loadEngine();loadProducts();
 </script>
 </body></html>
