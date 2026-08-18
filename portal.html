@@ -132,7 +132,8 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
       <label class="muted">TARGET</label><textarea id="ob_target" rows="2"></textarea>
       <label class="muted">WHATSAPP (Growth+)</label><input id="ob_wa" type="tel">
       <label class="muted">TELEGRAM (Growth+)</label><input id="ob_tg">
-      <p id="setMsg" style="color:#16A34A;min-height:18px"></p>
+      <label class="muted">ENGINE STATUS</label><select id="ob_engine"><option value="on">On — searching for me</option><option value="off">Off — paused</option></select>
+<p id="setMsg" style="color:#16A34A;min-height:18px"></p>
       <button class="btn btn-p" onclick="saveSet()">Save settings</button>
     </div>
   </section>
@@ -180,8 +181,8 @@ function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'
 function prospects(){try{return JSON.parse(localStorage.getItem('rf_prospects')||'[]');}catch(e){return[];}}
 function apps(){try{return JSON.parse(localStorage.getItem('rf_apps')||'[]');}catch(e){return[];}}
 function localMatches(){var pr=profile();var words=(pr.skills+' '+pr.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
- var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9)};});
- s.sort(function(a,b){return b.score-a.score;});return s;}
+ var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9),hits:h};});
+ var rel=words.length? s.filter(function(x){return x.hits>0;}) : s; rel.sort(function(a,b){return b.score-a.score;}); return rel;
 function liveJobs(words,cb){var out=[];var d=0;function f(){d++;if(d>=2)cb(out);}
  var q=encodeURIComponent((words||'python developer').slice(0,60));
  fetch('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story').then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70,comment:'https://news.ycombinator.com/item?id='+(h.objectID||'')});});f();}).catch(f);
@@ -194,7 +195,7 @@ window.addEventListener('hashchange',function(){var h=(location.hash||'').replac
 function appStatus(t){var a=apps().find(function(x){return x.title===t;});return a?a.status:null;}
 var PLATFORM_DM={X:'https://twitter.com/messages',Facebook:'https://www.facebook.com/messages',Instagram:'https://www.instagram.com/direct/inbox/',LinkedIn:'https://www.linkedin.com/messaging/',Telegram:'https://web.telegram.org/',WhatsApp:'https://wa.me/',TikTok:'https://www.tiktok.com/messages'};
 function outreachLinks(j){var h='';var dm=j.dm||PLATFORM_DM[j.p];
- if(dm)h+='<a class="btn btn-s" target="_blank" href="'+dm+'">DM</a> ';
+ if(dm)h+='<a class="btn btn-p" target="_blank" href="'+dm+'">Contact</a> ';
  if(j.comment)h+='<a class="btn btn-s" target="_blank" href="'+j.comment+'">Comment</a> ';
  if(j.author)h+='<a class="btn btn-s" target="_blank" href="'+j.author+'">Profile</a> ';
  return h;}
@@ -215,10 +216,10 @@ function submitApp(i){var j=(window._jobList||[])[i];if(!j)return;var a=apps();v
  var ex=a.find(function(x){return x.title===j.t;});
  if(ex){ex.status='Submitted';ex.draft=draft;}else{var fd=new Date();fd.setDate(fd.getDate()+3);a.unshift({title:j.t,platform:j.p,url:j.u,draft:draft,status:'Submitted',ts:Date.now(),due:fd.toISOString().slice(0,10)});}
  localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();alert('✓ Proposal submitted & tracked.');}
-function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=m.length;renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
-function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching latest jobs across platforms…';
+function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=Math.min(m.length,allowance());renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
+function runRobot(silent){var st=document.getElementById('robotStatus');var pr=profile();if(pr.engine===false||pr.engine==='off'){st.textContent='Engine is OFF — turn it on in Settings.';return;}if(!silent)st.textContent='Searching latest jobs across platforms…';
  var m=localMatches();var pr=profile();var words=(pr.skills+' '+pr.target)||'python developer';
- liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches — proposals ready to review & submit.';});}
+ liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=Math.min(mg.length,allowance());renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches — proposals ready to review & submit.';});}
 /* Services */
 function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
 function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
@@ -250,9 +251,11 @@ function renderApps(){var a=apps();var today=new Date().toISOString().slice(0,10
   return '<div class="row"><div><strong>'+x.title+'</strong><br><span class="muted">'+x.platform+' · '+x.status+fu+'</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+(x.status==='Submitted'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Replied\')">Replied</button>':'')+(x.status!=='Won'&&x.status!=='Lost'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Won\')">Won 🎉</button><button class="btn btn-g" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Lost\')">Lost</button>':'')+'</div></div>';}).join(''):'No applications yet — approve & submit a proposal above.';}
 function renderAll(){renderApps();showMatches();loadServ();loadPros();renderAna();renderBrief();}
 /* Settings */
-(function(){var pr=profile();document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';})();
-function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value};
- localStorage.setItem('rf_profile',JSON.stringify(pr));document.getElementById('setMsg').textContent='✓ Saved — searching now…';go('robot');runRobot(true);
+function applyProfile(pr){document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';var ee=document.getElementById('ob_engine');if(ee)ee.value=(pr.engine===false||pr.engine==='off')?'off':'on';}
+applyProfile(profile());
+fetch(API+'/api/get-profile?email='+E).then(function(r){return r.json();}).then(function(d){if(d.has){var pr={mode:d.mode,skills:d.skills,target:d.target,whatsapp:d.whatsapp,telegram:d.telegram,engine:d.engine};localStorage.setItem('rf_profile',JSON.stringify(pr));applyProfile(pr);renderAll();if(pr.engine!==false)runRobot(true);}}).catch(function(){});
+function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value,engine:document.getElementById('ob_engine').value!=='off'};
+ localStorage.setItem('rf_profile',JSON.stringify(pr));document.getElementById('setMsg').textContent='✓ Saved to your account.';if(pr.engine){go('robot');runRobot(true);}else{document.getElementById('robotStatus').textContent='Engine paused.';}
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})}).catch(function(){});}
 /* Plan (instant fallback, then server) */
 document.getElementById('planBody').innerHTML='<p>Plan: <strong>'+PLAN+'</strong> — '+allowance()+' matches & submissions.</p><a class="btn btn-p" href="pricing.html">Upgrade</a>';
