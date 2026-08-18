@@ -1,19 +1,19 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>Dashboard | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
 <style>
 body{background:#F4F6FA}
-.dash{display:grid;grid-template-columns:250px 1fr;gap:22px;max-width:1100px;margin:0 auto;padding:24px 16px}
+.dash{display:grid;grid-template-columns:250px 1fr;gap:22px;max-width:1180px;margin:0 auto;padding:24px 16px}
 .side{background:#0B2239;border-radius:16px;padding:18px 12px;color:#fff;height:fit-content;position:sticky;top:80px}
 .side .brand{display:flex;gap:10px;align-items:center;font-family:'Sora';font-weight:800;margin:0 6px 16px}
 .side .brand img{width:28px;border-radius:8px}
 .side .user{font-size:.78rem;color:#7C93A8;background:#123B5C;border-radius:10px;padding:8px 10px;margin:0 4px 12px;word-break:break-all}
-.nav-i{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:#A9BBD0;padding:12px;border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer}
+.nav-i{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:#A9BBD0;padding:11px;border-radius:10px;font-weight:600;font-size:.88rem;cursor:pointer}
 .nav-i i{width:18px;text-align:center}
 .nav-i.active,.nav-i:hover{background:#1D4E75;color:#fff}
 .panel{display:none}.panel.active{display:block;animation:fade .25s}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
 .crumb{font-size:.78rem;color:var(--muted);margin-bottom:4px}
 .ptitle{font-family:'Sora';font-size:1.25rem;margin-bottom:16px}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
 .kpi .n{font-family:'Sora';font-size:1.5rem;font-weight:800}
 .kpi .l{color:var(--muted);font-size:.78rem;margin-top:2px}
@@ -26,12 +26,15 @@ body{background:#F4F6FA}
 .b-green{background:#DCFCE7;color:#15803D}.b-blue{background:#DBEAFE;color:#1D4ED8}.b-amber{background:#FEF3C7;color:#B45309}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16A34A;margin-right:6px;animation:pulse 1.6s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px}
 .btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
 .btn-s{background:#EFF4FF;color:var(--accent);font-size:.75rem;padding:6px 10px}
 .muted{color:var(--muted);font-size:.85rem}
-@media (max-width:900px){.dash{grid-template-columns:1fr}.side{position:static}.kpis{grid-template-columns:1fr}}
+.bar{height:8px;background:#EEF2F7;border-radius:99px;overflow:hidden;margin:4px 0 10px}
+.bar>div{height:100%;background:var(--accent)}
+@media (max-width:900px){.dash{grid-template-columns:1fr}.side{position:static}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
 </style></head><body><div id="header"></div>
 <script>(function(){var q=new URLSearchParams(location.search);var a=q.get('authed');if(a){localStorage.setItem('rf_session',JSON.stringify({email:a}));history.replaceState(null,'',location.pathname);}})();</script>
 <div class="dash">
@@ -42,9 +45,9 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
   <button class="nav-i" data-p="robot"><i class="fa-solid fa-robot"></i> My Engine</button>
   <button class="nav-i" data-p="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
   <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
-  <button class="nav-i" data-p="sell"><i class="fa-solid fa-share-nodes"></i> Sell Everywhere</button>
-  <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
-  <button class="nav-i" data-p="sell"><i class="fa-solid fa-share-nodes"></i> Sell Everywhere</button>
+  <button class="nav-i" data-p="social"><i class="fa-solid fa-share-nodes"></i> Social Selling</button>
+  <button class="nav-i" data-p="pros"><i class="fa-solid fa-users"></i> Prospects & Follow-ups</button>
+  <button class="nav-i" data-p="ana"><i class="fa-solid fa-chart-pie"></i> Analytics</button>
   <button class="nav-i" data-p="plan"><i class="fa-solid fa-crown"></i> Plan & Billing</button>
   <button class="nav-i" data-p="set"><i class="fa-solid fa-sliders"></i> Settings & Alerts</button>
   <button class="nav-i" data-p="help"><i class="fa-solid fa-life-ring"></i> Help & Guide</button>
@@ -53,84 +56,91 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
   <section id="p-ov" class="panel active">
     <div class="crumb">Dashboard / Overview</div><div class="ptitle">Welcome back 👋</div>
     <div class="kpis">
-      <div class="kpi"><i class="ic fa-solid fa-briefcase"></i><div class="n" id="kJobs">0</div><div class="l">Matches this run</div></div>
-      <div class="kpi"><i class="ic fa-solid fa-paper-plane"></i><div class="n" id="kApp">0</div><div class="l">Applications sent</div></div>
-      <div class="kpi"><i class="ic fa-solid fa-crown"></i><div class="n" id="kPlan" style="font-size:1.05rem">Free</div><div class="l">Current plan</div></div>
+      <div class="kpi"><i class="ic fa-solid fa-briefcase"></i><div class="n" id="kJobs">0</div><div class="l">Matches found</div></div>
+      <div class="kpi"><i class="ic fa-solid fa-users"></i><div class="n" id="kPros">0</div><div class="l">Prospects</div></div>
+      <div class="kpi"><i class="ic fa-solid fa-boxes-stacked"></i><div class="n" id="kServ">0</div><div class="l">Services</div></div>
+      <div class="kpi"><i class="ic fa-solid fa-robot"></i><div class="n" style="font-size:1.05rem"><span class="dot"></span>Active</div><div class="l">Engine status</div></div>
     </div>
-    <div class="card"><h3><i class="fa-solid fa-sun"></i> Daily Briefing</h3><div id="briefBody" class="muted">Configure your engine to start receiving matches.</div></div>
-    <div class="card"><h3><i class="fa-solid fa-robot"></i> Your engine</h3>
-      <p class="muted"><span class="dot"></span>Once configured, it finds jobs for your skills, drafts proposals, and tracks your applications.</p>
-      <button class="btn btn-p" onclick="go('set')">Configure engine</button>
+    <div class="card"><h3><i class="fa-solid fa-sun"></i> Daily Briefing</h3><div id="briefBody" class="muted">Loading…</div></div>
+    <div class="grid2">
+      <div class="card"><h3><i class="fa-solid fa-rocket"></i> Quick start</h3>
+        <div class="row"><span>1 · Configure engine</span><button class="btn btn-g" onclick="go('set')">Open</button></div>
+        <div class="row"><span>2 · Add services</span><button class="btn btn-g" onclick="go('serv')">Open</button></div>
+        <div class="row"><span>3 · Add prospects</span><button class="btn btn-g" onclick="go('pros')">Open</button></div>
+        <div class="row"><span>4 · Activate a plan</span><button class="btn btn-p" onclick="go('plan')">Upgrade</button></div>
+      </div>
+      <div class="card"><h3><i class="fa-solid fa-robot"></i> Your engine</h3>
+        <p class="muted"><span class="dot"></span>Searching jobs & selling for you across 10+ platforms.</p>
+        <button class="btn btn-p" onclick="go('robot')">Open my engine</button>
+      </div>
     </div>
   </section>
   <section id="p-robot" class="panel">
-    <div class="crumb">Dashboard / My Engine</div><div class="ptitle">My Engine — job matches</div>
-    <div class="card"><h3><span class="dot"></span> Matches for your configuration</h3>
-      <button class="btn btn-p" onclick="runRobot(false)"><i class="fa-solid fa-bolt"></i> Find jobs now</button>
+    <div class="crumb">Dashboard / My Engine</div><div class="ptitle">My Autonomous Engine</div>
+    <div class="card"><h3><span class="dot"></span> Your autonomous engine</h3>
+      <p class="muted">It never stops. It searches jobs & sells for you across Reddit, X, Facebook, Instagram, LinkedIn, Telegram, WhatsApp, TikTok, Upwork, RemoteOK & more.</p>
+      <button class="btn btn-p" onclick="runRobot(false)"><i class="fa-solid fa-bolt"></i> Search now (instant)</button>
       <div id="robotStatus" class="muted" style="margin-top:10px"></div>
     </div>
-    <div class="card"><h3><i class="fa-solid fa-briefcase"></i> Your matches</h3><div id="robotJobs" class="muted">Configure your engine first (Settings).</div></div>
+    <div class="card"><h3><i class="fa-solid fa-briefcase"></i> Latest matches</h3><div id="robotJobs" class="muted">Configure your engine to see matches.</div></div>
   </section>
   <section id="p-jobs" class="panel">
-    <div class="crumb">Dashboard / Jobs</div><div class="ptitle">Jobs & Progress (applications)</div>
-    <div class="card"><div id="jobsBody" class="muted">No applications yet — find a match and apply.</div></div>
+    <div class="crumb">Dashboard / Jobs</div><div class="ptitle">Jobs & Progress</div>
+    <div class="card"><div id="jobsBody" class="muted">Loading…</div></div>
   </section>
   <section id="p-serv" class="panel">
-  <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
-  <div class="card"><h3><i class="fa-solid fa-plus"></i> Publish a service</h3>
-    <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><input id="sv_name" placeholder="Service name"></div><div><input id="sv_price" type="number" placeholder="Price (USD)"></div></div>
-    <textarea id="sv_desc" rows="2" placeholder="Short description"></textarea>
-    <button class="btn btn-p" onclick="addServ()"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
-  </div>
-  <div class="card"><h3><i class="fa-solid fa-list"></i> Your services</h3><div id="servBody" class="muted">No services yet.</div></div>
-</section>
-<section id="p-sell" class="panel">
-  <div class="crumb">Dashboard / Sell</div><div class="ptitle">Sell on every platform</div>
-  <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts <span class="badge b-green">included in all plans</span></h3>
-    <p class="muted">The caption is written for you. Post to any platform, or copy for Instagram/TikTok.</p>
-    <div id="sellBody" class="muted">Publish a service first.</div>
-  </div>
-</section>
-  <section id="p-serv" class="panel">
-  <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
-  <div class="card"><h3><i class="fa-solid fa-plus"></i> Publish a service</h3>
-    <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><input id="sv_name" placeholder="Service name"></div><div><input id="sv_price" type="number" placeholder="Price (USD)"></div></div>
-    <textarea id="sv_desc" rows="2" placeholder="Short description"></textarea>
-    <button class="btn btn-p" onclick="addServ()"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
-  </div>
-  <div class="card"><h3><i class="fa-solid fa-list"></i> Your services</h3><div id="servBody" class="muted">No services yet.</div></div>
-</section>
-<section id="p-sell" class="panel">
-  <div class="crumb">Dashboard / Sell</div><div class="ptitle">Sell on every platform</div>
-  <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts <span class="badge b-green">included in all plans</span></h3>
-    <p class="muted">The caption is written for you. Post to any platform, or copy for Instagram/TikTok.</p>
-    <div id="sellBody" class="muted">Publish a service first.</div>
-  </div>
-</section>
+    <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
+    <div class="card"><h3><i class="fa-solid fa-plus"></i> Add a service</h3>
+      <div class="grid2"><div><input id="sv_name" placeholder="Service name"></div><div><input id="sv_price" type="number" placeholder="Price (USD)"></div></div>
+      <textarea id="sv_desc" rows="2" placeholder="Short description"></textarea>
+      <button class="btn btn-p" onclick="addServ()"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
+    </div>
+    <div class="card"><h3><i class="fa-solid fa-list"></i> Published services</h3><div id="servBody" class="muted">Loading…</div></div>
+  </section>
+  <section id="p-social" class="panel">
+    <div class="crumb">Dashboard / Social Selling</div><div class="ptitle">Sell on every platform</div>
+    <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts</h3>
+      <p class="muted">The caption is written for you. Post anywhere, or copy for Instagram/TikTok.</p>
+      <div id="socialBody" class="muted">Add a service first.</div>
+    </div>
+  </section>
+  <section id="p-pros" class="panel">
+    <div class="crumb">Dashboard / Prospects</div><div class="ptitle">Prospects & Follow-ups</div>
+    <div class="card"><h3><i class="fa-solid fa-user-plus"></i> Add a prospect</h3>
+      <div class="grid2"><div><input id="pr_name" placeholder="Company / person"></div><div><input id="pr_note" placeholder="Note (e.g. needs automation)"></div></div>
+      <button class="btn btn-p" onclick="addPros()"><i class="fa-solid fa-plus"></i> Add prospect</button>
+    </div>
+    <div class="card"><h3><i class="fa-solid fa-bell"></i> Due for follow-up</h3><div id="dueBody" class="muted">Nothing due.</div></div>
+    <div class="card"><h3><i class="fa-solid fa-diagram-project"></i> Pipeline</h3><div id="pipeBody" class="muted">No prospects yet.</div></div>
+  </section>
+  <section id="p-ana" class="panel">
+    <div class="crumb">Dashboard / Analytics</div><div class="ptitle">Analytics</div>
+    <div class="card"><h3><i class="fa-solid fa-chart-pie"></i> Your activity</h3><div id="anaBody" class="muted">Loading…</div></div>
+  </section>
   <section id="p-plan" class="panel">
     <div class="crumb">Dashboard / Plan</div><div class="ptitle">Plan & Billing</div>
-    <div class="card"><div id="planBody" class="muted"></div></div>
+    <div class="card"><div id="planBody" class="muted">Loading…</div></div>
   </section>
   <section id="p-set" class="panel">
     <div class="crumb">Dashboard / Settings</div><div class="ptitle">Settings & Alerts</div>
     <div class="card"><h3><i class="fa-solid fa-robot"></i> Engine configuration</h3>
       <label class="muted">MODE</label><select id="ob_mode"><option value="jobs">Find me jobs</option><option value="outreach">Find me clients</option><option value="both">Both</option></select>
-      <label class="muted">SKILLS (what you're hired for)</label><textarea id="ob_skills" rows="2" placeholder="e.g. python, ocr, automation"></textarea>
-      <label class="muted">TARGET (who you want)</label><textarea id="ob_target" rows="2" placeholder="e.g. accounting firms, remote startups"></textarea>
+      <label class="muted">SKILLS</label><textarea id="ob_skills" rows="2"></textarea>
+      <label class="muted">TARGET</label><textarea id="ob_target" rows="2"></textarea>
       <label class="muted">WHATSAPP (Growth+)</label><input id="ob_wa" type="tel">
       <label class="muted">TELEGRAM (Growth+)</label><input id="ob_tg">
       <p id="setMsg" style="color:#16A34A;min-height:18px"></p>
-      <button class="btn btn-p" onclick="saveSet()">Save & start engine</button>
+      <button class="btn btn-p" onclick="saveSet()">Save settings</button>
     </div>
   </section>
   <section id="p-help" class="panel">
     <div class="crumb">Dashboard / Help</div><div class="ptitle">Help & Guide</div>
     <div class="card"><h3><i class="fa-solid fa-book"></i> How it works</h3>
-      <div class="row"><span>1 · Configure skills + target (Settings)</span></div>
-      <div class="row"><span>2 · Engine finds matches for YOUR config only</span></div>
-      <div class="row"><span>3 · Generate a proposal, copy it, apply on the job page</span></div>
-      <div class="row"><span>4 · Track applications in Jobs & Progress</span></div>
-      <div class="row"><span>5 · Upgrade for more daily matches + alerts</span></div>
+      <div class="row"><span>1 · Configure engine — it remembers forever</span></div>
+      <div class="row"><span>2 · Engine searches jobs across 10+ platforms</span></div>
+      <div class="row"><span>3 · Add services; sell everywhere</span></div>
+      <div class="row"><span>4 · Track prospects & follow-ups to win clients</span></div>
+      <div class="row"><span>5 · Watch Analytics; upgrade for more</span></div>
     </div>
   </section>
 </main>
@@ -142,90 +152,74 @@ var sess=null;try{sess=JSON.parse(localStorage.getItem('rf_session')||'null');}c
 if(!sess||!sess.email)location.href='signin.html';
 var API=window.RF_API||'';var E=encodeURIComponent(sess.email);
 document.getElementById('uEmail').textContent=sess.email;
-var LIMITS={Free:3,Starter:10,Growth:25,Agency:60};
-var PLAN='Free';
-function ft(url,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms||5000);return fetch(url,{signal:c.signal}).finally(function(){clearTimeout(t);});}
-function profile(){try{return JSON.parse(localStorage.getItem('rf_profile')||'null')||{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}catch(e){return{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}}
-function configured(){var p=profile();return (p.skills&&p.skills.trim())||(p.target&&p.target.trim());}
-function applied(){try{return JSON.parse(localStorage.getItem('rf_applied')||'[]');}catch(e){return[];}}
 var OPPS=[
- {t:"Python invoice automation for accounting firm",p:"Reddit",u:"https://reddit.com/r/PythonJobs/",k:"python automation ocr invoice accounting"},
+ {t:"Python invoice automation for accounting firm",p:"Reddit",u:"https://reddit.com/r/PythonJobs/",k:"python automation ocr invoice"},
  {t:"PDF to Excel data pipeline",p:"Upwork",u:"https://www.upwork.com/",k:"python ocr excel pdf data"},
  {t:"Web scraping & data extraction engineer",p:"RemoteOK",u:"https://remoteok.com/",k:"python scraping data web"},
  {t:"Remote full-stack developer",p:"HackerNews",u:"https://news.ycombinator.com/",k:"web developer full-stack javascript"},
  {t:"Workflow automation consultant (Zapier/Make)",p:"WeWorkRemotely",u:"https://weworkremotely.com/",k:"automation zapier workflow"},
  {t:"AI chatbot developer for support team",p:"HackerNews",u:"https://news.ycombinator.com/",k:"ai chatbot python"},
  {t:"Dashboards & reporting analyst",p:"LinkedIn",u:"https://www.linkedin.com/jobs/",k:"data dashboard reporting"},
- {t:"E-commerce data cleanup project",p:"Upwork",u:"https://www.upwork.com/",k:"data ecommerce cleaning"}
+ {t:"E-commerce data cleanup project",p:"Upwork",u:"https://www.upwork.com/",k:"data ecommerce cleaning"},
+ {t:"X/Twitter growth automation",p:"X",u:"https://twitter.com/",k:"automation social growth twitter"},
+ {t:"Facebook ads lead-gen assistant",p:"Facebook",u:"https://www.facebook.com/groups/",k:"facebook ads leads"},
+ {t:"Instagram content automation",p:"Instagram",u:"https://www.instagram.com/",k:"instagram content automation"},
+ {t:"Telegram community bot developer",p:"Telegram",u:"https://t.me/",k:"telegram bot python"},
+ {t:"LinkedIn outreach automation",p:"LinkedIn",u:"https://www.linkedin.com/",k:"linkedin outreach automation"},
+ {t:"WhatsApp business bot",p:"WhatsApp",u:"https://wa.me/",k:"whatsapp bot automation"},
+ {t:"TikTok shop product listings",p:"TikTok",u:"https://www.tiktok.com/",k:"tiktok ecommerce products"},
+ {t:"YouTube data extraction tool",p:"YouTube",u:"https://www.youtube.com/",k:"youtube data scraping"}
 ];
-function localMatches(){var p=profile();var words=(p.skills+' '+p.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
- var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,50+h*12),hit:h};});
- return s.filter(function(o){return o.hit>0;}).sort(function(a,b){return b.score-a.score;});}
+function profile(){try{return JSON.parse(localStorage.getItem('rf_profile')||'null')||{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}catch(e){return{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}}
+function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
+function prospects(){try{return JSON.parse(localStorage.getItem('rf_prospects')||'[]');}catch(e){return[];}}
+function localMatches(){var pr=profile();var words=(pr.skills+' '+pr.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
+ var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9)};});
+ s.sort(function(a,b){return b.score-a.score;});return s.slice(0,8);}
 function liveJobs(words,cb){var out=[];var d=0;function f(){d++;if(d>=2)cb(out);}
- var q=encodeURIComponent((words||'').slice(0,60));
- ft('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story',6000).then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70,hit:1});});f();}).catch(f);
- ft('https://www.reddit.com/r/PythonJobs/new.json',6000).then(function(r){return r.json();}).then(function(x){((((x||{}).data||{}).children)||[]).slice(0,6).forEach(function(c){var v=c.data||{};if(v.title)out.push({t:v.title,p:'Reddit',u:'https://reddit.com'+v.permalink,score:72,hit:1});});f();}).catch(f);}
+ var q=encodeURIComponent((words||'python developer').slice(0,60));
+ fetch('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story').then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70});});f();}).catch(f);
+ fetch('https://www.reddit.com/r/PythonJobs/new.json').then(function(r){return r.json();}).then(function(x){((((x||{}).data||{}).children)||[]).slice(0,6).forEach(function(c){var v=c.data||{};if(v.title)out.push({t:v.title,p:'Reddit',u:'https://reddit.com'+v.permalink,score:72});});f();}).catch(f);}
 function go(p){document.querySelectorAll('.nav-i').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');try{localStorage.setItem('rf_tab',p);history.replaceState(null,'','#'+p);}catch(e){}}
 document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.p);});});
 function restoreTab(){var h=(location.hash||'').replace('#','');var tb=h||localStorage.getItem('rf_tab')||'ov';if(document.getElementById('p-'+tb))go(tb);}
 window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(document.getElementById('p-'+h))go(h);});
-function limit(){return LIMITS[PLAN]||3;}
-function renderJobs(list,el){if(!configured()){el.innerHTML='Configure your engine first — go to <b>Settings</b>, add your skills & target, then Save.';return;}
- if(!list.length){el.innerHTML='No matches for your configuration yet — try broader skills, or the engine will find more on the next scan.';return;}
- var cap=list.slice(0,limit());
- el.innerHTML=cap.map(function(r,i){return '<div class="row"><div><strong>'+r.t+'</strong><br><span class="muted">'+r.p+'</span></div><div style="text-align:right"><span class="badge b-blue">'+r.score+'%</span><br><button class="btn btn-s" onclick="genProposal('+i+')">Generate proposal</button> <a class="btn btn-s" target="_blank" href="'+r.u+'">Open job</a></div></div>';}).join('')+(list.length>limit()?'<p class="muted" style="margin-top:10px">Showing '+cap.length+' of '+list.length+' — <a href="pricing.html">upgrade for more</a>.</p>':'');
- window._cur=list;}
-var LAST=[];
-function showMatches(){var m=localMatches();LAST=m;document.getElementById('kJobs').textContent=Math.min(m.length,limit());renderJobs(m,document.getElementById('robotJobs'));renderBrief();}
-function runRobot(silent){if(!configured()){go('set');return;}var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching for your configuration…';
- var p=profile();var words=(p.skills+' '+p.target);
- liveJobs(words,function(live){var mg=localMatches().concat(live);LAST=mg;document.getElementById('kJobs').textContent=Math.min(mg.length,limit());renderJobs(mg,document.getElementById('robotJobs'));if(!silent)st.textContent='✓ '+mg.length+' matches found for your skills.';renderBrief();});}
-function genProposal(i){var j=(window._cur||LAST)[i];if(!j)return;var p=profile();
- var txt='Hi,\n\nI saw your opening for "'+j.t+'" and I can help immediately. Relevant skills: '+(p.skills||'—')+'.\n\nApproach: 1) understand your setup, 2) deliver a working prototype in 48h, 3) provide tested results + documentation.\n\nI work with '+(p.target||'businesses like yours')+' and can start this week.\n\nBest,\n'+sess.email;
- var box=document.getElementById('robotJobs');
- var d=document.createElement('div');d.className='card';d.innerHTML='<h3>Proposal for: '+j.t+'</h3><textarea rows="7">'+txt+'</textarea><button class="btn btn-p" onclick="copyProp(this)">Copy proposal</button> <button class="btn btn-g" onclick="markApplied(\''+j.t.replace(/'/g,"")+'\',\''+j.u+'\')">Mark as applied</button> <a class="btn btn-g" target="_blank" href="'+j.u+'">Open job & paste</a>';
- box.parentNode.insertBefore(d,box);}
-function copyProp(btn){var ta=btn.parentNode.querySelector('textarea');if(navigator.clipboard)navigator.clipboard.writeText(ta.value).then(function(){alert('Proposal copied — paste it on the job page.');});else{ta.select();document.execCommand('copy');}}
-function markApplied(t,u){var l=applied();l.unshift({t:t,u:u,ts:Date.now()});localStorage.setItem('rf_applied',JSON.stringify(l));loadApplied();alert('Tracked! See Jobs & Progress.');}
-function loadApplied(){var l=applied();document.getElementById('kApp').textContent=l.length;
- document.getElementById('jobsBody').innerHTML=l.length?l.map(function(a){return '<div class="row"><div><strong>'+a.t+'</strong><br><span class="muted">'+new Date(a.ts).toLocaleString()+'</span></div><span class="badge b-amber">Applied</span></div>';}).join(''):'No applications yet — find a match and apply.';}
-loadApplied();
-function renderBrief(){document.getElementById('briefBody').innerHTML=configured()?('Plan: <strong>'+PLAN+'</strong> · '+Math.min(localMatches().length,limit())+' matches this run · <strong>'+applied().length+'</strong> applications sent.'):'Configure your engine to start receiving matches.';}
-/* Settings: save to server (persists across login) + local fallback */
-(function(){var p=profile();document.getElementById('ob_mode').value=p.mode||'jobs';document.getElementById('ob_skills').value=p.skills||'';document.getElementById('ob_target').value=p.target||'';document.getElementById('ob_wa').value=p.whatsapp||'';document.getElementById('ob_tg').value=p.telegram||'';
- ft(API+'/api/get-profile?email='+E,4000).then(function(r){return r.json();}).then(function(d){if(d.has){document.getElementById('ob_mode').value=d.mode||'jobs';document.getElementById('ob_skills').value=d.skills||'';document.getElementById('ob_target').value=d.target||'';document.getElementById('ob_wa').value=d.whatsapp||'';document.getElementById('ob_tg').value=d.telegram||'';localStorage.setItem('rf_profile',JSON.stringify(d));showMatches();}}).catch(function(){});})();
+function renderJobs(list,el){el.innerHTML=list.length?list.map(function(r){return '<div class="row"><div><strong>'+r.t+'</strong><br><span class="muted">'+r.p+'</span></div><div style="text-align:right"><span class="badge b-blue">'+r.score+'%</span><br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+r.u+'">View →</a></div></div>';}).join(''):'Configure your engine (Settings) to see matches.';}
+function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=m.length;renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
+function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching latest jobs across platforms…';
+ var m=localMatches();var pr=profile();var words=(pr.skills+' '+pr.target)||'python developer';
+ liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches found for your skills.';});}
+showMatches();restoreTab();runRobot(true);
+function loadServ(){var l=services();document.getElementById('kServ').textContent=l.length;
+ document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
+function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
+ fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
+ document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
+loadServ();
+function loadSocial(l){var box=document.getElementById('socialBody');l=l||services();if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
+ box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
+  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-g" onclick="copyCap(\''+cap.replace(/'/g,"")+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
+function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}else{prompt('Copy this caption:',t);}}
+var STAGES=['New','Contacted','Replied','Won'];
+function loadPros(){var l=prospects();document.getElementById('kPros').textContent=l.length;
+ var today=new Date().toISOString().slice(0,10);
+ var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);});
+ document.getElementById('dueBody').innerHTML=due.length?due.map(function(p,i){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.note||'')+'</span></div><button class="btn btn-s" onclick="advPros(\''+p.id+'\')">Mark contacted →</button></div>';}).join(''):'Nothing due. Add prospects and set follow-up dates.';
+ document.getElementById('pipeBody').innerHTML=l.length?STAGES.map(function(s){var g=l.filter(function(p){return p.stage===s;});return '<div style="margin-bottom:12px"><span class="badge '+(s==='Won'?'b-green':'b-blue')+'">'+s+' · '+g.length+'</span>'+g.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.note||'')+'</span></div><div style="display:flex;gap:6px">'+(p.stage!=='Won'?'<button class="btn btn-s" onclick="advPros(\''+p.id+'\')">Advance →</button>':'')+'<button class="btn btn-g" onclick="delPros(\''+p.id+'\')">×</button></div></div>';}).join('')+'</div>';}).join(''):'No prospects yet — add your first one above.';
+ renderBrief();renderAna();}
+function addPros(){var l=prospects();var d=new Date();d.setDate(d.getDate()+2);
+ l.unshift({id:String(Date.now()),name:document.getElementById('pr_name').value,note:document.getElementById('pr_note').value,stage:'New',due:d.toISOString().slice(0,10)});
+ localStorage.setItem('rf_prospects',JSON.stringify(l));document.getElementById('pr_name').value='';document.getElementById('pr_note').value='';loadPros();}
+function advPros(id){var l=prospects();var p=l.find(function(x){return x.id===id;});if(p){var i=STAGES.indexOf(p.stage);p.stage=STAGES[Math.min(i+1,STAGES.length-1)];var nd=new Date();nd.setDate(nd.getDate()+3);p.due=nd.toISOString().slice(0,10);localStorage.setItem('rf_prospects',JSON.stringify(l));loadPros();}}
+function delPros(id){var l=prospects().filter(function(x){return x.id!==id;});localStorage.setItem('rf_prospects',JSON.stringify(l));loadPros();}
+loadPros();
+function renderAna(){var l=prospects();var wins=l.filter(function(p){return p.stage==='Won';}).length;
+ document.getElementById('anaBody').innerHTML=STAGES.map(function(s){var n=l.filter(function(p){return p.stage===s;}).length;var pct=l.length?Math.round(n/l.length*100):0;return '<div class="muted">'+s+' · '+n+'</div><div class="bar"><div style="width:'+pct+'%"></div></div>';}).join('')+'<div class="row"><span>Jobs matched</span><strong>'+document.getElementById('kJobs').textContent+'</strong></div><div class="row"><span>Services live</span><strong>'+services().length+'</strong></div><div class="row"><span>Clients won</span><strong>'+wins+'</strong></div>';}
+function renderBrief(){var l=prospects();var today=new Date().toISOString().slice(0,10);var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);}).length;
+ document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> job matches found · <strong>'+l.length+'</strong> prospects in pipeline · <strong>'+due+'</strong> due for follow-up · plan: <strong>'+(document.getElementById('kPlan').textContent||'Free')+'</strong>.';}
+(function(){var pr=profile();document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';})();
 function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value};
- localStorage.setItem('rf_profile',JSON.stringify(pr));
- document.getElementById('setMsg').textContent='✓ Saved — starting your engine…';
- ft(API+'/api/save-profile',5000).then(function(){return fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})});}).catch(function(){});
- fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})}).catch(function(){});
- showMatches();go('robot');runRobot(true);}
-/* Plan: instant, no hang */
-(function(){var pb=document.getElementById('planBody');pb.innerHTML=planHTML();
- ft(API+'/api/sub/'+E,4000).then(function(r){return r.json();}).then(function(d){if(d.has){PLAN=d.plan;document.getElementById('kPlan').textContent=PLAN;pb.innerHTML=planHTML(d);}renderBrief();showMatches();}).catch(function(){renderBrief();});})();
-function planHTML(d){if(d&&d.has)return '<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Daily matches</span><strong>'+LIMITS[d.plan]+'</strong></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>';
- return '<div class="row"><span>Plan</span><span class="badge b-blue">Free</span></div><div class="row"><span>Daily matches</span><strong>3</strong></div><div class="row"><span>Upgrade</span><a class="btn btn-p" href="pricing.html">See packages</a></div>';}
-
-function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
-function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSell(l);}
-function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
- fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
- document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
-function loadSell(l){var box=document.getElementById('sellBody');l=l||services();if(!l.length){box.textContent='Publish a service first (My Services), then sell it everywhere here.';return;}
- box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
-  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-s" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-s" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-s" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-s" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-s" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-s" onclick="copyCap(\''+cap.replace(/'/g,"")+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
-function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}else{prompt('Copy this caption:',t);}}
-loadServ();
-
-function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
-function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSell(l);}
-function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
- fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
- document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
-function loadSell(l){var box=document.getElementById('sellBody');l=l||services();if(!l.length){box.textContent='Publish a service first (My Services), then sell it everywhere here.';return;}
- box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
-  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-s" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-s" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-s" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-s" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-s" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-s" onclick="copyCap(\''+cap.replace(/'/g,"")+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
-function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}else{prompt('Copy this caption:',t);}}
-loadServ();
-restoreTab();showMatches();
+ localStorage.setItem('rf_profile',JSON.stringify(pr));document.getElementById('setMsg').textContent='✓ Saved — searching now…';showMatches();go('robot');
+ fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})}).catch(function(){});runRobot(true);}
+fetch(API+'/api/sub/'+E).then(function(r){return r.json();}).then(function(d){document.getElementById('kPlan').textContent=d.has?d.plan:'Free';document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>You are on the free tier.</p><a class="btn btn-p" href="pricing.html">View packages</a>';renderBrief();}).catch(function(){document.getElementById('planBody').innerHTML='<a class="btn btn-p" href="pricing.html">View packages</a>';});
 </script></body></html>
