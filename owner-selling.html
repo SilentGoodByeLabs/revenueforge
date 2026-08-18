@@ -44,6 +44,7 @@ function shareLinks(p){var cap=p.name+' — '+(p.description||'')+' $'+p.price+'
  +'<a class="btn btn-g" target="_blank" href="https://www.reddit.com/submit?title='+ce+'">Reddit</a>';}
 function copyAds(i){var p=window.PRODS[i];var ads=allPlatforms().map(function(pl){return adCopy(p,pl);}).join('\n\n');
  if(navigator.clipboard){navigator.clipboard.writeText(ads).then(function(){alert('All ads copied!');});}else{prompt('Copy:',ads);}}
+function advertiseNow(){fetch(API+'/api/owner/advertise-now',{method:'POST'}).then(function(r){return r.json();}).then(function(d){alert('✓ Advertised '+d.advertised+' product(s) everywhere.');loadProducts();});}
 function loadProducts(){fetch(API+'/api/owner/products').then(function(r){return r.json();}).then(function(d){
  window.PRODS=d.products||[];var b=document.getElementById('prodList');
  b.innerHTML=window.PRODS.length?window.PRODS.map(function(p,i){
