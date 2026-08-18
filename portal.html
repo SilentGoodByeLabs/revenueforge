@@ -187,6 +187,7 @@ function prospects(){return ls('rf_prospects','[]');}
 function apps(){return ls('rf_apps','[]');}
 function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function localMatches(){var pr=profile();var words=(pr.skills+' '+pr.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
+ if(!words.length)return [];
  var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9)};});
  s.sort(function(a,b){return b.score-a.score;});return s;}
 function liveJobs(words,cb){var out=[];var d=0;function f(){d++;if(d>=2)cb(out);}
@@ -219,9 +220,12 @@ function setAppIdx(i,s){var a=apps();var x=a[i];if(!x)return;x.status=s;
  if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+x.title,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});save('rf_prospects',l);}
  save('rf_apps',a);renderAll();}
 function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=m.length;renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
-function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching latest jobs across platforms…';
- var m=localMatches();var pr=profile();var words=(pr.skills+' '+pr.target)||'python developer';
- liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches — proposals ready.';});}
+function runRobot(silent){var st=document.getElementById('robotStatus');var pr=profile();
+ var words=(pr.skills+' '+pr.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
+ if(!words.length){st.textContent='Configure your engine first (Settings) — matches are based on YOUR skills & target.';document.getElementById('kJobs').textContent=0;renderJobs([],document.getElementById('robotJobs'));renderJobs([],document.getElementById('jobsBody'));return;}
+ if(!silent)st.textContent='Searching latest jobs across platforms…';
+ var m=localMatches();
+ liveJobs(pr.skills+' '+pr.target,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' matches for your configuration.';});}
 function loadServ(){var l=services();var b=document.getElementById('servBody');
  b.innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
 function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});save('rf_services',l);
@@ -252,6 +256,8 @@ function renderBrief(){var l=prospects();var a=apps();var today=new Date().toISO
  document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> matches · <strong>'+a.length+'</strong> proposals · <strong>'+due+'</strong> follow-ups due · plan: <strong>'+PLAN+'</strong> ('+allowance()+' matches). '+(PLAN==='Free'?'<a href="pricing.html" style="color:var(--accent)">Upgrade for more →</a>':'');}
 function renderAll(){showMatches();loadServ();loadPros();renderApps();renderAna();renderBrief();}
 (function(){var pr=profile();document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';})();
+fetch(API+'/api/get-profile?email='+E).then(function(r){return r.json();}).then(function(d){if(d&&d.has){var pr=profile();var upd={mode:d.mode||pr.mode,skills:d.skills||pr.skills,target:d.target||pr.target,whatsapp:d.whatsapp||pr.whatsapp,telegram:d.telegram||pr.telegram};save('rf_profile',upd);
+ document.getElementById('ob_mode').value=upd.mode||'jobs';document.getElementById('ob_skills').value=upd.skills||'';document.getElementById('ob_target').value=upd.target||'';document.getElementById('ob_wa').value=upd.whatsapp||'';document.getElementById('ob_tg').value=upd.telegram||'';renderAll();runRobot(true);}}).catch(function(){});
 function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value};
  save('rf_profile',pr);document.getElementById('setMsg').textContent='✓ Saved — searching now…';go('robot');runRobot(true);
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})}).catch(function(){});}
