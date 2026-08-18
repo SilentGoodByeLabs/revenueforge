@@ -36,7 +36,7 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
 .bar>div{height:100%;background:var(--accent)}
 .lock{opacity:.55;filter:grayscale(1)}
 details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:700}
-.menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:70;width:44px;height:44px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:1.1rem;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(37,99,235,.35)}
+.menu-btn{display:none;position:fixed;top:76px;left:12px;z-index:70;width:44px;height:44px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:1.1rem;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(37,99,235,.35)}
 .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55}
 .backdrop.show{display:block}
 @media (max-width:900px){.dash{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
@@ -255,10 +255,15 @@ function renderAna(){var l=prospects();var a=apps();var wins=l.filter(function(p
 function renderBrief(){var l=prospects();var a=apps();var today=new Date().toISOString().slice(0,10);var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);}).length;
  document.getElementById('kApps').textContent=a.filter(function(x){return x.status!=='Draft';}).length;
  document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> matches · <strong>'+a.length+'</strong> proposals · <strong>'+due+'</strong> follow-ups due · plan: <strong>'+PLAN+'</strong> ('+allowance()+' matches). '+(PLAN==='Free'?'<a href="pricing.html" style="color:var(--accent)">Upgrade for more →</a>':'');}
-function setApp(t2,s){var a=apps();var x=a.find(function(y){return y.title===t2;});if(x){x.status=s;if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+t2,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});localStorage.setItem('rf_prospects',JSON.stringify(l));}localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();}}
+function setAppIdx(i,s){var a=apps();var x=a[i];if(!x)return;x.status=s;
+ if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+x.title,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});localStorage.setItem('rf_prospects',JSON.stringify(l));}
+ localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();}
 function renderApps(){var a=apps();var today=new Date().toISOString().slice(0,10);
- document.getElementById('appsBody').innerHTML=a.length?a.map(function(x){var fu=(x.status==='Submitted'&&x.due&&x.due<=today)?' <span class="badge b-amber">follow up now</span>':'';
-  return '<div class="row"><div><strong>'+x.title+'</strong><br><span class="muted">'+x.platform+' · '+x.status+fu+'</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+(x.status==='Submitted'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Replied\')">Replied</button>':'')+(x.status!=='Won'&&x.status!=='Lost'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Won\')">Won 🎉</button><button class="btn btn-g" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Lost\')">Lost</button>':'')+'</div></div>';}).join(''):'No applications yet — approve & submit a proposal above.';}
+ document.getElementById('appsBody').innerHTML=a.length?a.map(function(x,i){var fu=(x.status==='Submitted'&&x.due&&x.due<=today)?' <span class="badge b-amber">follow up now</span>':'';
+  var btns='';
+  if(x.status==='Submitted')btns+='<button class="btn btn-s" onclick="setAppIdx('+i+',\'Replied\')">Replied</button> ';
+  if(x.status!=='Won'&&x.status!=='Lost')btns+='<button class="btn btn-s" onclick="setAppIdx('+i+',\'Won\')">Won 🎉</button> <button class="btn btn-g" onclick="setAppIdx('+i+',\'Lost\')">Lost</button>';
+  return '<div class="row"><div><strong>'+x.title+'</strong><br><span class="muted">'+x.platform+' · '+x.status+fu+'</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+btns+'</div></div>';}).join(''):'No applications yet — approve & submit a proposal above.';}
 function renderAll(){renderApps();showMatches();loadServ();loadPros();renderAna();renderBrief();}
 /* Settings */
 function applyProfile(pr){document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';var ee=document.getElementById('ob_engine');if(ee)ee.value=(pr.engine===false||pr.engine==='off')?'off':'on';}
