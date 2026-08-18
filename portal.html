@@ -1,16 +1,19 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>Dashboard | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
 <style>
 body{background:#F4F6FA}
+.topbar{display:none;align-items:center;gap:12px;background:#0B2239;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:40}
+.topbar button{background:var(--accent);border:0;color:#fff;width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer}
+.topbar .tt{font-family:'Sora';font-weight:700}
 .dash{display:grid;grid-template-columns:250px 1fr;gap:22px;max-width:1180px;margin:0 auto;padding:24px 16px}
 .side{background:#0B2239;border-radius:16px;padding:18px 12px;color:#fff;height:fit-content;position:sticky;top:80px}
 .side .brand{display:flex;gap:10px;align-items:center;font-family:'Sora';font-weight:800;margin:0 6px 16px}
 .side .brand img{width:28px;border-radius:8px}
-.side .user{font-size:.78rem;color:#7C93A8;background:#123B5C;border-radius:10px;padding:8px 10px;margin:0 4px 12px;word-break:break-all}
 .nav-i{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:#A9BBD0;padding:11px;border-radius:10px;font-weight:600;font-size:.88rem;cursor:pointer}
 .nav-i i{width:18px;text-align:center}
 .nav-i.active,.nav-i:hover{background:#1D4E75;color:#fff}
-.panel{display:none}.panel.active{display:block;animation:fade .25s}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55}
+.backdrop.show{display:block}
+.panel{display:none}.panel.active{display:block}
 .crumb{font-size:.78rem;color:var(--muted);margin-bottom:4px}
 .ptitle{font-family:'Sora';font-size:1.25rem;margin-bottom:16px}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
@@ -24,33 +27,30 @@ body{background:#F4F6FA}
 .row:last-child{border-bottom:0}
 .badge{font-size:.7rem;font-weight:700;border-radius:99px;padding:3px 10px}
 .b-green{background:#DCFCE7;color:#15803D}.b-blue{background:#DBEAFE;color:#1D4ED8}.b-amber{background:#FEF3C7;color:#B45309}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16A34A;margin-right:6px;animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16A34A;margin-right:6px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px}
 .btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
 .btn-s{background:#EFF4FF;color:var(--accent);font-size:.75rem;padding:6px 10px}
 .muted{color:var(--muted);font-size:.85rem}
-.bar{height:8px;background:#EEF2F7;border-radius:99px;overflow:hidden;margin:4px 0 10px}
-.bar>div{height:100%;background:var(--accent)}
-.lock{opacity:.55;filter:grayscale(1)}
+.bar{height:8px;background:#EEF2F7;border-radius:99px;overflow:hidden;margin:4px 0 10px}.bar>div{height:100%;background:var(--accent)}
 details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:700}
-.menu-btn{display:none;position:fixed;top:76px;left:12px;z-index:70;width:44px;height:44px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:1.1rem;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(37,99,235,.35)}
-.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55}
-.backdrop.show{display:block}
-@media (max-width:900px){.dash{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
+.lock{opacity:.55;filter:grayscale(1)}
+@media (max-width:900px){
+ .topbar{display:flex}
+ .dash{grid-template-columns:1fr;padding-top:12px}
+ .kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
  .side{position:fixed;left:0;top:0;bottom:0;width:270px;z-index:60;transform:translateX(-105%);transition:transform .25s;border-radius:0;overflow-y:auto}
  .side.open{transform:none}
- .menu-btn{display:flex}}
+}
 </style></head><body><div id="header"></div>
-<button class="menu-btn" onclick="toggleSide()"><i class="fa-solid fa-bars"></i></button>
+<div class="topbar"><button onclick="toggleSide()"><i class="fa-solid fa-bars"></i></button><span class="tt">RevenueForge Dashboard</span></div>
 <div class="backdrop" id="backdrop" onclick="toggleSide()"></div>
 <script>(function(){var q=new URLSearchParams(location.search);var a=q.get('authed');if(a){localStorage.setItem('rf_session',JSON.stringify({email:a}));history.replaceState(null,'',location.pathname);}})();</script>
 <div class="dash">
 <aside class="side" id="side">
   <div class="brand"><img src="assets/logo.png" alt="">Revenue<b style="color:var(--accent)">Forge</b></div>
-  <div class="user" id="uEmail">…</div>
   <button class="nav-i active" data-p="ov"><i class="fa-solid fa-chart-line"></i> Overview</button>
   <button class="nav-i" data-p="robot"><i class="fa-solid fa-robot"></i> My Engine</button>
   <button class="nav-i" data-p="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
@@ -80,7 +80,7 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
         <div class="row"><span>4 · Upgrade for more</span><button class="btn btn-p" onclick="go('plan')">Upgrade</button></div>
       </div>
       <div class="card"><h3><i class="fa-solid fa-robot"></i> Your engine</h3>
-        <p class="muted"><span class="dot"></span>It finds jobs, writes proposals, and sells for you across 10+ platforms.</p>
+        <p class="muted"><span class="dot"></span>It finds jobs, writes proposals & sells for you across 10+ platforms.</p>
         <button class="btn btn-p" onclick="go('robot')">Open my engine</button>
       </div>
     </div>
@@ -140,8 +140,7 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
       <label class="muted">TARGET</label><textarea id="ob_target" rows="2"></textarea>
       <label class="muted">WHATSAPP (Growth+)</label><input id="ob_wa" type="tel">
       <label class="muted">TELEGRAM (Growth+)</label><input id="ob_tg">
-      <label class="muted">ENGINE STATUS</label><select id="ob_engine"><option value="on">On — searching for me</option><option value="off">Off — paused</option></select>
-<p id="setMsg" style="color:#16A34A;min-height:18px"></p>
+      <p id="setMsg" style="color:#16A34A;min-height:18px"></p>
       <button class="btn btn-p" onclick="saveSet()">Save settings</button>
     </div>
   </section>
@@ -150,8 +149,8 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
     <div class="card"><h3><i class="fa-solid fa-book"></i> How to win jobs</h3>
       <div class="row"><span>1 · Configure engine (skills/target)</span></div>
       <div class="row"><span>2 · Engine finds jobs & writes proposals</span></div>
-      <div class="row"><span>3 · Review → edit → Approve & Submit</span></div>
-      <div class="row"><span>4 · Track in Jobs & Analytics; follow up in Prospects</span></div>
+      <div class="row"><span>3 · Review → edit → Approve & Submit → Copy</span></div>
+      <div class="row"><span>4 · Paste on the job site; track Replied → Won</span></div>
       <div class="row"><span>5 · Free = 3 matches/submissions; upgrade for more</span></div>
     </div>
   </section>
@@ -161,9 +160,8 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
 <script src="js/config.js?v=4"></script><script src="js/layout.js?v=11"></script>
 <script>
 var sess=null;try{sess=JSON.parse(localStorage.getItem('rf_session')||'null');}catch(e){}
-if(!sess||!sess.email)location.href='signin.html';
+if(!sess||!sess.email){location.href='signin.html';}
 var API=window.RF_API||'';var E=encodeURIComponent(sess.email);
-document.getElementById('uEmail').textContent=sess.email;
 var PLAN='Free';var ALLOW={Free:3,Starter:10,Growth:25,Agency:60};
 function allowance(){return ALLOW[PLAN]||3;}
 var OPPS=[
@@ -179,101 +177,86 @@ var OPPS=[
  {t:"Facebook ads lead-gen assistant",p:"Facebook",u:"https://www.facebook.com/groups/",k:"facebook ads leads"},
  {t:"Instagram content automation",p:"Instagram",u:"https://www.instagram.com/",k:"instagram content automation"},
  {t:"Telegram community bot developer",p:"Telegram",u:"https://t.me/",k:"telegram bot python"},
- {t:"LinkedIn outreach automation",p:"LinkedIn",u:"https://www.linkedin.com/",k:"linkedin outreach automation"},
  {t:"WhatsApp business bot",p:"WhatsApp",u:"https://wa.me/",k:"whatsapp bot automation"},
- {t:"TikTok shop product listings",p:"TikTok",u:"https://www.tiktok.com/",k:"tiktok ecommerce products"},
- {t:"YouTube data extraction tool",p:"YouTube",u:"https://www.youtube.com/",k:"youtube data scraping"}
+ {t:"TikTok shop product listings",p:"TikTok",u:"https://www.tiktok.com/",k:"tiktok ecommerce products"}
 ];
-function profile(){try{return JSON.parse(localStorage.getItem('rf_profile')||'null')||{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}catch(e){return{mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''};}}
-function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
-function prospects(){try{return JSON.parse(localStorage.getItem('rf_prospects')||'[]');}catch(e){return[];}}
-function apps(){try{return JSON.parse(localStorage.getItem('rf_apps')||'[]');}catch(e){return[];}}
+function ls(k,d){try{return JSON.parse(localStorage.getItem(k)||d)||JSON.parse(d);}catch(e){return JSON.parse(d);}}
+function profile(){return ls('rf_profile',JSON.stringify({mode:'jobs',skills:'',target:'',whatsapp:'',telegram:''}));}
+function services(){return ls('rf_services','[]');}
+function prospects(){return ls('rf_prospects','[]');}
+function apps(){return ls('rf_apps','[]');}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function localMatches(){var pr=profile();var words=(pr.skills+' '+pr.target).toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
- var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9),hits:h};});
- var rel=words.length? s.filter(function(x){return x.hits>0;}) : s; rel.sort(function(a,b){return b.score-a.score;}); return rel;
+ var s=OPPS.map(function(o){var hay=(o.t+' '+o.k+' '+o.p).toLowerCase();var h=0;words.forEach(function(w){if(hay.indexOf(w)>-1)h++;});return{t:o.t,p:o.p,u:o.u,score:Math.min(99,55+h*9)};});
+ s.sort(function(a,b){return b.score-a.score;});return s;}
 function liveJobs(words,cb){var out=[];var d=0;function f(){d++;if(d>=2)cb(out);}
  var q=encodeURIComponent((words||'python developer').slice(0,60));
- fetch('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story').then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70,comment:'https://news.ycombinator.com/item?id='+(h.objectID||'')});});f();}).catch(f);
- fetch('https://www.reddit.com/r/PythonJobs/new.json').then(function(r){return r.json();}).then(function(x){((((x||{}).data||{}).children)||[]).slice(0,6).forEach(function(c){var v=c.data||{};if(v.title)out.push({t:v.title,p:'Reddit',u:'https://reddit.com'+v.permalink,score:72,author:'https://www.reddit.com/user/'+(v.author||''),dm:'https://www.reddit.com/message/compose?to='+(v.author||''),comment:'https://reddit.com'+v.permalink});});f();}).catch(f);}
+ fetch('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story').then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70});});f();}).catch(f);
+ fetch('https://www.reddit.com/r/PythonJobs/new.json').then(function(r){return r.json();}).then(function(x){((((x||{}).data||{}).children)||[]).slice(0,6).forEach(function(c){var v=c.data||{};if(v.title)out.push({t:v.title,p:'Reddit',u:'https://reddit.com'+v.permalink,score:72});});f();}).catch(f);}
 function genDraft(j){var pr=profile();return 'Hi,\n\nI saw your posting for "'+j.t+'" on '+j.p+'. I specialize in '+(pr.skills||'automation & development')+' and can deliver this quickly.\n\nMy approach:\n1. Understand your exact needs.\n2. Build & test a working solution.\n3. Deliver with documentation and support.\n\nTimeline: 2-5 days. Available to start immediately.\n\nBest,\n'+sess.email;}
-function go(p){document.querySelectorAll('.nav-i').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');try{localStorage.setItem('rf_tab',p);history.replaceState(null,'','#'+p);}catch(e){}
- if(window.innerWidth<=900){var sd=document.getElementById('side');if(sd)sd.classList.remove('open');var bd=document.getElementById('backdrop');if(bd)bd.classList.remove('show');}}
-document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.p);});});
-function toggleSide(){var s=document.getElementById('side');var b=document.getElementById('backdrop');s.classList.toggle('open');b.classList.toggle('show');}
+function toggleSide(){document.getElementById('side').classList.toggle('open');document.getElementById('backdrop').classList.toggle('show');}
+function go(p){var n=document.querySelectorAll('.nav-i');for(var i=0;i<n.length;i++)n[i].classList.remove('active');var ps=document.querySelectorAll('.panel');for(var i=0;i<ps.length;i++)ps[i].classList.remove('active');var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');var el=document.getElementById('p-'+p);if(el)el.classList.add('active');try{localStorage.setItem('rf_tab',p);history.replaceState(null,'','#'+p);}catch(e){}
+ if(window.innerWidth<=900){document.getElementById('side').classList.remove('open');document.getElementById('backdrop').classList.remove('show');}}
+var navs=document.querySelectorAll('.nav-i');for(var i=0;i<navs.length;i++){navs[i].addEventListener('click',function(){go(this.dataset.p);});}
 function restoreTab(){var h=(location.hash||'').replace('#','');var tb=h||localStorage.getItem('rf_tab')||'ov';if(document.getElementById('p-'+tb))go(tb);}
-window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(document.getElementById('p-'+h))go(h);});
-function appStatus(t){var a=apps().find(function(x){return x.title===t;});return a?a.status:null;}
-var PLATFORM_DM={X:'https://twitter.com/messages',Facebook:'https://www.facebook.com/messages',Instagram:'https://www.instagram.com/direct/inbox/',LinkedIn:'https://www.linkedin.com/messaging/',Telegram:'https://web.telegram.org/',WhatsApp:'https://wa.me/',TikTok:'https://www.tiktok.com/messages'};
-function outreachLinks(j){var h='';var dm=j.dm||PLATFORM_DM[j.p];
- if(dm)h+='<a class="btn btn-p" target="_blank" href="'+dm+'">Contact</a> ';
- if(j.comment)h+='<a class="btn btn-s" target="_blank" href="'+j.comment+'">Comment</a> ';
- if(j.author)h+='<a class="btn btn-s" target="_blank" href="'+j.author+'">Profile</a> ';
- return h;}
-function renderJobs(list,el){var lim=allowance();var html='';
- list.slice(0,Math.max(lim,3)).forEach(function(j,i){var st=appStatus(j.t);var locked=i>=lim;
-  if(locked){html+='<div class="row lock"><div><i class="fa-solid fa-lock"></i> '+j.t+'<br><span class="muted">'+j.p+'</span></div><a class="btn btn-p" href="pricing.html">Upgrade</a></div>';return;}
-  html+='<div class="row"><div><strong>'+j.t+'</strong><br><span class="muted">'+j.p+' · '+j.score+'% match</span>'
-   +'<details style="margin-top:6px"><summary>'+(st?'View':'Write')+' proposal</summary><textarea id="d_'+i+'" rows="6">'+genDraft(j).replace(/</g,'&lt;')+'</textarea>'
+function appStatus(t){var a=apps();for(var i=0;i<a.length;i++)if(a[i].title===t)return a[i].status;return null;}
+var JOBLIST=[];
+function renderJobs(list,el){var lim=allowance();JOBLIST=list;var html='';var shown=Math.max(lim,3);
+ for(var i=0;i<list.length&&i<shown+ (list.length>shown? list.length-shown:0);i++){var j=list[i];var st=appStatus(j.t);
+  if(i>=lim){html+='<div class="row lock"><div><i class="fa-solid fa-lock"></i> '+j.t+'<br><span class="muted">'+j.p+'</span></div><a class="btn btn-p" href="pricing.html">Upgrade</a></div>';continue;}
+  html+='<div class="row"><div style="flex:1"><strong>'+j.t+'</strong><br><span class="muted">'+j.p+' · '+j.score+'% match</span>'
+   +'<details style="margin-top:6px"><summary>'+(st?'View':'Write')+' proposal</summary><textarea id="d_'+i+'" rows="6">'+genDraft(j).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</textarea>'
    +'<button class="btn btn-p" onclick="submitApp('+i+')">Approve & Submit</button> <button class="btn btn-g" onclick="copyDraft('+i+')">Copy</button></details></div>'
-   +'<div style="text-align:right">'+(st?'<span class="badge '+(st==='Submitted'?'b-blue':st==='Won'?'b-green':'b-amber')+'">'+st+'</span>':'<span class="badge b-amber">Draft</span>')+'<br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+j.u+'">View job →</a></div></div>';});
- el.innerHTML=html||'Configure your engine (Settings) to see matches.';
- window._jobList=list;}
-function copyDraft(i){var el=document.getElementById('d_'+i);if(el){if(navigator.clipboard){navigator.clipboard.writeText(el.value).then(function(){alert('Proposal copied — paste it on the job site (View job).');});}else{prompt('Copy proposal:',el.value);}}}
-function submitApp(i){var j=(window._jobList||[])[i];if(!j)return;var a=apps();var lim=allowance();
- var sent=a.filter(function(x){return x.status==='Submitted'||x.status==='Won';}).length;
+   +'<div style="text-align:right">'+(st?'<span class="badge '+(st==='Submitted'?'b-blue':st==='Won'?'b-green':'b-amber')+'">'+st+'</span>':'<span class="badge b-amber">Draft</span>')+'<br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+j.u+'">View job →</a></div></div>';}
+ el.innerHTML=html||'Configure your engine (Settings) to see matches.';}
+function copyDraft(i){var el=document.getElementById('d_'+i);if(el&&navigator.clipboard){navigator.clipboard.writeText(el.value).then(function(){alert('Proposal copied — paste it on the job site (View job).');});}}
+function submitApp(i){var j=JOBLIST[i];if(!j)return;var a=apps();var lim=allowance();var sent=0;for(var x=0;x<a.length;x++)if(a[x].status==='Submitted'||a[x].status==='Won')sent++;
  if(sent>=lim){alert('Free limit reached ('+lim+' submissions). Upgrade to send more.');location.href='pricing.html';return;}
- var draft=document.getElementById('d_'+i).value;
- var ex=a.find(function(x){return x.title===j.t;});
+ var draft=document.getElementById('d_'+i).value;var ex=null;for(var y=0;y<a.length;y++)if(a[y].title===j.t)ex=a[y];
  if(ex){ex.status='Submitted';ex.draft=draft;}else{var fd=new Date();fd.setDate(fd.getDate()+3);a.unshift({title:j.t,platform:j.p,url:j.u,draft:draft,status:'Submitted',ts:Date.now(),due:fd.toISOString().slice(0,10)});}
- localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();alert('✓ Proposal submitted & tracked.');}
-function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=Math.min(m.length,allowance());renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
-function runRobot(silent){var st=document.getElementById('robotStatus');var pr=profile();if(pr.engine===false||pr.engine==='off'){st.textContent='Engine is OFF — turn it on in Settings.';return;}if(!silent)st.textContent='Searching latest jobs across platforms…';
+ save('rf_apps',a);renderAll();alert('✓ Proposal submitted & tracked.');}
+function setAppIdx(i,s){var a=apps();var x=a[i];if(!x)return;x.status=s;
+ if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+x.title,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});save('rf_prospects',l);}
+ save('rf_apps',a);renderAll();}
+function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=m.length;renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
+function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching latest jobs across platforms…';
  var m=localMatches();var pr=profile();var words=(pr.skills+' '+pr.target)||'python developer';
- liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=Math.min(mg.length,allowance());renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches — proposals ready to review & submit.';});}
-/* Services */
-function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
-function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
+ liveJobs(words,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' latest matches — proposals ready.';});}
+function loadServ(){var l=services();var b=document.getElementById('servBody');
+ b.innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
+function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});save('rf_services',l);
  fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
  document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
 function loadSocial(l){var box=document.getElementById('socialBody');l=l||services();if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
  box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
-  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-g" onclick="copyCap(\''+cap.replace(/'/g,"")+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
-function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}else{prompt('Copy this caption:',t);}}
-/* Prospects */
+  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-g" onclick="copyCap(\''+cap.replace(/'/g,'')+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
+function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}}
 var STAGES=['New','Contacted','Replied','Won'];
 function loadPros(){var l=prospects();document.getElementById('kPros').textContent=l.length;var today=new Date().toISOString().slice(0,10);
  var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);});
- document.getElementById('dueBody').innerHTML=due.length?due.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.note||'')+'</span></div><button class="btn btn-s" onclick="advPros(\''+p.id+'\')">Mark contacted →</button></div>';}).join(''):'Nothing due.';
+ document.getElementById('dueBody').innerHTML=due.length?due.map(function(p,i){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.note||'')+'</span></div><button class="btn btn-s" onclick="advPros(\''+p.id+'\')">Mark contacted →</button></div>';}).join(''):'Nothing due.';
  document.getElementById('pipeBody').innerHTML=l.length?STAGES.map(function(s){var g=l.filter(function(p){return p.stage===s;});return '<div style="margin-bottom:10px"><span class="badge '+(s==='Won'?'b-green':'b-blue')+'">'+s+' · '+g.length+'</span>'+g.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px">'+(p.stage!=='Won'?'<button class="btn btn-s" onclick="advPros(\''+p.id+'\')">Advance →</button>':'')+'<button class="btn btn-g" onclick="delPros(\''+p.id+'\')">×</button></div></div>';}).join('')+'</div>';}).join(''):'No prospects yet.';}
-function addPros(){var l=prospects();var d=new Date();d.setDate(d.getDate()+2);l.unshift({id:String(Date.now()),name:document.getElementById('pr_name').value,note:document.getElementById('pr_note').value,stage:'New',due:d.toISOString().slice(0,10)});localStorage.setItem('rf_prospects',JSON.stringify(l));document.getElementById('pr_name').value='';document.getElementById('pr_note').value='';loadPros();}
-function advPros(id){var l=prospects();var p=l.find(function(x){return x.id===id;});if(p){var i=STAGES.indexOf(p.stage);p.stage=STAGES[Math.min(i+1,3)];var nd=new Date();nd.setDate(nd.getDate()+3);p.due=nd.toISOString().slice(0,10);localStorage.setItem('rf_prospects',JSON.stringify(l));loadPros();}}
-function delPros(id){localStorage.setItem('rf_prospects',JSON.stringify(prospects().filter(function(x){return x.id!==id;})));loadPros();}
-/* Analytics + briefing (instant, no Loading) */
-function renderAna(){var l=prospects();var a=apps();var wins=l.filter(function(p){return p.stage==='Won';}).length+a.filter(function(x){return x.status==='Won';}).length;
- document.getElementById('anaBody').innerHTML=STAGES.map(function(s){var n=l.filter(function(p){return p.stage===s;}).length;var pct=l.length?Math.round(n/l.length*100):0;return '<div class="muted">'+s+' · '+n+'</div><div class="bar"><div style="width:'+pct+'%"></div></div>';}).join('')
- +'<div class="row"><span>Jobs matched</span><strong>'+document.getElementById('kJobs').textContent+'</strong></div><div class="row"><span>Proposals submitted</span><strong>'+a.filter(function(x){return x.status!=='Draft';}).length+'</strong></div><div class="row"><span>Services live</span><strong>'+services().length+'</strong></div><div class="row"><span>Clients won</span><strong>'+wins+'</strong></div>';}
-function renderBrief(){var l=prospects();var a=apps();var today=new Date().toISOString().slice(0,10);var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);}).length;
- document.getElementById('kApps').textContent=a.filter(function(x){return x.status!=='Draft';}).length;
- document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> matches · <strong>'+a.length+'</strong> proposals · <strong>'+due+'</strong> follow-ups due · plan: <strong>'+PLAN+'</strong> ('+allowance()+' matches). '+(PLAN==='Free'?'<a href="pricing.html" style="color:var(--accent)">Upgrade for more →</a>':'');}
-function setAppIdx(i,s){var a=apps();var x=a[i];if(!x)return;x.status=s;
- if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+x.title,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});localStorage.setItem('rf_prospects',JSON.stringify(l));}
- localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();}
+function addPros(){var l=prospects();var d=new Date();d.setDate(d.getDate()+2);l.unshift({id:String(Date.now()),name:document.getElementById('pr_name').value,note:document.getElementById('pr_note').value,stage:'New',due:d.toISOString().slice(0,10)});save('rf_prospects',l);document.getElementById('pr_name').value='';document.getElementById('pr_note').value='';loadPros();}
+function advPros(id){var l=prospects();for(var i=0;i<l.length;i++)if(l[i].id===id){var ix=STAGES.indexOf(l[i].stage);l[i].stage=STAGES[Math.min(ix+1,3)];var nd=new Date();nd.setDate(nd.getDate()+3);l[i].due=nd.toISOString().slice(0,10);}save('rf_prospects',l);loadPros();}
+function delPros(id){save('rf_prospects',prospects().filter(function(x){return x.id!==id;}));loadPros();}
 function renderApps(){var a=apps();var today=new Date().toISOString().slice(0,10);
- document.getElementById('appsBody').innerHTML=a.length?a.map(function(x,i){var fu=(x.status==='Submitted'&&x.due&&x.due<=today)?' <span class="badge b-amber">follow up now</span>':'';
-  var btns='';
+ document.getElementById('kApps').textContent=a.filter(function(x){return x.status!=='Draft';}).length;
+ document.getElementById('appsBody').innerHTML=a.length?a.map(function(x,i){var fu=(x.status==='Submitted'&&x.due&&x.due<=today)?' <span class="badge b-amber">follow up now</span>':'';var btns='';
   if(x.status==='Submitted')btns+='<button class="btn btn-s" onclick="setAppIdx('+i+',\'Replied\')">Replied</button> ';
   if(x.status!=='Won'&&x.status!=='Lost')btns+='<button class="btn btn-s" onclick="setAppIdx('+i+',\'Won\')">Won 🎉</button> <button class="btn btn-g" onclick="setAppIdx('+i+',\'Lost\')">Lost</button>';
   return '<div class="row"><div><strong>'+x.title+'</strong><br><span class="muted">'+x.platform+' · '+x.status+fu+'</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+btns+'</div></div>';}).join(''):'No applications yet — approve & submit a proposal above.';}
-function renderAll(){renderApps();showMatches();loadServ();loadPros();renderAna();renderBrief();}
-/* Settings */
-function applyProfile(pr){document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';var ee=document.getElementById('ob_engine');if(ee)ee.value=(pr.engine===false||pr.engine==='off')?'off':'on';}
-applyProfile(profile());
-fetch(API+'/api/get-profile?email='+E).then(function(r){return r.json();}).then(function(d){if(d.has){var pr={mode:d.mode,skills:d.skills,target:d.target,whatsapp:d.whatsapp,telegram:d.telegram,engine:d.engine};localStorage.setItem('rf_profile',JSON.stringify(pr));applyProfile(pr);renderAll();if(pr.engine!==false)runRobot(true);}}).catch(function(){});
-function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value,engine:document.getElementById('ob_engine').value!=='off'};
- localStorage.setItem('rf_profile',JSON.stringify(pr));document.getElementById('setMsg').textContent='✓ Saved to your account.';if(pr.engine){go('robot');runRobot(true);}else{document.getElementById('robotStatus').textContent='Engine paused.';}
+function renderAna(){var l=prospects();var a=apps();var wins=l.filter(function(p){return p.stage==='Won';}).length;
+ document.getElementById('anaBody').innerHTML=STAGES.map(function(s){var n=l.filter(function(p){return p.stage===s;}).length;var pct=l.length?Math.round(n/l.length*100):0;return '<div class="muted">'+s+' · '+n+'</div><div class="bar"><div style="width:'+pct+'%"></div></div>';}).join('')
+ +'<div class="row"><span>Jobs matched</span><strong>'+document.getElementById('kJobs').textContent+'</strong></div><div class="row"><span>Proposals submitted</span><strong>'+a.filter(function(x){return x.status!=='Draft';}).length+'</strong></div><div class="row"><span>Services live</span><strong>'+services().length+'</strong></div><div class="row"><span>Clients won</span><strong>'+wins+'</strong></div>';}
+function renderBrief(){var l=prospects();var a=apps();var today=new Date().toISOString().slice(0,10);var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);}).length;
+ document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> matches · <strong>'+a.length+'</strong> proposals · <strong>'+due+'</strong> follow-ups due · plan: <strong>'+PLAN+'</strong> ('+allowance()+' matches). '+(PLAN==='Free'?'<a href="pricing.html" style="color:var(--accent)">Upgrade for more →</a>':'');}
+function renderAll(){showMatches();loadServ();loadPros();renderApps();renderAna();renderBrief();}
+(function(){var pr=profile();document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';})();
+function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value};
+ save('rf_profile',pr);document.getElementById('setMsg').textContent='✓ Saved — searching now…';go('robot');runRobot(true);
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,mode:pr.mode,skills:pr.skills,target:pr.target,whatsapp:pr.whatsapp,telegram:pr.telegram})}).catch(function(){});}
-/* Plan (instant fallback, then server) */
 document.getElementById('planBody').innerHTML='<p>Plan: <strong>'+PLAN+'</strong> — '+allowance()+' matches & submissions.</p><a class="btn btn-p" href="pricing.html">Upgrade</a>';
-fetch(API+'/api/sub/'+E).then(function(r){return r.json();}).then(function(d){if(d.has){PLAN=d.plan;document.getElementById('kPlan')&&(document.getElementById('kPlan').textContent=PLAN);}document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>Plan: <strong>Free</strong> — '+allowance()+' matches & submissions.</p><a class="btn btn-p" href="pricing.html">Upgrade</a>';renderAll();}).catch(function(){renderAll();});
+fetch(API+'/api/sub/'+E).then(function(r){return r.json();}).then(function(d){if(d.has)PLAN=d.plan;
+ document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>Plan: <strong>Free</strong> — '+allowance()+' matches & submissions.</p><a class="btn btn-p" href="pricing.html">Upgrade</a>';renderAll();}).catch(function(){renderAll();});
 renderAll();restoreTab();runRobot(true);
 </script></body></html>
