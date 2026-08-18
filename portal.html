@@ -89,6 +89,7 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
   <section id="p-jobs" class="panel">
     <div class="crumb">Dashboard / Jobs</div><div class="ptitle">Jobs & Progress — review, approve, submit</div>
     <div class="card"><div id="jobsBody" class="muted">Loading…</div></div>
+    <div class="card"><h3><i class="fa-solid fa-paper-plane"></i> Your applications — what to do next</h3><div id="appsBody" class="muted">No applications yet.</div></div>
   </section>
   <section id="p-serv" class="panel">
     <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
@@ -196,16 +197,17 @@ function renderJobs(list,el){var lim=allowance();var html='';
   if(locked){html+='<div class="row lock"><div><i class="fa-solid fa-lock"></i> '+j.t+'<br><span class="muted">'+j.p+'</span></div><a class="btn btn-p" href="pricing.html">Upgrade</a></div>';return;}
   html+='<div class="row"><div><strong>'+j.t+'</strong><br><span class="muted">'+j.p+' · '+j.score+'% match</span>'
    +'<details style="margin-top:6px"><summary>'+(st?'View':'Write')+' proposal</summary><textarea id="d_'+i+'" rows="6">'+genDraft(j).replace(/</g,'&lt;')+'</textarea>'
-   +'<button class="btn btn-p" onclick="submitApp('+i+')">Approve & Submit</button></details></div>'
+   +'<button class="btn btn-p" onclick="submitApp('+i+')">Approve & Submit</button> <button class="btn btn-g" onclick="copyDraft('+i+')">Copy</button></details></div>'
    +'<div style="text-align:right">'+(st?'<span class="badge '+(st==='Submitted'?'b-blue':st==='Won'?'b-green':'b-amber')+'">'+st+'</span>':'<span class="badge b-amber">Draft</span>')+'<br><a style="color:var(--accent);font-size:.8rem" target="_blank" href="'+j.u+'">View job →</a></div></div>';});
  el.innerHTML=html||'Configure your engine (Settings) to see matches.';
  window._jobList=list;}
+function copyDraft(i){var el=document.getElementById('d_'+i);if(el){if(navigator.clipboard){navigator.clipboard.writeText(el.value).then(function(){alert('Proposal copied — paste it on the job site (View job).');});}else{prompt('Copy proposal:',el.value);}}}
 function submitApp(i){var j=(window._jobList||[])[i];if(!j)return;var a=apps();var lim=allowance();
  var sent=a.filter(function(x){return x.status==='Submitted'||x.status==='Won';}).length;
  if(sent>=lim){alert('Free limit reached ('+lim+' submissions). Upgrade to send more.');location.href='pricing.html';return;}
  var draft=document.getElementById('d_'+i).value;
  var ex=a.find(function(x){return x.title===j.t;});
- if(ex){ex.status='Submitted';ex.draft=draft;}else{a.unshift({title:j.t,platform:j.p,url:j.u,draft:draft,status:'Submitted',ts:Date.now()});}
+ if(ex){ex.status='Submitted';ex.draft=draft;}else{var fd=new Date();fd.setDate(fd.getDate()+3);a.unshift({title:j.t,platform:j.p,url:j.u,draft:draft,status:'Submitted',ts:Date.now(),due:fd.toISOString().slice(0,10)});}
  localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();alert('✓ Proposal submitted & tracked.');}
 function showMatches(){var m=localMatches();document.getElementById('kJobs').textContent=m.length;renderJobs(m,document.getElementById('jobsBody'));renderJobs(m,document.getElementById('robotJobs'));}
 function runRobot(silent){var st=document.getElementById('robotStatus');if(!silent)st.textContent='Searching latest jobs across platforms…';
@@ -236,7 +238,11 @@ function renderAna(){var l=prospects();var a=apps();var wins=l.filter(function(p
 function renderBrief(){var l=prospects();var a=apps();var today=new Date().toISOString().slice(0,10);var due=l.filter(function(p){return p.stage!=='Won'&&(!p.due||p.due<=today);}).length;
  document.getElementById('kApps').textContent=a.filter(function(x){return x.status!=='Draft';}).length;
  document.getElementById('briefBody').innerHTML='Today: <strong>'+localMatches().length+'</strong> matches · <strong>'+a.length+'</strong> proposals · <strong>'+due+'</strong> follow-ups due · plan: <strong>'+PLAN+'</strong> ('+allowance()+' matches). '+(PLAN==='Free'?'<a href="pricing.html" style="color:var(--accent)">Upgrade for more →</a>':'');}
-function renderAll(){showMatches();loadServ();loadPros();renderAna();renderBrief();}
+function setApp(t2,s){var a=apps();var x=a.find(function(y){return y.title===t2;});if(x){x.status=s;if(s==='Won'){var l=prospects();l.unshift({id:String(Date.now()),name:'WON: '+t2,note:'client won',stage:'Won',due:new Date().toISOString().slice(0,10)});localStorage.setItem('rf_prospects',JSON.stringify(l));}localStorage.setItem('rf_apps',JSON.stringify(a));renderAll();}}
+function renderApps(){var a=apps();var today=new Date().toISOString().slice(0,10);
+ document.getElementById('appsBody').innerHTML=a.length?a.map(function(x){var fu=(x.status==='Submitted'&&x.due&&x.due<=today)?' <span class="badge b-amber">follow up now</span>':'';
+  return '<div class="row"><div><strong>'+x.title+'</strong><br><span class="muted">'+x.platform+' · '+x.status+fu+'</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+(x.status==='Submitted'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Replied\')">Replied</button>':'')+(x.status!=='Won'&&x.status!=='Lost'?'<button class="btn btn-s" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Won\')">Won 🎉</button><button class="btn btn-g" onclick="setApp(\''+x.title.replace(/'/g,'')+'\',\'Lost\')">Lost</button>':'')+'</div></div>';}).join(''):'No applications yet — approve & submit a proposal above.';}
+function renderAll(){renderApps();showMatches();loadServ();loadPros();renderAna();renderBrief();}
 /* Settings */
 (function(){var pr=profile();document.getElementById('ob_mode').value=pr.mode||'jobs';document.getElementById('ob_skills').value=pr.skills||'';document.getElementById('ob_target').value=pr.target||'';document.getElementById('ob_wa').value=pr.whatsapp||'';document.getElementById('ob_tg').value=pr.telegram||'';})();
 function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:document.getElementById('ob_skills').value,target:document.getElementById('ob_target').value,whatsapp:document.getElementById('ob_wa').value,telegram:document.getElementById('ob_tg').value};
