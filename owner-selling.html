@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Owner Selling | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
+<style>body{background:#F4F6FA}.wrap{max-width:900px;margin:0 auto;padding:24px 16px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}.card h3{font-family:'Sora';margin-bottom:12px}input,select,textarea{width:100%;margin:6px 0 12px;padding:11px;border:1.5px solid var(--line);border-radius:10px}.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}.btn-p{background:var(--accent);color:#fff}.btn-g{background:#fff;border:1.5px solid var(--line);color:var(--ink)}.btn-s{background:#EFF4FF;color:var(--accent);font-size:.8rem;padding:6px 10px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.badge{background:#DCFCE7;color:#15803D;font-size:.7rem;padding:3px 8px;border-radius:99px}@media(max-width:700px){.grid{grid-template-columns:1fr}}</style></head>
+<body>
+<div class="wrap">
+<h1 style="font-family:'Sora'"><i class="fa-solid fa-crown"></i> Owner Selling Engine</h1>
+<p class="muted">Publish your products with media, advertise on all platforms, sell directly.</p>
+
+<div class="card">
+<h3><i class="fa-solid fa-plus"></i> Publish Your Product</h3>
+<div class="grid">
+<div><input id="p_name" placeholder="Product name"></div>
+<div><input id="p_price" type="number" placeholder="Price (USD)"></div>
+</div>
+<textarea id="p_desc" rows="2" placeholder="Description"></textarea>
+<label class="muted">IMAGE</label><input id="p_image" type="file" accept="image/*">
+<label class="muted">VIDEO</label><input id="p_video" type="file" accept="video/*">
+<label class="muted">CONTACT METHOD</label>
+<select id="p_contact"><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option><option value="email">Email</option><option value="phone">Phone</option></select>
+<label class="muted">CONTACT VALUE</label><input id="p_contactval" placeholder="+234... or @username or email">
+<button class="btn btn-p" onclick="addProduct()"><i class="fa-solid fa-rocket"></i> Publish & Advertise</button>
+</div>
+
+<div class="card">
+<h3><i class="fa-solid fa-list"></i> Your Products</h3>
+<div id="prodList"><p class="muted">Loading…</p></div>
+</div>
+</div>
+
+<script>
+var API='http://localhost:8502';
+function allPlatforms(){return ['X (Twitter)','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit'];}
+function adCopy(p,pl){return pl+' ad: '+p.name+' — '+(p.description||'')+' Only $'+p.price+'! Contact: '+(p.contact_value||'');}
+function shareLinks(p){var cap=p.name+' — '+(p.description||'')+' $'+p.price+'. Contact: '+(p.contact_value||'');var ce=encodeURIComponent(cap);
+ return '<a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?quote='+ce+'">FB</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.instagram.com/">IG</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(window.location.href)+'">in</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://t.me/share/url?text='+ce+'">TG</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.tiktok.com/">TT</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.youtube.com/">YT</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.pinterest.com/pin/create/button/?description='+ce+'">Pin</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.snapchat.com/">Snap</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.reddit.com/submit?title='+ce+'">Reddit</a>';}
+function copyAds(i){var p=window.PRODS[i];var ads=allPlatforms().map(function(pl){return adCopy(p,pl);}).join('\n\n');
+ if(navigator.clipboard){navigator.clipboard.writeText(ads).then(function(){alert('All ads copied!');});}else{prompt('Copy:',ads);}}
+function loadProducts(){fetch(API+'/api/owner/products').then(function(r){return r.json();}).then(function(d){
+ window.PRODS=d.products||[];var b=document.getElementById('prodList');
+ b.innerHTML=window.PRODS.length?window.PRODS.map(function(p,i){
+  var media=p.image?'<img src="'+p.image+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px">':p.video?'<video src="'+p.video+'" style="width:60px;height:60px;border-radius:6px"></video>':'';
+  return '<div class="row">'+(media||'')+'<div style="flex:1;margin-left:10px"><strong>'+p.name+'</strong> <span class="badge">$'+p.price+'</span><br><span class="muted">'+(p.description||'')+'</span><br><span class="muted">'+(p.contact_method||'email')+': '+(p.contact_value||'')+'</span>'
+   +'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">'+shareLinks(p)+' <button class="btn btn-s" onclick="copyAds('+i+')">Copy all ads</button></div>'
+   +'</div></div>';}).join(''):'<p class="muted">No products yet — publish your first one above.</p>';
+}).catch(function(){document.getElementById('prodList').innerHTML='<p class="muted">Start your local server (rf) to manage products.</p>';});}
+function addProduct(){var img=document.getElementById('p_image').files[0];var vid=document.getElementById('p_video').files[0];
+ function finish(iu,vu){fetch(API+'/api/owner/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('p_name').value,price:document.getElementById('p_price').value,description:document.getElementById('p_desc').value,image_url:iu,video_url:vu,contact_method:document.getElementById('p_contact').value,contact_value:document.getElementById('p_contactval').value})}).then(function(){
+  document.getElementById('p_name').value='';document.getElementById('p_price').value='';document.getElementById('p_desc').value='';document.getElementById('p_image').value='';document.getElementById('p_video').value='';document.getElementById('p_contactval').value='';loadProducts();alert('✓ Published! Ads ready for all platforms.');});}
+ if(img||vid){var fd=new FormData();if(img)fd.append('file',img);if(vid)fd.append('file',vid);
+  fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){finish(d.link||'',vid?d.link:'');}).catch(function(){finish('','');});}
+ else finish('','');}
+loadProducts();
+</script>
+</body></html>
