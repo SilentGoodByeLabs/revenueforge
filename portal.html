@@ -43,6 +43,8 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
   <button class="nav-i" data-p="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
   <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
   <button class="nav-i" data-p="sell"><i class="fa-solid fa-share-nodes"></i> Sell Everywhere</button>
+  <button class="nav-i" data-p="serv"><i class="fa-solid fa-boxes-stacked"></i> My Services</button>
+  <button class="nav-i" data-p="sell"><i class="fa-solid fa-share-nodes"></i> Sell Everywhere</button>
   <button class="nav-i" data-p="plan"><i class="fa-solid fa-crown"></i> Plan & Billing</button>
   <button class="nav-i" data-p="set"><i class="fa-solid fa-sliders"></i> Settings & Alerts</button>
   <button class="nav-i" data-p="help"><i class="fa-solid fa-life-ring"></i> Help & Guide</button>
@@ -73,6 +75,22 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
     <div class="crumb">Dashboard / Jobs</div><div class="ptitle">Jobs & Progress (applications)</div>
     <div class="card"><div id="jobsBody" class="muted">No applications yet — find a match and apply.</div></div>
   </section>
+  <section id="p-serv" class="panel">
+  <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
+  <div class="card"><h3><i class="fa-solid fa-plus"></i> Publish a service</h3>
+    <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><input id="sv_name" placeholder="Service name"></div><div><input id="sv_price" type="number" placeholder="Price (USD)"></div></div>
+    <textarea id="sv_desc" rows="2" placeholder="Short description"></textarea>
+    <button class="btn btn-p" onclick="addServ()"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
+  </div>
+  <div class="card"><h3><i class="fa-solid fa-list"></i> Your services</h3><div id="servBody" class="muted">No services yet.</div></div>
+</section>
+<section id="p-sell" class="panel">
+  <div class="crumb">Dashboard / Sell</div><div class="ptitle">Sell on every platform</div>
+  <div class="card"><h3><i class="fa-solid fa-share-nodes"></i> One-tap selling posts <span class="badge b-green">included in all plans</span></h3>
+    <p class="muted">The caption is written for you. Post to any platform, or copy for Instagram/TikTok.</p>
+    <div id="sellBody" class="muted">Publish a service first.</div>
+  </div>
+</section>
   <section id="p-serv" class="panel">
   <div class="crumb">Dashboard / Services</div><div class="ptitle">My Services</div>
   <div class="card"><h3><i class="fa-solid fa-plus"></i> Publish a service</h3>
@@ -187,6 +205,17 @@ function saveSet(){var pr={mode:document.getElementById('ob_mode').value,skills:
  ft(API+'/api/sub/'+E,4000).then(function(r){return r.json();}).then(function(d){if(d.has){PLAN=d.plan;document.getElementById('kPlan').textContent=PLAN;pb.innerHTML=planHTML(d);}renderBrief();showMatches();}).catch(function(){renderBrief();});})();
 function planHTML(d){if(d&&d.has)return '<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Daily matches</span><strong>'+LIMITS[d.plan]+'</strong></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>';
  return '<div class="row"><span>Plan</span><span class="badge b-blue">Free</span></div><div class="row"><span>Daily matches</span><strong>3</strong></div><div class="row"><span>Upgrade</span><a class="btn btn-p" href="pricing.html">See packages</a></div>';}
+
+function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
+function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSell(l);}
+function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});localStorage.setItem('rf_services',JSON.stringify(l));
+ fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
+ document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
+function loadSell(l){var box=document.getElementById('sellBody');l=l||services();if(!l.length){box.textContent='Publish a service first (My Services), then sell it everywhere here.';return;}
+ box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
+  return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-s" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-s" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-s" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-s" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-s" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-s" onclick="copyCap(\''+cap.replace(/'/g,"")+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
+function copyCap(t){if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Caption copied — paste it in Instagram or TikTok.');});}else{prompt('Copy this caption:',t);}}
+loadServ();
 
 function services(){try{return JSON.parse(localStorage.getItem('rf_services')||'[]');}catch(e){return[];}}
 function loadServ(){var l=services();document.getElementById('servBody').innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSell(l);}
