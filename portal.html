@@ -36,11 +36,19 @@ input,select,textarea{width:100%;margin:6px 0 12px;padding:11px 12px;border:1.5p
 .bar>div{height:100%;background:var(--accent)}
 .lock{opacity:.55;filter:grayscale(1)}
 details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:700}
-@media (max-width:900px){.dash{grid-template-columns:1fr}.side{position:static}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+.menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:70;width:44px;height:44px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:1.1rem;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(37,99,235,.35)}
+.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:55}
+.backdrop.show{display:block}
+@media (max-width:900px){.dash{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}
+ .side{position:fixed;left:0;top:0;bottom:0;width:270px;z-index:60;transform:translateX(-105%);transition:transform .25s;border-radius:0;overflow-y:auto}
+ .side.open{transform:none}
+ .menu-btn{display:flex}}
 </style></head><body><div id="header"></div>
+<button class="menu-btn" onclick="toggleSide()"><i class="fa-solid fa-bars"></i></button>
+<div class="backdrop" id="backdrop" onclick="toggleSide()"></div>
 <script>(function(){var q=new URLSearchParams(location.search);var a=q.get('authed');if(a){localStorage.setItem('rf_session',JSON.stringify({email:a}));history.replaceState(null,'',location.pathname);}})();</script>
 <div class="dash">
-<aside class="side">
+<aside class="side" id="side">
   <div class="brand"><img src="assets/logo.png" alt="">Revenue<b style="color:var(--accent)">Forge</b></div>
   <div class="user" id="uEmail">…</div>
   <button class="nav-i active" data-p="ov"><i class="fa-solid fa-chart-line"></i> Overview</button>
@@ -188,8 +196,10 @@ function liveJobs(words,cb){var out=[];var d=0;function f(){d++;if(d>=2)cb(out);
  fetch('https://hn.algolia.com/api/v1/search?query='+q+'&tags=story').then(function(r){return r.json();}).then(function(x){(x.hits||[]).slice(0,6).forEach(function(h){if(h.title&&h.url)out.push({t:h.title,p:'HackerNews',u:h.url,score:70,comment:'https://news.ycombinator.com/item?id='+(h.objectID||'')});});f();}).catch(f);
  fetch('https://www.reddit.com/r/PythonJobs/new.json').then(function(r){return r.json();}).then(function(x){((((x||{}).data||{}).children)||[]).slice(0,6).forEach(function(c){var v=c.data||{};if(v.title)out.push({t:v.title,p:'Reddit',u:'https://reddit.com'+v.permalink,score:72,author:'https://www.reddit.com/user/'+(v.author||''),dm:'https://www.reddit.com/message/compose?to='+(v.author||''),comment:'https://reddit.com'+v.permalink});});f();}).catch(f);}
 function genDraft(j){var pr=profile();return 'Hi,\n\nI saw your posting for "'+j.t+'" on '+j.p+'. I specialize in '+(pr.skills||'automation & development')+' and can deliver this quickly.\n\nMy approach:\n1. Understand your exact needs.\n2. Build & test a working solution.\n3. Deliver with documentation and support.\n\nTimeline: 2-5 days. Available to start immediately.\n\nBest,\n'+sess.email;}
-function go(p){document.querySelectorAll('.nav-i').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');try{localStorage.setItem('rf_tab',p);history.replaceState(null,'','#'+p);}catch(e){}}
+function go(p){document.querySelectorAll('.nav-i').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('active');});var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');document.getElementById('p-'+p).classList.add('active');try{localStorage.setItem('rf_tab',p);history.replaceState(null,'','#'+p);}catch(e){}
+ if(window.innerWidth<=900){var sd=document.getElementById('side');if(sd)sd.classList.remove('open');var bd=document.getElementById('backdrop');if(bd)bd.classList.remove('show');}}
 document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.p);});});
+function toggleSide(){var s=document.getElementById('side');var b=document.getElementById('backdrop');s.classList.toggle('open');b.classList.toggle('show');}
 function restoreTab(){var h=(location.hash||'').replace('#','');var tb=h||localStorage.getItem('rf_tab')||'ov';if(document.getElementById('p-'+tb))go(tb);}
 window.addEventListener('hashchange',function(){var h=(location.hash||'').replace('#','');if(document.getElementById('p-'+h))go(h);});
 function appStatus(t){var a=apps().find(function(x){return x.title===t;});return a?a.status:null;}
