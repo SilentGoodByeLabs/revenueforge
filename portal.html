@@ -104,6 +104,10 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
     <div class="card"><h3><i class="fa-solid fa-plus"></i> Add a service</h3>
       <div class="grid2"><div><input id="sv_name" placeholder="Service name"></div><div><input id="sv_price" type="number" placeholder="Price (USD)"></div></div>
       <textarea id="sv_desc" rows="2" placeholder="Short description"></textarea>
+      <label class="muted">IMAGE (optional)</label><input id="sv_image" type="file" accept="image/*">
+      <label class="muted">VIDEO (optional)</label><input id="sv_video" type="file" accept="video/*">
+      <label class="muted">CONTACT METHOD</label><select id="sv_contact"><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option><option value="email">Email</option><option value="phone">Phone</option></select>
+      <label class="muted">CONTACT VALUE (number/username/email)</label><input id="sv_contactval" placeholder="+234... or @username or email">
       <button class="btn btn-p" onclick="addServ()"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
     </div>
     <div class="card"><h3><i class="fa-solid fa-list"></i> Published services</h3><div id="servBody" class="muted">No services yet.</div></div>
@@ -226,11 +230,29 @@ function runRobot(silent){var st=document.getElementById('robotStatus');var pr=p
  if(!silent)st.textContent='Searching latest jobs across platforms…';
  var m=localMatches();
  liveJobs(pr.skills+' '+pr.target,function(live){var mg=m.concat(live);document.getElementById('kJobs').textContent=mg.length;renderJobs(mg,document.getElementById('robotJobs'));renderJobs(mg,document.getElementById('jobsBody'));if(!silent)st.textContent='✓ '+mg.length+' matches for your configuration.';});}
-function loadServ(){var l=services();var b=document.getElementById('servBody');
- b.innerHTML=l.length?l.map(function(p){return '<div class="row"><div><strong>'+p.name+'</strong><br><span class="muted">'+(p.description||'')+'</span></div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong><br><span class="badge b-green">active</span></div></div>';}).join(''):'No services yet — publish your first one above.';loadSocial(l);}
-function addServ(){var l=services();l.unshift({name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value||0,description:document.getElementById('sv_desc').value});save('rf_services',l);
- fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({email:sess.email,name:document.getElementById('sv_name').value,price:document.getElementById('sv_price').value,description:document.getElementById('sv_desc').value})}).catch(function(){});
- document.getElementById('sv_name').value='';document.getElementById('sv_price').value='';document.getElementById('sv_desc').value='';loadServ();}
+function adCopy(p,platform){var base=platform+' ad: '+p.name+' — '+(p.description||'')+' Only $'+(p.price||0)+'!';return base;}
+function allPlatforms(){return ['X (Twitter)','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit'];}
+function shareLinks(p){var cap=p.name+' — '+(p.description||'')+' $'+(p.price||0)+'. Contact: '+(p.contact_value||'');var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/marketplace.html');
+ return '<a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.instagram.com/">IG (copy caption)</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.tiktok.com/">TikTok</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.youtube.com/">YT</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.pinterest.com/pin/create/button/?url='+u+'&description='+ce+'">Pin</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.snapchat.com/">Snap</a>'
+ +'<a class="btn btn-g" target="_blank" href="https://www.reddit.com/submit?url='+u+'&title='+ce+'">Reddit</a>';}
+function copyAdAll(i){var p=window.SERVS[i];var ads=allPlatforms().map(function(pl){return adCopy(p,pl);}).join('\n\n');copyText(ads);}
+function loadServ(){var l=services();window.SERVS=l;var b=document.getElementById('servBody');
+ b.innerHTML=l.length?l.map(function(p,i){
+  var media=p.image?'<img src="'+p.image+'" style="width:80px;height:80px;object-fit:cover;border-radius:8px">':p.video?'<video src="'+p.video+'" style="width:80px;height:80px;border-radius:8px"></video>':'';
+  var contact=(p.contact_method||'email')+': '+(p.contact_value||sess.email);
+  return '<div class="row" style="align-items:flex-start">'+(media?'<div>'+media+'</div>':'')+'<div style="flex:1"><strong>'+p.name+'</strong> <span class="badge b-green">live on marketplace</span><br><span class="muted">'+(p.description||'')+'</span><br><span class="muted"><i class="fa-solid fa-address-book"></i> '+contact+'</span>'
+  +'<div style="margin:8px 0"><strong class="muted">Share on all platforms:</strong><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+shareLinks(p)+'</div></div>'
+  +'<button class="btn btn-s" onclick="copyAdAll('+i+')">Copy ads for all platforms</button>'
+  +'</div><div style="text-align:right"><strong>$'+(p.price||0)+'</strong></div></div>';}).join(''):'No services yet — publish your first one above with image/video; the engine will advertise it everywhere.';loadSocial(l);}
 function loadSocial(l){var box=document.getElementById('socialBody');l=l||services();if(!l.length){box.textContent='Add a service first (My Services), then sell it everywhere here.';return;}
  box.innerHTML=l.map(function(p){var cap='I offer '+p.name+' — '+(p.description||'')+' Get it here: https://silentgoodbyelabs.github.io/revenueforge/';var ce=encodeURIComponent(cap);var u=encodeURIComponent('https://silentgoodbyelabs.github.io/revenueforge/');
   return '<div class="row"><div><strong>'+p.name+'</strong></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-g" target="_blank" href="https://twitter.com/intent/tweet?text='+ce+'">X</a><a class="btn btn-g" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u='+u+'&quote='+ce+'">FB</a><a class="btn btn-g" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url='+u+'">in</a><a class="btn btn-g" target="_blank" href="https://wa.me/?text='+ce+'">WA</a><a class="btn btn-g" target="_blank" href="https://t.me/share/url?url='+u+'&text='+ce+'">TG</a><button class="btn btn-g" onclick="copyCap(\''+cap.replace(/'/g,'')+'\')">Copy IG/TikTok</button></div></div>';}).join('');}
