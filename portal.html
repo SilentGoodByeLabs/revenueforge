@@ -65,8 +65,7 @@ details summary{cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:7
   <button class="nav-i" data-p="plan"><i class="fa-solid fa-crown"></i> Plan & Billing</button>
   <button class="nav-i" data-p="set"><i class="fa-solid fa-sliders"></i> Settings & Alerts</button>
   <button class="nav-i" data-p="help"><i class="fa-solid fa-life-ring"></i> Help & Guide</button>
-  <button class="nav-i" onclick="startTour()" style="background:#16A34A;color:#fff"><i class="fa-solid fa-circle-play"></i> ▶ Record Demo</button>
-</aside>
+  </aside>
 <main>
   <section id="p-ov" class="panel active">
     <div class="crumb">Dashboard / Overview</div><div class="ptitle">Welcome back 👋</div>
@@ -303,33 +302,5 @@ document.getElementById('planBody').innerHTML='<p>Plan: <strong>'+PLAN+'</strong
 fetch(API+'/api/sub/'+E).then(function(r){return r.json();}).then(function(d){if(d.has)PLAN=d.plan;
  document.getElementById('planBody').innerHTML=d.has?'<div class="row"><span>Plan</span><span class="badge b-blue">'+d.plan+'</span></div><div class="row"><span>Status</span><span class="badge b-green">'+d.status+'</span></div><div class="row"><span>Manage</span><a class="btn btn-g" href="pricing.html">Change plan</a></div>':'<p>Plan: <strong>Free</strong> — '+allowance()+' matches & submissions.</p><a class="btn btn-p" href="pricing.html">Upgrade</a>';renderAll();}).catch(function(){renderAll();});
 renderAll();restoreTab();loadEngine();
-</script>
-<div id="cur" style="position:fixed;width:18px;height:18px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 0 0 4px rgba(37,99,235,.3);z-index:9999;pointer-events:none;transition:left .6s,top .6s;display:none"></div>
-<div id="tourCap" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0B2239;color:#fff;padding:12px 22px;border-radius:99px;font-weight:600;z-index:9999;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)"></div>
-<script>
-var _alert=window.alert;
-function cap(x){var c=document.getElementById('tourCap');c.style.display='block';c.textContent=x;}
-function move(el){if(!el)return;var r=el.getBoundingClientRect();var cu=document.getElementById('cur');cu.style.display='block';cu.style.left=(r.left+r.width/2)+'px';cu.style.top=(r.top+r.height/2)+'px';}
-function pulse(el){move(el);if(el){el.style.outline='3px solid #2563EB';setTimeout(function(){el.style.outline='';},700);}}
-function startTour(){
-  window.alert=function(m){cap('✓ '+m);};   // no popups during recording
-  var steps=[
-    [function(){go('set');cap('1 · Configure the engine with your skills.');pulse(document.getElementById('ob_skills'));},2600],
-    [function(){document.getElementById('ob_skills').value='python · automation · web scraping';document.getElementById('ob_target').value='startups & agencies';cap('2 · Skills saved — the engine knows what to hunt.');},2600],
-    [function(){saveSet();cap('3 · Engine searches 10+ platforms instantly.');},2600],
-    [function(){go('robot');runRobot(false);cap('4 · Real latest matches appear, scored to your skills.');},3000],
-    [function(){go('jobs');var d=document.querySelector('#jobsBody details');if(d)d.open=true;cap('5 · Every match gets a written proposal.');},2800],
-    [function(){submitApp(0);cap('6 · Approve & submit — tracked automatically.');},2600],
-    [function(){go('serv');document.getElementById('sv_name').value='OCR & Data Automation';document.getElementById('sv_price').value='150';cap('7 · Publish a service with your direct contact.');},2600],
-    [function(){addServ();cap('8 · It goes live on the public marketplace.');},2400],
-    [function(){go('social');cap('9 · One tap sells it on X, FB, LinkedIn, WhatsApp, Telegram + more.');},2800],
-    [function(){go('pros');addPros();cap('10 · Track every buyer from prospect to WON.');},2600],
-    [function(){go('ana');cap('11 · Analytics show your pipeline & wins.');},2400],
-    [function(){go('ov');cap('RevenueForge — your autonomous revenue engine. Free audit → revenueforge.github.io');},4000],
-    [function(){document.getElementById('tourCap').style.display='none';document.getElementById('cur').style.display='none';window.alert=_alert;},500]
-  ];
-  var i=0;(function next(){if(i>=steps.length)return;var s=steps[i++];s[0]();setTimeout(next,s[1]);})();
-}
-if(new URLSearchParams(location.search).get('tour')==='1')setTimeout(startTour,900);
 </script>
 </body></html>
