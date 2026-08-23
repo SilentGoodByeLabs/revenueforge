@@ -96,9 +96,26 @@ label{display:block;margin-top:16px;font-weight:600;font-size:.9rem}
   </div>
 </main>
 <script>
+
 var API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:8502':'https://revenueforge-api.onrender.com';
-var sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');
-if(!sess.email){var q=new URLSearchParams(location.search).get('email');if(q)sess={email:q};else{location.href='login.html';}}
+var sess = {};
+var urlParams = new URLSearchParams(location.search);
+var authedEmail = urlParams.get('authed') || urlParams.get('email');
+
+// 1. If backend sent ?authed=, save it immediately
+if (authedEmail) {
+    sess = { email: authedEmail };
+    sessionStorage.setItem('rf_session', JSON.stringify(sess));
+    localStorage.setItem('rf_session', JSON.stringify(sess));
+}
+
+// 2. Fallback to saved storage
+if (!sess.email) { try { sess = JSON.parse(sessionStorage.getItem('rf_session') || '{}'); } catch(e) {} }
+if (!sess.email) { try { sess = JSON.parse(localStorage.getItem('rf_session') || '{}'); } catch(e) {} }
+
+// 3. If still nothing, redirect to login
+if (!sess.email) { location.href = 'login.html'; }
+
 document.getElementById('userName').textContent=(sess.email||'').split('@')[0];
 document.getElementById('userEmail').textContent=sess.email||'';
 function showView(n){document.querySelectorAll('main > div').forEach(function(d){d.style.display='none';});var t=document.getElementById('view-'+n);if(t)t.style.display='block';document.querySelectorAll('.nav-i').forEach(function(b){b.classList.remove('active');});var b=document.querySelector('.nav-i[data-view="'+n+'"]');if(b)b.classList.add('active');if(n==='engine')loadEngine();if(n==='services')loadServices();if(n==='billing')loadPlan();}
