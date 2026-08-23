@@ -296,4 +296,35 @@ function loadServs(){
 });
 window.addEventListener('DOMContentLoaded',function(){ if(typeof go==='function') go('ov'); });
 </script>
+
+<script>
+// navWired - independent navigation so menu always responds
+(function(){
+  function show(p){
+    var codes=['ov','robot','jobs','serv','social','pros','ana','plan','set','help'];
+    codes.forEach(function(c){var el=document.getElementById('p-'+c);if(el)el.style.display='none';});
+    var t2=document.getElementById('p-'+p);if(t2)t2.style.display='block';
+    document.querySelectorAll('.nav-i').forEach(function(b){b.classList.remove('active');});
+    var b=document.querySelector('.nav-i[data-p="'+p+'"]');if(b)b.classList.add('active');
+    // run the page's own loaders if they exist
+    if(p==='jobs'&&typeof renderAll==='function')renderAll();
+    if(p==='serv'&&typeof renderServs==='function')renderServs();
+    if(p==='pros'&&typeof renderPros==='function')renderPros();
+    if(p==='ana'&&typeof renderAna==='function')renderAna();
+    if(p==='plan'&&typeof renderPlan==='function')renderPlan();
+    if(p==='set'&&typeof renderSet==='function')renderSet();
+  }
+  window.go = window.go || show;
+  document.querySelectorAll('.nav-i').forEach(function(b){
+    b.addEventListener('click',function(){show(b.getAttribute('data-p'));});
+  });
+  // hamburger / menu toggle
+  ['menuBtn','menu','burger','ham','navBtn','sideToggle'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.addEventListener('click',function(){var s=document.getElementById('side');if(s)s.classList.toggle('open');});
+  });
+  // make sure Overview shows on load
+  document.addEventListener('DOMContentLoaded',function(){show('ov');});
+})();
+</script>
 </body></html>
