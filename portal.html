@@ -115,4 +115,21 @@ function loadPlan(){fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(f
 function logout(){localStorage.removeItem('rf_session');location.href='login.html';}
 document.getElementById('brief').textContent='Engine ready. Configure skills and run your engine.';
 show('ov');loadServices();renderPros();
-</script></body></html>
+</script>
+<script>/* RF_NAV_FIX */
+(function(){
+  function show(code){
+    var codes=['ov','robot','jobs','serv','social','pros','ana','plan','set','help'];
+    for(var i=0;i<codes.length;i++){var el=document.getElementById('p-'+codes[i]);if(el)el.style.display=(codes[i]===code)?'block':'none';}
+    var bs=document.querySelectorAll('.nav-i');
+    for(var j=0;j<bs.length;j++){bs[j].classList.toggle('active',bs[j].getAttribute('data-p')===code);}
+    var s=document.getElementById('side');if(s)s.classList.remove('open');
+  }
+  window.go=show;
+  var bs=document.querySelectorAll('.nav-i');
+  for(var j=0;j<bs.length;j++){(function(b){b.addEventListener('click',function(){var p=b.getAttribute('data-p');if(p)show(p);});})(bs[j]);}
+  var burger=document.getElementById('burger')||document.querySelector('.burger');
+  if(burger)burger.addEventListener('click',function(){var s=document.getElementById('side');if(s)s.classList.toggle('open');});
+})();
+</script>
+</body></html>
