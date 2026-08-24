@@ -1,49 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RevenueForge Portal</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RevenueForge Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--accent:#2563EB;--ink:#0B2239;--muted:#64748B;--line:#E2E8F0;--bg:#F4F6FA;--side:#0B2239}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink)}
-.wrap{display:flex;min-height:100vh}
-aside{background:var(--side);width:260px;padding:20px 14px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
-.brand{color:#fff;font-family:'Sora';font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center;padding:8px 10px 20px}
-.brand img{width:34px;height:34px;background:#fff;border-radius:50%;padding:6px}
-.brand b{color:var(--accent)}
+:root{--accent:#2563EB;--ink:#0B2239;--muted:#64748B;--line:#E2E8F0;--bg:#EEF1F6;--side:#0B2239}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink)}
+.hdr{background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:60}
+.hdr .brand{display:flex;gap:8px;align-items:center;font-family:'Sora';font-weight:800}
+.hdr .brand b{color:var(--accent)}
+.hdr button{background:none;border:0;font-size:1.3rem;cursor:pointer;color:var(--ink)}
+.dashbar{background:#0B2239;color:#fff;padding:14px 16px;display:flex;gap:14px;align-items:center;font-family:'Sora';font-weight:700}
+.dashbar button{background:var(--accent);border:0;color:#fff;border-radius:10px;width:42px;height:42px;font-size:1.1rem;cursor:pointer}
+aside{background:var(--side);width:270px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;transform:translateX(-100%);transition:.25s;padding:18px 12px}
+aside.open{transform:none}
+.brand2{color:#fff;font-family:'Sora';font-weight:800;display:flex;gap:10px;align-items:center;padding:6px 10px 18px}
+.brand2 .logo{width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.brand2 b{color:var(--accent)}
 .nav-i{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:#A9BBD0;padding:13px 14px;border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:4px}
-.nav-i:hover,.nav-i.active{background:#1D4E75;color:#fff}
-.nav-i i{width:20px;text-align:center}
-main{flex:1;margin-left:260px;padding:28px 32px}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
-.card h2{font-family:'Sora';font-size:1.35rem;margin-bottom:6px}
-.card h3{font-family:'Sora';font-size:1.05rem;margin-bottom:12px}
-.muted{color:var(--muted);font-size:.88rem}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
-.kpi .l{font-size:.75rem;letter-spacing:.5px;color:var(--muted);font-weight:700;text-transform:uppercase}
-.kpi .v{font-family:'Sora';font-size:1.9rem;font-weight:800;margin-top:6px}
-input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;margin-top:6px;font-family:inherit}
-label{display:block;margin-top:14px;font-weight:600;font-size:.88rem}
-.btn{border:0;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;font-size:.9rem}
+.nav-i:hover,.nav-i.active{background:#1D4E75;color:#fff}.nav-i i{width:20px;text-align:center}
+main{padding:20px 16px 40px;max-width:760px;margin:0 auto}
+.crumbs{color:var(--muted);font-size:.8rem;margin:6px 0 4px}
+h1{font-family:'Sora';font-size:1.5rem;margin-bottom:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.card h2{font-family:'Sora';font-size:1.25rem;margin-bottom:10px}
+.card h3{font-family:'Sora';font-size:1.05rem;margin-bottom:10px}
+.muted{color:var(--muted);font-size:.9rem}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;position:relative}
+.kpi .v{font-family:'Sora';font-size:1.8rem;font-weight:800}
+.kpi .l{color:var(--muted);font-size:.85rem;margin-top:6px}
+.kpi i{position:absolute;top:16px;right:16px;color:var(--accent);font-size:1.1rem}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#16A34A;margin-right:6px}
+input,select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;margin-top:6px;font-family:inherit;background:#fff}
+label{display:block;margin-top:14px;font-weight:600;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.btn{border:0;border-radius:10px;padding:12px 20px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;font-size:.9rem}
 .btn-p{background:var(--accent);color:#fff}
-.btn-s{background:#EFF4FF;color:var(--accent);padding:8px 14px;font-size:.83rem}
-.btn-d{background:#FEE;color:#DC2626;padding:8px 14px;font-size:.83rem;border:1px solid #FCA5A5}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line)}
-.badge{background:#DCFCE7;color:#15803D;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:700}
-.burger{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--accent);color:#fff;border:0;border-radius:10px;width:46px;height:46px;font-size:1.2rem;cursor:pointer}
-@media(max-width:900px){aside{transform:translateX(-100%);transition:.25s}aside.open{transform:none}main{margin-left:0;padding:76px 16px 16px}.burger{display:block}}
-</style>
-</head>
-<body>
-<button class="burger" id="burger"><i class="fa-solid fa-bars"></i></button>
-<div class="wrap">
+.btn-o{background:#fff;border:1.5px solid var(--line);color:var(--ink);padding:9px 18px;font-size:.85rem}
+.btn-s{background:#EFF4FF;color:var(--accent);padding:9px 16px;font-size:.85rem}
+.btn-d{background:#FEE;color:#DC2626;padding:8px 14px;font-size:.8rem;border:1px solid #FCA5A5}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 2px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.badge{background:#DCFCE7;color:#15803D;padding:3px 10px;border-radius:8px;font-size:.75rem;font-weight:700}
+.badge-b{background:#DBEAFE;color:#1D4ED8;padding:4px 12px;border-radius:8px;font-size:.8rem;font-weight:700}
+.plat{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 0;text-align:center;font-weight:700;font-size:.8rem;cursor:pointer}
+.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:10px 0}
+.bar{height:8px;border-radius:99px;background:#E2E8F0;margin:8px 0 14px}.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+footer{background:#0B2239;color:#fff;padding:26px 18px;margin-top:30px}
+footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}
+footer p{color:#A9BBD0;font-size:.9rem;margin-top:8px}
+.svc{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+</style></head><body>
+<header class="hdr"><div class="brand"><i class="fa-solid fa-shield-halved"></i>Revenue<b>Forge</b></div><button id="burger2"><i class="fa-solid fa-bars"></i></button></header>
+<div class="dashbar"><button id="burger"><i class="fa-solid fa-bars"></i></button> RevenueForge Dashboard</div>
 <aside id="side">
-  <div class="brand"><img src="assets/logo.png" alt="">Revenue<b>Forge</b></div>
+  <div class="brand2"><span class="logo"><i class="fa-solid fa-shield-halved"></i></span>Revenue<b>Forge</b></div>
   <button class="nav-i active" data-view="ov"><i class="fa-solid fa-chart-line"></i> Overview</button>
   <button class="nav-i" data-view="eng"><i class="fa-solid fa-robot"></i> My Engine</button>
   <button class="nav-i" data-view="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
@@ -57,199 +67,131 @@ label{display:block;margin-top:14px;font-weight:600;font-size:.88rem}
 </aside>
 <main>
 <div id="view-ov">
-  <h1 style="font-family:Sora;font-size:1.7rem">Welcome back 👋</h1>
-  <p class="muted" id="uEmail"></p>
+  <div class="crumbs">Dashboard / Overview</div><h1>Welcome back 👋</h1>
   <div class="kpis">
-    <div class="kpi"><div class="l">Matches</div><div class="v" id="kMat">0</div></div>
-    <div class="kpi"><div class="l">Services Live</div><div class="v" id="kServ">0</div></div>
-    <div class="kpi"><div class="l">Prospects</div><div class="v" id="kPros">0</div></div>
+    <div class="kpi"><div class="v" id="kMat">0</div><div class="l">Matches found</div><i class="fa-solid fa-briefcase"></i></div>
+    <div class="kpi"><div class="v" id="kApps">0</div><div class="l">Applications sent</div><i class="fa-solid fa-paper-plane"></i></div>
+    <div class="kpi"><div class="v" id="kPros">0</div><div class="l">Prospects</div><i class="fa-solid fa-users"></i></div>
+    <div class="kpi"><div class="v" style="font-size:1.2rem"><span class="dot"></span>Active</div><div class="l">Engine status</div><i class="fa-solid fa-robot"></i></div>
   </div>
-  <div class="card">
-    <h3>☀️ Daily Briefing</h3>
-    <p class="muted" id="brief">Engine ready. Configure skills and run your engine.</p>
+  <div class="card"><h3><i class="fa-solid fa-gear"></i> Daily Briefing</h3><p class="muted" id="brief"></p></div>
+  <div class="card"><h3><i class="fa-solid fa-rocket"></i> Quick start</h3>
+    <div class="row"><span>1 · Configure engine</span><button class="btn btn-o" data-go="eng">Open</button></div>
+    <div class="row"><span>2 · Review & submit proposals</span><button class="btn btn-o" data-go="jobs">Open</button></div>
+    <div class="row"><span>3 · Sell everywhere</span><button class="btn btn-o" data-go="serv">Open</button></div>
+    <div class="row"><span>4 · Upgrade for more</span><button class="btn btn-p" data-go="plan">Upgrade</button></div>
   </div>
+  <div class="card"><h3><i class="fa-solid fa-robot"></i> Your engine</h3><p class="muted"><span class="dot"></span>It finds jobs, writes proposals & sells for you across 10+ platforms.</p><button class="btn btn-p" data-go="eng" style="margin-top:14px">Open my engine</button></div>
 </div>
-
-<div id="view-eng" style="display:none">
-  <div class="card">
-    <h2>🤖 My Engine</h2>
-    <p class="muted">Set what work you do. The engine finds people actively HIRING.</p>
-    <label>Skills / work type</label>
-    <textarea id="skills" rows="3" placeholder="cleaning, design, writing, virtual assistant, python..."></textarea>
-    <label>Target clients</label>
-    <input id="target" placeholder="startups, small businesses...">
-    <div style="margin-top:18px;display:flex;gap:10px">
-      <button class="btn btn-p" id="saveBtn"><i class="fa-solid fa-save"></i> Save</button>
-      <button class="btn btn-s" id="runBtn"><i class="fa-solid fa-play"></i> Run engine</button>
-    </div>
+<div id="view-eng" style="display:none"><div class="crumbs">Dashboard / My Engine</div><h1>My Engine</h1>
+  <div class="card"><h2><i class="fa-solid fa-robot"></i> Engine configuration</h2>
+    <label>Mode</label><select id="mode"><option>Find me jobs</option><option>Sell my services</option><option>Both</option></select>
+    <label>Skills</label><textarea id="skills" rows="3" placeholder="your skills / work type"></textarea>
+    <label>Target</label><input id="target" placeholder="who you want to work for">
+    <label>WhatsApp (Growth+)</label><input id="wa" placeholder="">
+    <label>Telegram (Growth+)</label><input id="tg" placeholder="">
+    <button class="btn btn-p" id="saveBtn" style="margin-top:18px">Save settings</button>
   </div>
-  <div class="card">
-    <h3>Latest matches</h3>
-    <div id="matchList" class="muted">Run the engine to see matches.</div>
-  </div>
+  <div class="card"><h3>Run engine</h3><p class="muted">Finds people actively HIRING for your skills.</p><button class="btn btn-p" id="runBtn" style="margin-top:12px"><i class="fa-solid fa-play"></i> Run now</button><div id="matchList" style="margin-top:14px"></div></div>
 </div>
-
-<div id="view-jobs" style="display:none">
-  <div class="card">
-    <h2>💼 Jobs & Progress</h2>
-    <p class="muted">Real hiring posts. Apply copies your proposal and opens the hirer page.</p>
-    <button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh</button>
-    <div id="jobsBody" class="muted">No jobs yet.</div>
+<div id="view-jobs" style="display:none"><div class="crumbs">Dashboard / Jobs</div><h1>Jobs & Progress</h1>
+  <div class="card"><p class="muted">Every match gets a proposal — approve & submit.</p><button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh matches</button><div id="jobsBody" class="muted">No jobs yet.</div></div></div>
+<div id="view-serv" style="display:none"><div class="crumbs">Dashboard / My Services</div><h1>My Services</h1>
+  <div class="card"><h2>＋ Add a service</h2>
+    <input id="sv_name" placeholder="Service name"><input id="sv_price" type="number" placeholder="Price (USD)" style="margin-top:12px"><textarea id="sv_desc" rows="3" placeholder="Short description" style="margin-top:12px"></textarea>
+    <label>Image (optional)</label><input id="sv_img" type="file" accept="image/*">
+    <label>Video (optional)</label><input id="sv_vid" type="file" accept="video/*">
+    <label>Contact method</label><select id="sv_cm"><option>whatsapp</option><option>telegram</option><option>email</option><option>phone</option></select>
+    <label>Contact value (number/username/email)</label><input id="sv_cv" placeholder="+234… or @username or email">
+    <button class="btn btn-p" id="pubBtn" style="margin-top:18px"><i class="fa-solid fa-floppy-disk"></i> Publish service</button>
   </div>
-</div>
-
-<div id="view-serv" style="display:none">
-  <div class="card">
-    <h2>📦 Publish a Service</h2>
-    <label>Name</label>
-    <input id="sv_name">
-    <label>Price (USD)</label>
-    <input id="sv_price" type="number">
-    <label>Description</label>
-    <textarea id="sv_desc" rows="2"></textarea>
-    <label>Image (optional)</label>
-    <input id="sv_img" type="file" accept="image/*">
-    <label>Contact method</label>
-    <select id="sv_cm">
-      <option>whatsapp</option>
-      <option>telegram</option>
-      <option>email</option>
-      <option>phone</option>
-    </select>
-    <label>Contact value</label>
-    <input id="sv_cv" placeholder="phone / username / email">
-    <button class="btn btn-p" id="pubBtn" style="margin-top:16px"><i class="fa-solid fa-rocket"></i> Publish</button>
-  </div>
-  <div class="card">
-    <h3>Your services</h3>
-    <div id="servBody" class="muted">Loading...</div>
-  </div>
-</div>
-
-<div id="view-social" style="display:none">
-  <div class="card">
-    <h2>🔗 Social Selling</h2>
-    <p class="muted">One tap copies ready ads for 11 platforms.</p>
-    <button class="btn btn-p" id="adsBtn" style="margin-top:12px"><i class="fa-solid fa-copy"></i> Copy ads for all platforms</button>
-  </div>
-</div>
-
-<div id="view-pros" style="display:none">
-  <div class="card">
-    <h2>👥 Prospects & Follow-ups</h2>
-    <label>Company / person</label>
-    <input id="pr_name">
-    <label>Note</label>
-    <input id="pr_note">
-    <button class="btn btn-p" id="prBtn" style="margin-top:14px">+ Add prospect</button>
-    <div id="prosBody" style="margin-top:16px"></div>
-  </div>
-</div>
-
-<div id="view-ana" style="display:none">
-  <div class="card">
-    <h2>📊 Analytics</h2>
-    <div id="anaBody"></div>
-  </div>
-</div>
-
-<div id="view-plan" style="display:none">
-  <div class="card">
-    <h2>👑 Plan & Billing</h2>
-    <div id="planBody" class="muted">Loading...</div>
-  </div>
-</div>
-
-<div id="view-set" style="display:none">
-  <div class="card">
-    <h2>⚙️ Settings & Alerts</h2>
-    <p class="muted">Account: <b id="setEmail"></b></p>
-    <button class="btn btn-d" id="outBtn" style="margin-top:16px"><i class="fa-solid fa-sign-out"></i> Logout</button>
-  </div>
-</div>
-
-<div id="view-help" style="display:none">
-  <div class="card">
-    <h2>🛟 Help & Guide</h2>
-    <ol style="margin-left:20px;line-height:1.9">
-      <li>Configure skills in My Engine.</li>
-      <li>Run the engine to find hiring posts.</li>
-      <li>Apply — proposal copied, hirer page opens.</li>
-      <li>Publish services to the marketplace.</li>
-      <li>Share on social to reach buyers.</li>
-      <li>Track prospects to WON.</li>
-    </ol>
-  </div>
-</div>
+  <div class="card"><h2>Published services</h2><div id="servBody" class="muted">Loading…</div></div></div>
+<div id="view-social" style="display:none"><div class="crumbs">Dashboard / Social Selling</div><h1>Social Selling</h1>
+  <div class="card"><h2><i class="fa-solid fa-share-nodes"></i> One-tap selling posts</h2><p class="muted">The caption is written for you. Post anywhere, or copy for Instagram/TikTok.</p><div id="socialBody" style="margin-top:14px"></div></div></div>
+<div id="view-pros" style="display:none"><div class="crumbs">Dashboard / Prospects</div><h1>Prospects & Follow-ups</h1>
+  <div class="card"><h2><i class="fa-solid fa-user-plus"></i> Add a prospect</h2><input id="pr_name" placeholder="Company / person"><input id="pr_note" placeholder="Note" style="margin-top:12px"><button class="btn btn-p" id="prBtn" style="margin-top:14px">＋ Add prospect</button></div>
+  <div class="card"><h3><i class="fa-solid fa-bell"></i> Due for follow-up</h3><div id="dueBody" class="muted">Nothing due.</div></div>
+  <div class="card"><h3><i class="fa-solid fa-filter"></i> Pipeline</h3><div id="prosBody"></div></div></div>
+<div id="view-ana" style="display:none"><div class="crumbs">Dashboard / Analytics</div><h1>Analytics</h1>
+  <div class="card"><h2><i class="fa-solid fa-chart-pie"></i> Your activity</h2><div id="anaBody"></div></div></div>
+<div id="view-plan" style="display:none"><div class="crumbs">Dashboard / Plan</div><h1>Plan & Billing</h1>
+  <div class="card"><p class="muted" id="planBody">Loading…</p><button class="btn btn-p" style="margin-top:12px">Upgrade</button></div></div>
+<div id="view-set" style="display:none"><div class="crumbs">Dashboard / Settings</div><h1>Settings & Alerts</h1>
+  <div class="card"><p class="muted">Account: <b id="setEmail"></b></p><button class="btn btn-d" id="outBtn" style="margin-top:16px"><i class="fa-solid fa-sign-out"></i> Logout</button></div></div>
+<div id="view-help" style="display:none"><div class="crumbs">Dashboard / Help</div><h1>Help & Guide</h1>
+  <div class="card"><ol style="margin-left:20px;line-height:2"><li>Configure skills in My Engine.</li><li>Run the engine to find hiring posts.</li><li>Review & submit proposals.</li><li>Publish services with your contact.</li><li>Sell everywhere; track buyers to WON.</li></ol></div></div>
 </main>
-</div>
-
+<footer><div class="b">Revenue <b>Forge</b></div><p>The autonomous revenue engine for freelancers and agencies.</p></footer>
 <script>
-var API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:8502':'https://revenueforge-api.onrender.com';
+var API='https://revenueforge-api.onrender.com';
 var sess={email:''};
 try{var u=new URLSearchParams(location.search);var a=u.get('authed')||u.get('email');if(a){sess={email:a};sessionStorage.setItem('rf_session',JSON.stringify(sess));}}catch(e){}
 if(!sess.email){try{sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');}catch(e){}}
-if(!sess.email){try{sess=JSON.parse(localStorage.getItem('rf_session')||'{}');}catch(e){}}
 if(!sess.email){location.href='login.html';}
-
 function $(id){return document.getElementById(id);}
-function ls(k,d){try{return JSON.parse(localStorage.getItem(k+sess.email)||d);}catch(e){return d;}}
-function sv(k,v){localStorage.setItem(k+sess.email,JSON.stringify(v));}
-
-function go(v){
-  var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];
-  for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
-  var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++){bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);}
-  if(v==='serv')loadServ();if(v==='plan')loadPlan();if(v==='ana')loadAna();if(v==='pros')loadPros();if(v==='jobs')loadJobs();if(v==='ov')loadOv();
-}
-
+function ls(k,d){try{return JSON.parse(localStorage.getItem(k+'::'+sess.email)||d);}catch(e){return d;}}
+function sv(k,v){localStorage.setItem(k+'::'+sess.email,JSON.stringify(v));}
+var SERVICES=[];
+function go(v){var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
+ var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++)bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);
+ $('side').classList.remove('open');window.scrollTo(0,0);
+ if(v==='ov')loadOv();if(v==='serv')loadServ();if(v==='social')loadSocial();if(v==='pros')loadPros();if(v==='ana')loadAna();if(v==='plan')loadPlan();if(v==='jobs')loadJobs();if(v==='eng')loadEng();}
 document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-view'));});});
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-go'));});});
 $('burger').addEventListener('click',function(){$('side').classList.toggle('open');});
-
-function loadOv(){$('uEmail').textContent=sess.email;$('setEmail').textContent=sess.email;
-  $('kMat').textContent=(ls('rf_jobs','[]')).length;$('kPros').textContent=(ls('rf_pros','[]')).length;
-  fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('kServ').textContent=(d.products||[]).length;}).catch(function(){});
-}
-
-$('saveBtn').addEventListener('click',function(){fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).then(function(){alert('✓ Saved');}).catch(function(){alert('✓ Saved locally');});});
+$('burger2').addEventListener('click',function(){$('side').classList.toggle('open');});
+function loadOv(){$('setEmail').textContent=sess.email;var j=ls('rf_jobs','[]'),ap=ls('rf_apps','[]'),pr=ls('rf_pros','[]');
+ $('kMat').textContent=j.length;$('kApps').textContent=ap.length;$('kPros').textContent=pr.length;
+ $('brief').innerHTML='Today: <b>'+j.length+'</b> matches · <b>'+ap.length+'</b> proposals · <b>0</b> follow-ups due · plan: <b>Free</b> (3 matches). <a href="#" data-go="plan" style="color:var(--accent)">Upgrade for more →</a>';
+ document.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){go(this.getAttribute('data-go'));};});}
+function loadEng(){var c=ls('rf_cfg',null);if(c){$('skills').value=c.skills||'';$('target').value=c.target||'';$('wa').value=c.wa||'';$('tg').value=c.tg||'';}}
+$('saveBtn').addEventListener('click',function(){sv('rf_cfg',{skills:$('skills').value,target:$('target').value,wa:$('wa').value,tg:$('tg').value});
+ fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).catch(function(){});
+ alert('✓ Settings saved');});
 $('runBtn').addEventListener('click',runEng);$('refBtn').addEventListener('click',runEng);
-
-function runEng(){var q=$('skills').value||'hiring';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=10').then(function(r){return r.json();}).then(function(d){var rs=d.results||[];sv('rf_jobs',rs);$('kMat').textContent=rs.length;renderJobs(rs);go('jobs');}).catch(function(){alert('Search error — check connection');});}
-
+function runEng(){var q=$('skills').value||'hiring';$('jobsBody').innerHTML='Searching…';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=10').then(function(r){return r.json();}).then(function(d){var rs=d.results||[];sv('rf_jobs',rs);renderJobs(rs);go('jobs');}).catch(function(){$('jobsBody').innerHTML='Search error.';});}
 function renderJobs(rs){if(!rs||!rs.length){$('jobsBody').innerHTML='<p class="muted">No matches. Try different skills.</p>';return;}
-  $('jobsBody').innerHTML=rs.map(function(r,i){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' • '+r.score+'%</span></div><button class="btn btn-p" data-u="'+r.url+'">Apply</button></div>';}).join('');
-  var btns=$('jobsBody').querySelectorAll('button');btns.forEach(function(b){b.addEventListener('click',function(){var p='Hi,\n\nI saw your post and can help immediately.\n\nContact me at '+sess.email+'.\n\nBest,\n'+sess.email;if(navigator.clipboard)navigator.clipboard.writeText(p);window.open(b.getAttribute('data-u'),'_blank');});});
-}
-
+ $('jobsBody').innerHTML=rs.map(function(r){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div><button class="btn btn-p" data-u="'+r.url+'">Review</button></div>';}).join('');
+ $('jobsBody').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){var p='Hi,\n\nI saw your post and can help immediately.\n\nContact me at '+sess.email+'.\n\nBest,\n'+sess.email;if(navigator.clipboard)navigator.clipboard.writeText(p);var ap=ls('rf_apps','[]');ap.push(1);sv('rf_apps',ap);window.open(b.getAttribute('data-u'),'_blank');});});}
 function loadJobs(){renderJobs(ls('rf_jobs','[]'));}
-
-$('pubBtn').addEventListener('click',function(){var img=$('sv_img').files[0];function fin(iu){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,name:$('sv_name').value,price:$('sv_price').value,description:$('sv_desc').value,image_url:iu,contact_method:$('sv_cm').value,contact_value:$('sv_cv').value||sess.email})}).then(function(r){return r.json();}).then(function(d){if(d.ok){alert('✓ Published');loadServ();}else alert('Error');}).catch(function(){alert('Error');});}
-  if(img){var fd=new FormData();fd.append('file',img);fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){fin(d.link||'');}).catch(function(){fin('');});}else fin('');
-});
-
-function loadServ(){fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var ps=d.products||[];$('kServ').textContent=ps.length;if(!ps.length){$('servBody').innerHTML='No services yet.';return;}
-  $('servBody').innerHTML=ps.map(function(p){return '<div class="row"><div><b>'+p.name+'</b> — $'+p.price+'</div><button class="btn btn-d" data-id="'+p.id+'">Delete</button></div>';}).join('');
-  $('servBody').querySelectorAll('.btn-d').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Delete?'))return;fetch(API+'/api/my/products/'+b.getAttribute('data-id')+'/delete',{method:'POST'}).then(function(){loadServ();});});});
-}).catch(function(){$('servBody').innerHTML='Error loading.';});}
-
-$('adsBtn').addEventListener('click',function(){var ps=['X','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit'];var ads=ps.map(function(p){return p+' Ad:\nProfessional services — contact '+sess.email;}).join('\n\n---\n\n');if(navigator.clipboard)navigator.clipboard.writeText(ads).then(function(){alert('✓ Copied for 11 platforms');});else prompt('Copy:',ads);});
-
-$('prBtn').addEventListener('click',function(){var l=ls('rf_pros','[]');l.push({n:$('pr_name').value,note:$('pr_note').value,s:'New'});sv('rf_pros',l);$('pr_name').value='';$('pr_note').value='';loadPros();});
-
-function loadPros(){var l=ls('rf_pros','[]');$('kPros').textContent=l.length;if(!l.length){$('prosBody').innerHTML='<p class="muted">No prospects.</p>';return;}
-  $('prosBody').innerHTML=l.map(function(p,i){return '<div class="row"><div><b>'+p.n+'</b> <span class="badge">'+p.s+'</span></div><button class="btn btn-s" data-i="'+i+'">Advance</button></div>';}).join('');
-  $('prosBody').querySelectorAll('.btn-s').forEach(function(b){b.addEventListener('click',function(){var i=+b.getAttribute('data-i');var l=ls('rf_pros','[]');var order=['New','Contacted','Replied','Won'];var x=order.indexOf(l[i].s)+1;l[i].s=order[Math.min(x,3)];sv('rf_pros',l);loadPros();});});
-}
-
-function loadAna(){var j=ls('rf_jobs','[]').length,p=ls('rf_pros','[]').length;fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var s=(d.products||[]).length;
-  $('anaBody').innerHTML='<div class="row"><span>Jobs matched</span><b>'+j+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Prospects</span><b>'+p+'</b></div>';}).catch(function(){});
-}
-
-function loadPlan(){fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('planBody').innerHTML=(d&&d.plan)?'<b>'+d.plan+'</b> plan — active':'<b>Free</b> tier — 3 matches/day. <a href="pricing.html" style="color:var(--accent)">Upgrade</a>';}).catch(function(){$('planBody').innerHTML='<b>Free</b> tier.';});}
-
+function cap(s){return '🚀 '+s.name+' — professional service. '+(s.description||'')+' Price: $'+s.price+'. Contact: '+(s.contact_method||'email')+' '+(s.contact_value||sess.email);}
+function share(p,s){var c=cap(s);var mk='https://silentgoodbyelabs.github.io/revenueforge/marketplace.html';var u='';
+ if(p==='X')u='https://twitter.com/intent/tweet?text='+encodeURIComponent(c);
+ else if(p==='FB')u='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(mk);
+ else if(p==='in')u='https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(mk);
+ else if(p==='WA')u='https://wa.me/?text='+encodeURIComponent(c);
+ else if(p==='TG')u='https://t.me/share/url?url='+encodeURIComponent(mk)+'&text='+encodeURIComponent(c);
+ else if(p==='Reddit')u='https://www.reddit.com/submit?title='+encodeURIComponent(c);
+ else if(p==='Pin')u='https://pinterest.com/pin/create/button/?description='+encodeURIComponent(c);
+ if(u)window.open(u,'_blank');else{if(navigator.clipboard)navigator.clipboard.writeText(c);alert('Caption copied for '+p+' — paste in the app.');}}
+$('pubBtn').addEventListener('click',function(){var img=$('sv_img').files[0];function fin(iu){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,name:$('sv_name').value,price:$('sv_price').value,description:$('sv_desc').value,image_url:iu,contact_method:$('sv_cm').value,contact_value:$('sv_cv').value||sess.email})}).then(function(r){return r.json();}).then(function(d){if(d.ok){alert('✓ Published — live on marketplace');loadServ();}else alert('Error');}).catch(function(){alert('Error');});}
+ if(img){var fd=new FormData();fd.append('file',img);fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){fin(d.link||'');}).catch(function(){fin('');});}else fin('');});
+function loadServ(){fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){SERVICES=d.products||[];if(!SERVICES.length){$('servBody').innerHTML='No services yet.';return;}
+ $('servBody').innerHTML=SERVICES.map(function(p,i){return '<div class="svc"><div class="row" style="border:0;padding:0"><div><b>'+p.name+'</b> <span class="badge">live on marketplace</span></div><b>$'+p.price+'</b></div><p class="muted" style="margin:8px 0"><i class="fa-solid fa-mobile"></i> '+p.contact_method+': '+p.contact_value+'</p><p class="muted">Share on all platforms:</p><div class="pgrid">'+['X','FB','IG','in','WA','TG','TikTok','YT','Pin','Snap','Reddit'].map(function(pl){return '<button class="plat" data-i="'+i+'" data-p="'+pl+'">'+pl+'</button>';}).join('')+'</div><button class="btn btn-s" data-copy="'+i+'">Copy ads for all platforms</button> <button class="btn btn-d" data-del="'+p.id+'">Delete</button></div>';}).join('');
+ $('servBody').querySelectorAll('.plat').forEach(function(b){b.addEventListener('click',function(){share(b.getAttribute('data-p'),SERVICES[+b.getAttribute('data-i')]);});});
+ $('servBody').querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var s=SERVICES[+b.getAttribute('data-copy')];if(navigator.clipboard)navigator.clipboard.writeText(cap(s));alert('✓ Ads copied for all platforms');});});
+ $('servBody').querySelectorAll('[data-del]').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Delete this service?'))return;fetch(API+'/api/my/products/'+b.getAttribute('data-del')+'/delete',{method:'POST'}).then(function(){loadServ();});});});}).catch(function(){$('servBody').innerHTML='Error loading.';});}
+function loadSocial(){if(!SERVICES.length)loadServSilent();
+ $('socialBody').innerHTML=SERVICES.length?SERVICES.map(function(s,i){return '<div style="margin-bottom:18px"><b>'+s.name+'</b><div class="pgrid" style="grid-template-columns:repeat(5,1fr)">'+['X','FB','in','WA','TG'].map(function(pl){return '<button class="plat" data-i="'+i+'" data-p="'+pl+'">'+pl+'</button>';}).join('')+'</div><button class="btn btn-o" data-ig="'+i+'">Copy IG/TikTok</button></div>';}).join(''):'<p class="muted">Publish a service first.</p>';
+ $('socialBody').querySelectorAll('.plat').forEach(function(b){b.addEventListener('click',function(){share(b.getAttribute('data-p'),SERVICES[+b.getAttribute('data-i')]);});});
+ $('socialBody').querySelectorAll('[data-ig]').forEach(function(b){b.addEventListener('click',function(){if(navigator.clipboard)navigator.clipboard.writeText(cap(SERVICES[+b.getAttribute('data-ig')]));alert('✓ Caption copied for IG/TikTok');});});}
+function loadServSilent(){fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){SERVICES=d.products||[];});}
+$('prBtn').addEventListener('click',function(){var l=ls('rf_pros','[]');l.push({n:$('pr_name').value||'Prospect',note:$('pr_note').value,s:'New'});sv('rf_pros',l);$('pr_name').value='';$('pr_note').value='';loadPros();});
+function loadPros(){var l=ls('rf_pros','[]');var stages=['New','Contacted','Replied','Won'];var html='';
+ stages.forEach(function(st){var items=l.map(function(p,i){p._i=i;return p;}).filter(function(p){return p.s===st;});
+  html+='<span class="badge-b" style="background:'+(st==='Won'?'#DCFCE7;color:#15803D':st==='New'?'#DBEAFE;color:#1D4ED8':'#E2E8F0;color:#334155')+'">'+st+' · '+items.length+'</span>';
+  items.forEach(function(p){html+='<div class="row"><div><b>'+p.n+'</b></div><div>'+(st!=='Won'?'<button class="btn btn-s" data-adv="'+p._i+'">Advance →</button> ':'')+'<button class="btn btn-o" data-rm="'+p._i+'">×</button></div></div>';});
+  html+='<div style="height:10px"></div>';});
+ $('prosBody').innerHTML=html||'<p class="muted">No prospects.</p>';
+ var due=l.filter(function(p){return p.s==='Contacted'||p.s==='Replied';});
+ $('dueBody').innerHTML=due.length?due.map(function(p){return '<div class="row"><span>'+p.n+'</span></div>';}).join(''):'Nothing due.';
+ $('prosBody').querySelectorAll('[data-adv]').forEach(function(b){b.addEventListener('click',function(){var i=+b.getAttribute('data-adv');var l=ls('rf_pros','[]');var o=['New','Contacted','Replied','Won'];l[i].s=o[Math.min(o.indexOf(l[i].s)+1,3)];sv('rf_pros',l);loadPros();});});
+ $('prosBody').querySelectorAll('[data-rm]').forEach(function(b){b.addEventListener('click',function(){var i=+b.getAttribute('data-rm');var l=ls('rf_pros','[]');l.splice(i,1);sv('rf_pros',l);loadPros();});});}
+function loadAna(){var l=ls('rf_pros','[]');var c={New:0,Contacted:0,Replied:0,Won:0};l.forEach(function(p){c[p.s]=(c[p.s]||0)+1;});var tot=Math.max(l.length,1);
+ fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var s=(d.products||[]).length;
+ $('anaBody').innerHTML=['New','Contacted','Replied','Won'].map(function(st){return '<div class="muted">'+st+' · '+c[st]+'</div><div class="bar"><i style="width:'+(c[st]/tot*100)+'%"></i></div>';}).join('')+
+ '<div class="row"><span>Jobs matched</span><b>'+ls('rf_jobs','[]').length+'</b></div><div class="row"><span>Proposals submitted</span><b>'+ls('rf_apps','[]').length+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Clients won</span><b>'+c.Won+'</b></div>';}).catch(function(){});}
+function loadPlan(){fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('planBody').innerHTML=(d&&d.plan)?'Plan: <b>'+d.plan+'</b>':'Plan: <b>Free</b> — 3 matches & submissions.';}).catch(function(){$('planBody').innerHTML='Plan: <b>Free</b> — 3 matches & submissions.';});}
 $('outBtn').addEventListener('click',function(){sessionStorage.removeItem('rf_session');location.href='login.html';});
-
 go('ov');
-</script>
-</body>
-</html>
+</script></body></html>
