@@ -1,20 +1,27 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RevenueForge Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root{--accent:#2563EB;--ink:#0B2239;--muted:#64748B;--line:#E2E8F0;--bg:#F4F6FA;--side:#0B2239}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink)}
 .wrap{display:flex;min-height:100vh}
-aside{background:var(--side);width:260px;padding:20px 14px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100}
+aside{background:var(--side);width:260px;padding:20px 14px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
 .brand{color:#fff;font-family:'Sora';font-weight:800;font-size:1.15rem;display:flex;gap:10px;align-items:center;padding:8px 10px 20px}
-.brand .logo{width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.brand img{width:34px;height:34px;background:#fff;border-radius:50%;padding:6px}
 .brand b{color:var(--accent)}
 .nav-i{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;color:#A9BBD0;padding:13px 14px;border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:4px}
-.nav-i:hover,.nav-i.active{background:#1D4E75;color:#fff}.nav-i i{width:20px;text-align:center}
+.nav-i:hover,.nav-i.active{background:#1D4E75;color:#fff}
+.nav-i i{width:20px;text-align:center}
 main{flex:1;margin-left:260px;padding:28px 32px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
-.card h2{font-family:'Sora';font-size:1.35rem;margin-bottom:6px}.card h3{font-family:'Sora';font-size:1.05rem;margin-bottom:12px}
+.card h2{font-family:'Sora';font-size:1.35rem;margin-bottom:6px}
+.card h3{font-family:'Sora';font-size:1.05rem;margin-bottom:12px}
 .muted{color:var(--muted);font-size:.88rem}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
@@ -23,17 +30,20 @@ main{flex:1;margin-left:260px;padding:28px 32px}
 input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;margin-top:6px;font-family:inherit}
 label{display:block;margin-top:14px;font-weight:600;font-size:.88rem}
 .btn{border:0;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;font-size:.9rem}
-.btn-p{background:var(--accent);color:#fff}.btn-s{background:#EFF4FF;color:var(--accent);padding:8px 14px;font-size:.83rem}
+.btn-p{background:var(--accent);color:#fff}
+.btn-s{background:#EFF4FF;color:var(--accent);padding:8px 14px;font-size:.83rem}
 .btn-d{background:#FEE;color:#DC2626;padding:8px 14px;font-size:.83rem;border:1px solid #FCA5A5}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line)}
 .badge{background:#DCFCE7;color:#15803D;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:700}
 .burger{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--accent);color:#fff;border:0;border-radius:10px;width:46px;height:46px;font-size:1.2rem;cursor:pointer}
 @media(max-width:900px){aside{transform:translateX(-100%);transition:.25s}aside.open{transform:none}main{margin-left:0;padding:76px 16px 16px}.burger{display:block}}
-</style></head><body>
+</style>
+</head>
+<body>
 <button class="burger" id="burger"><i class="fa-solid fa-bars"></i></button>
 <div class="wrap">
 <aside id="side">
-  <div class="brand"><span class="logo"><i class="fa-solid fa-shield-halved"></i></span>Revenue<b>Forge</b></div>
+  <div class="brand"><img src="assets/logo.png" alt="">Revenue<b>Forge</b></div>
   <button class="nav-i active" data-view="ov"><i class="fa-solid fa-chart-line"></i> Overview</button>
   <button class="nav-i" data-view="eng"><i class="fa-solid fa-robot"></i> My Engine</button>
   <button class="nav-i" data-view="jobs"><i class="fa-solid fa-briefcase"></i> Jobs & Progress</button>
@@ -46,29 +56,134 @@ label{display:block;margin-top:14px;font-weight:600;font-size:.88rem}
   <button class="nav-i" data-view="help"><i class="fa-solid fa-life-ring"></i> Help & Guide</button>
 </aside>
 <main>
-<div id="view-ov"><h1 style="font-family:Sora;font-size:1.7rem">Welcome back 👋</h1><p class="muted" id="uEmail"></p>
-  <div class="kpis"><div class="kpi"><div class="l">Matches</div><div class="v" id="kMat">0</div></div><div class="kpi"><div class="l">Services Live</div><div class="v" id="kServ">0</div></div><div class="kpi"><div class="l">Prospects</div><div class="v" id="kPros">0</div></div></div>
-  <div class="card"><h3>☀️ Daily Briefing</h3><p class="muted" id="brief">Engine ready. Configure skills and run your engine.</p></div></div>
-<div id="view-eng" style="display:none"><div class="card"><h2>🤖 My Engine</h2><p class="muted">Set what work you do. The engine finds people actively HIRING.</p>
-  <label>Skills / work type</label><textarea id="skills" rows="3" placeholder="cleaning, design, writing, virtual assistant, python..."></textarea>
-  <label>Target clients</label><input id="target" placeholder="startups, small businesses...">
-  <div style="margin-top:18px;display:flex;gap:10px"><button class="btn btn-p" id="saveBtn"><i class="fa-solid fa-save"></i> Save</button><button class="btn btn-s" id="runBtn"><i class="fa-solid fa-play"></i> Run engine</button></div></div>
-  <div class="card"><h3>Latest matches</h3><div id="matchList" class="muted">Run the engine to see matches.</div></div></div>
-<div id="view-jobs" style="display:none"><div class="card"><h2>💼 Jobs & Progress</h2><p class="muted">Real hiring posts. Apply copies your proposal and opens the hirer page.</p><button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh</button><div id="jobsBody" class="muted">No jobs yet.</div></div></div>
-<div id="view-serv" style="display:none"><div class="card"><h2>📦 Publish a Service</h2>
-  <label>Name</label><input id="sv_name"><label>Price (USD)</label><input id="sv_price" type="number"><label>Description</label><textarea id="sv_desc" rows="2"></textarea>
-  <label>Image (optional)</label><input id="sv_img" type="file" accept="image/*">
-  <label>Contact method</label><select id="sv_cm"><option>whatsapp</option><option>telegram</option><option>email</option><option>phone</option></select>
-  <label>Contact value</label><input id="sv_cv" placeholder="phone / username / email">
-  <button class="btn btn-p" id="pubBtn" style="margin-top:16px"><i class="fa-solid fa-rocket"></i> Publish</button></div>
-  <div class="card"><h3>Your services</h3><div id="servBody" class="muted">Loading...</div></div></div>
-<div id="view-social" style="display:none"><div class="card"><h2>🔗 Social Selling</h2><p class="muted">One tap copies ready ads for 11 platforms.</p><button class="btn btn-p" id="adsBtn" style="margin-top:12px"><i class="fa-solid fa-copy"></i> Copy ads for all platforms</button></div></div>
-<div id="view-pros" style="display:none"><div class="card"><h2>👥 Prospects & Follow-ups</h2><label>Company / person</label><input id="pr_name"><label>Note</label><input id="pr_note"><button class="btn btn-p" id="prBtn" style="margin-top:14px">+ Add prospect</button><div id="prosBody" style="margin-top:16px"></div></div></div>
-<div id="view-ana" style="display:none"><div class="card"><h2>📊 Analytics</h2><div id="anaBody"></div></div></div>
-<div id="view-plan" style="display:none"><div class="card"><h2>👑 Plan & Billing</h2><div id="planBody" class="muted">Loading...</div></div></div>
-<div id="view-set" style="display:none"><div class="card"><h2>⚙️ Settings & Alerts</h2><p class="muted">Account: <b id="setEmail"></b></p><button class="btn btn-d" id="outBtn" style="margin-top:16px"><i class="fa-solid fa-sign-out"></i> Logout</button></div></div>
-<div id="view-help" style="display:none"><div class="card"><h2>🛟 Help & Guide</h2><ol style="margin-left:20px;line-height:1.9"><li>Configure skills in My Engine.</li><li>Run the engine to find hiring posts.</li><li>Apply — proposal copied, hirer page opens.</li><li>Publish services to the marketplace.</li><li>Share on social to reach buyers.</li><li>Track prospects to WON.</li></ol></div></div>
-</main></div>
+<div id="view-ov">
+  <h1 style="font-family:Sora;font-size:1.7rem">Welcome back 👋</h1>
+  <p class="muted" id="uEmail"></p>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Matches</div><div class="v" id="kMat">0</div></div>
+    <div class="kpi"><div class="l">Services Live</div><div class="v" id="kServ">0</div></div>
+    <div class="kpi"><div class="l">Prospects</div><div class="v" id="kPros">0</div></div>
+  </div>
+  <div class="card">
+    <h3>☀️ Daily Briefing</h3>
+    <p class="muted" id="brief">Engine ready. Configure skills and run your engine.</p>
+  </div>
+</div>
+
+<div id="view-eng" style="display:none">
+  <div class="card">
+    <h2>🤖 My Engine</h2>
+    <p class="muted">Set what work you do. The engine finds people actively HIRING.</p>
+    <label>Skills / work type</label>
+    <textarea id="skills" rows="3" placeholder="cleaning, design, writing, virtual assistant, python..."></textarea>
+    <label>Target clients</label>
+    <input id="target" placeholder="startups, small businesses...">
+    <div style="margin-top:18px;display:flex;gap:10px">
+      <button class="btn btn-p" id="saveBtn"><i class="fa-solid fa-save"></i> Save</button>
+      <button class="btn btn-s" id="runBtn"><i class="fa-solid fa-play"></i> Run engine</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Latest matches</h3>
+    <div id="matchList" class="muted">Run the engine to see matches.</div>
+  </div>
+</div>
+
+<div id="view-jobs" style="display:none">
+  <div class="card">
+    <h2>💼 Jobs & Progress</h2>
+    <p class="muted">Real hiring posts. Apply copies your proposal and opens the hirer page.</p>
+    <button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    <div id="jobsBody" class="muted">No jobs yet.</div>
+  </div>
+</div>
+
+<div id="view-serv" style="display:none">
+  <div class="card">
+    <h2>📦 Publish a Service</h2>
+    <label>Name</label>
+    <input id="sv_name">
+    <label>Price (USD)</label>
+    <input id="sv_price" type="number">
+    <label>Description</label>
+    <textarea id="sv_desc" rows="2"></textarea>
+    <label>Image (optional)</label>
+    <input id="sv_img" type="file" accept="image/*">
+    <label>Contact method</label>
+    <select id="sv_cm">
+      <option>whatsapp</option>
+      <option>telegram</option>
+      <option>email</option>
+      <option>phone</option>
+    </select>
+    <label>Contact value</label>
+    <input id="sv_cv" placeholder="phone / username / email">
+    <button class="btn btn-p" id="pubBtn" style="margin-top:16px"><i class="fa-solid fa-rocket"></i> Publish</button>
+  </div>
+  <div class="card">
+    <h3>Your services</h3>
+    <div id="servBody" class="muted">Loading...</div>
+  </div>
+</div>
+
+<div id="view-social" style="display:none">
+  <div class="card">
+    <h2>🔗 Social Selling</h2>
+    <p class="muted">One tap copies ready ads for 11 platforms.</p>
+    <button class="btn btn-p" id="adsBtn" style="margin-top:12px"><i class="fa-solid fa-copy"></i> Copy ads for all platforms</button>
+  </div>
+</div>
+
+<div id="view-pros" style="display:none">
+  <div class="card">
+    <h2>👥 Prospects & Follow-ups</h2>
+    <label>Company / person</label>
+    <input id="pr_name">
+    <label>Note</label>
+    <input id="pr_note">
+    <button class="btn btn-p" id="prBtn" style="margin-top:14px">+ Add prospect</button>
+    <div id="prosBody" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<div id="view-ana" style="display:none">
+  <div class="card">
+    <h2>📊 Analytics</h2>
+    <div id="anaBody"></div>
+  </div>
+</div>
+
+<div id="view-plan" style="display:none">
+  <div class="card">
+    <h2>👑 Plan & Billing</h2>
+    <div id="planBody" class="muted">Loading...</div>
+  </div>
+</div>
+
+<div id="view-set" style="display:none">
+  <div class="card">
+    <h2>⚙️ Settings & Alerts</h2>
+    <p class="muted">Account: <b id="setEmail"></b></p>
+    <button class="btn btn-d" id="outBtn" style="margin-top:16px"><i class="fa-solid fa-sign-out"></i> Logout</button>
+  </div>
+</div>
+
+<div id="view-help" style="display:none">
+  <div class="card">
+    <h2>🛟 Help & Guide</h2>
+    <ol style="margin-left:20px;line-height:1.9">
+      <li>Configure skills in My Engine.</li>
+      <li>Run the engine to find hiring posts.</li>
+      <li>Apply — proposal copied, hirer page opens.</li>
+      <li>Publish services to the marketplace.</li>
+      <li>Share on social to reach buyers.</li>
+      <li>Track prospects to WON.</li>
+    </ol>
+  </div>
+</div>
+</main>
+</div>
+
 <script>
 var API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:8502':'https://revenueforge-api.onrender.com';
 var sess={email:''};
@@ -76,37 +191,65 @@ try{var u=new URLSearchParams(location.search);var a=u.get('authed')||u.get('ema
 if(!sess.email){try{sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');}catch(e){}}
 if(!sess.email){try{sess=JSON.parse(localStorage.getItem('rf_session')||'{}');}catch(e){}}
 if(!sess.email){location.href='login.html';}
+
 function $(id){return document.getElementById(id);}
 function ls(k,d){try{return JSON.parse(localStorage.getItem(k+sess.email)||d);}catch(e){return d;}}
 function sv(k,v){localStorage.setItem(k+sess.email,JSON.stringify(v));}
-function go(v){var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
- var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++){bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);}
- if(v==='serv')loadServ();if(v==='plan')loadPlan();if(v==='ana')loadAna();if(v==='pros')loadPros();if(v==='jobs')loadJobs();if(v==='ov')loadOv();}
+
+function go(v){
+  var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];
+  for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
+  var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++){bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);}
+  if(v==='serv')loadServ();if(v==='plan')loadPlan();if(v==='ana')loadAna();if(v==='pros')loadPros();if(v==='jobs')loadJobs();if(v==='ov')loadOv();
+}
+
 document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-view'));});});
 $('burger').addEventListener('click',function(){$('side').classList.toggle('open');});
+
 function loadOv(){$('uEmail').textContent=sess.email;$('setEmail').textContent=sess.email;
- $('kMat').textContent=(ls('rf_jobs','[]')).length;$('kPros').textContent=(ls('rf_pros','[]')).length;
- fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('kServ').textContent=(d.products||[]).length;}).catch(function(){});}
-$('saveBtn').addEventListener('click',function(){fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).then(function(){alert('✓ Saved');}).catch(function(){alert('✓ Saved');});});
+  $('kMat').textContent=(ls('rf_jobs','[]')).length;$('kPros').textContent=(ls('rf_pros','[]')).length;
+  fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('kServ').textContent=(d.products||[]).length;}).catch(function(){});
+}
+
+$('saveBtn').addEventListener('click',function(){fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).then(function(){alert('✓ Saved');}).catch(function(){alert('✓ Saved locally');});});
 $('runBtn').addEventListener('click',runEng);$('refBtn').addEventListener('click',runEng);
+
 function runEng(){var q=$('skills').value||'hiring';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=10').then(function(r){return r.json();}).then(function(d){var rs=d.results||[];sv('rf_jobs',rs);$('kMat').textContent=rs.length;renderJobs(rs);go('jobs');}).catch(function(){alert('Search error — check connection');});}
+
 function renderJobs(rs){if(!rs||!rs.length){$('jobsBody').innerHTML='<p class="muted">No matches. Try different skills.</p>';return;}
- $('jobsBody').innerHTML=rs.map(function(r){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' • '+r.score+'%</span></div><button class="btn btn-p" data-u="'+r.url+'">Apply</button></div>';}).join('');
- $('jobsBody').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){var p='Hi,\n\nI saw your post and can help immediately.\n\nContact me at '+sess.email+'.\n\nBest,\n'+sess.email;if(navigator.clipboard)navigator.clipboard.writeText(p);window.open(b.getAttribute('data-u'),'_blank');});});}
+  $('jobsBody').innerHTML=rs.map(function(r,i){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' • '+r.score+'%</span></div><button class="btn btn-p" data-u="'+r.url+'">Apply</button></div>';}).join('');
+  var btns=$('jobsBody').querySelectorAll('button');btns.forEach(function(b){b.addEventListener('click',function(){var p='Hi,\n\nI saw your post and can help immediately.\n\nContact me at '+sess.email+'.\n\nBest,\n'+sess.email;if(navigator.clipboard)navigator.clipboard.writeText(p);window.open(b.getAttribute('data-u'),'_blank');});});
+}
+
 function loadJobs(){renderJobs(ls('rf_jobs','[]'));}
+
 $('pubBtn').addEventListener('click',function(){var img=$('sv_img').files[0];function fin(iu){fetch(API+'/api/my/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,name:$('sv_name').value,price:$('sv_price').value,description:$('sv_desc').value,image_url:iu,contact_method:$('sv_cm').value,contact_value:$('sv_cv').value||sess.email})}).then(function(r){return r.json();}).then(function(d){if(d.ok){alert('✓ Published');loadServ();}else alert('Error');}).catch(function(){alert('Error');});}
- if(img){var fd=new FormData();fd.append('file',img);fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){fin(d.link||'');}).catch(function(){fin('');});}else fin('');});
+  if(img){var fd=new FormData();fd.append('file',img);fetch('https://file.io',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){fin(d.link||'');}).catch(function(){fin('');});}else fin('');
+});
+
 function loadServ(){fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var ps=d.products||[];$('kServ').textContent=ps.length;if(!ps.length){$('servBody').innerHTML='No services yet.';return;}
- $('servBody').innerHTML=ps.map(function(p){return '<div class="row"><div><b>'+p.name+'</b> — $'+p.price+'</div><button class="btn btn-d" data-id="'+p.id+'">Delete</button></div>';}).join('');
- $('servBody').querySelectorAll('.btn-d').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Delete?'))return;fetch(API+'/api/my/products/'+b.getAttribute('data-id')+'/delete',{method:'POST'}).then(function(){loadServ();});});});}).catch(function(){$('servBody').innerHTML='Error loading.';});}
+  $('servBody').innerHTML=ps.map(function(p){return '<div class="row"><div><b>'+p.name+'</b> — $'+p.price+'</div><button class="btn btn-d" data-id="'+p.id+'">Delete</button></div>';}).join('');
+  $('servBody').querySelectorAll('.btn-d').forEach(function(b){b.addEventListener('click',function(){if(!confirm('Delete?'))return;fetch(API+'/api/my/products/'+b.getAttribute('data-id')+'/delete',{method:'POST'}).then(function(){loadServ();});});});
+}).catch(function(){$('servBody').innerHTML='Error loading.';});}
+
 $('adsBtn').addEventListener('click',function(){var ps=['X','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit'];var ads=ps.map(function(p){return p+' Ad:\nProfessional services — contact '+sess.email;}).join('\n\n---\n\n');if(navigator.clipboard)navigator.clipboard.writeText(ads).then(function(){alert('✓ Copied for 11 platforms');});else prompt('Copy:',ads);});
+
 $('prBtn').addEventListener('click',function(){var l=ls('rf_pros','[]');l.push({n:$('pr_name').value,note:$('pr_note').value,s:'New'});sv('rf_pros',l);$('pr_name').value='';$('pr_note').value='';loadPros();});
+
 function loadPros(){var l=ls('rf_pros','[]');$('kPros').textContent=l.length;if(!l.length){$('prosBody').innerHTML='<p class="muted">No prospects.</p>';return;}
- $('prosBody').innerHTML=l.map(function(p,i){return '<div class="row"><div><b>'+p.n+'</b> <span class="badge">'+p.s+'</span></div><button class="btn btn-s" data-i="'+i+'">Advance</button></div>';}).join('');
- $('prosBody').querySelectorAll('.btn-s').forEach(function(b){b.addEventListener('click',function(){var i=+b.getAttribute('data-i');var l=ls('rf_pros','[]');var o=['New','Contacted','Replied','Won'];var x=o.indexOf(l[i].s)+1;l[i].s=o[Math.min(x,3)];sv('rf_pros',l);loadPros();});});}
+  $('prosBody').innerHTML=l.map(function(p,i){return '<div class="row"><div><b>'+p.n+'</b> <span class="badge">'+p.s+'</span></div><button class="btn btn-s" data-i="'+i+'">Advance</button></div>';}).join('');
+  $('prosBody').querySelectorAll('.btn-s').forEach(function(b){b.addEventListener('click',function(){var i=+b.getAttribute('data-i');var l=ls('rf_pros','[]');var order=['New','Contacted','Replied','Won'];var x=order.indexOf(l[i].s)+1;l[i].s=order[Math.min(x,3)];sv('rf_pros',l);loadPros();});});
+}
+
 function loadAna(){var j=ls('rf_jobs','[]').length,p=ls('rf_pros','[]').length;fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var s=(d.products||[]).length;
- $('anaBody').innerHTML='<div class="row"><span>Jobs matched</span><b>'+j+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Prospects</span><b>'+p+'</b></div>';}).catch(function(){});}
+  $('anaBody').innerHTML='<div class="row"><span>Jobs matched</span><b>'+j+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Prospects</span><b>'+p+'</b></div>';}).catch(function(){});
+}
+
 function loadPlan(){fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){$('planBody').innerHTML=(d&&d.plan)?'<b>'+d.plan+'</b> plan — active':'<b>Free</b> tier — 3 matches/day. <a href="pricing.html" style="color:var(--accent)">Upgrade</a>';}).catch(function(){$('planBody').innerHTML='<b>Free</b> tier.';});}
+
 $('outBtn').addEventListener('click',function(){sessionStorage.removeItem('rf_session');location.href='login.html';});
+
 go('ov');
-</script></body></html>
+</script>
+</body>
+</html>
