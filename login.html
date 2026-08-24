@@ -8,7 +8,8 @@ a{color:#2563EB}</style></head><body>
 <div class="card"><h1>Revenue<b>Forge</b></h1><p style="color:#64748B;margin:0 0 8px">Sign in to your dashboard</p>
 <form id="f"><input id="em" type="email" placeholder="Email" required><input id="pw" type="password" placeholder="Password" required><button>Log in</button></form>
 <p style="color:#64748B;font-size:.85rem;margin-top:14px">No account? <a href="signup.html">Sign up</a></p></div>
-<script>
+<script>// auto-forward
+try{var s=JSON.parse(sessionStorage.getItem('rf_session')||'{}');if(s.email)location.href='portal.html?authed='+encodeURIComponent(s.email);}catch(e){}
 var API=(location.hostname==='localhost')?'http://localhost:8502':'https://revenueforge-api.onrender.com';
 document.getElementById('f').addEventListener('submit',function(e){e.preventDefault();
  var em=document.getElementById('em').value;
