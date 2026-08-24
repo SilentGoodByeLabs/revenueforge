@@ -94,7 +94,7 @@ footer p{color:#A9BBD0;font-size:.9rem;margin-top:8px}
     <button class="btn btn-p" id="startBtn" style="margin-top:12px"><i class="fa-solid fa-play"></i> Start engine</button>
     <button class="btn btn-d" id="stopBtn" style="margin-top:12px;display:none"><i class="fa-solid fa-stop"></i> Stop engine</button>
     <p class="muted" style="margin-top:10px">When started, it keeps working for you in the cloud until you stop it — even if you close the app.</p></div>
-  <div class="card"><h3>Run once</h3><p class="muted">Finds people actively HIRING for your skills right now.</p><button class="btn btn-p" id="runBtn" style="margin-top:12px"><i class="fa-solid fa-play"></i> Run now</button><div id="matchList" style="margin-top:14px"></div></div>
+  <div class="card"><h3>🌍 Where the engine searches</h3><p class="muted">Remotive (global) · RemoteOK (global) · Arbeitnow (Europe) · Reed (UK) · Indeed (worldwide) · Reddit (r/forhire, r/Jobs, r/WorkOnline, r/slavelabour) · Hacker News (tech). Any kind of work, people who need to HIRE.</p></div><div class="card"><h3>Run once</h3><p class="muted">Finds people actively HIRING for your skills right now.</p><button class="btn btn-p" id="runBtn" style="margin-top:12px"><i class="fa-solid fa-play"></i> Run now</button><div id="matchList" style="margin-top:14px"></div></div>
 </div>
 <div id="view-jobs" style="display:none"><div class="crumbs">Dashboard / Jobs</div><h1>Jobs & Progress</h1>
   <div class="card"><p class="muted">Every match gets a proposal — approve & submit.</p><button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh matches</button><div id="jobsBody" class="muted">No jobs yet.</div></div></div>
@@ -127,7 +127,18 @@ footer p{color:#A9BBD0;font-size:.9rem;margin-top:8px}
 <div id="view-help" style="display:none"><div class="crumbs">Dashboard / Help</div><h1>Help & Guide</h1>
   <div class="card"><ol style="margin-left:20px;line-height:2"><li>Configure skills in My Engine.</li><li>Run the engine to find hiring posts.</li><li>Review & submit proposals.</li><li>Publish services with your contact.</li><li>Sell everywhere; track buyers to WON.</li></ol></div></div>
 </main>
-<footer><div class="b">Revenue <b>Forge</b></div><p>The autonomous revenue engine for freelancers and agencies.</p></footer>
+<footer><div class="b">Revenue <b>Forge</b></div><p>The autonomous revenue engine for freelancers and agencies.</p>
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(11,34,57,.6);z-index:300;padding:20px;overflow:auto">
+ <div style="background:#fff;border-radius:14px;max-width:640px;margin:6vh auto;padding:20px">
+  <h3 style="font-family:Sora;margin-bottom:10px">📄 Your proposal</h3>
+  <textarea id="propTxt" rows="14" style="width:100%;border:1.5px solid #E2E8F0;border-radius:10px;padding:12px;font-size:13px"></textarea>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+   <button class="btn btn-p" id="sendBtn">📨 Submit & send</button>
+   <button class="btn btn-o" id="closeM">Close</button>
+  </div>
+  <p class="muted" style="margin-top:10px">Submit & send = copies the proposal, opens the hirer's page, and opens a pre-filled email to them when a contact email exists — as automatic as platforms allow.</p>
+ </div></div>
+</footer>
 <script>
 var API='https://revenueforge-api.onrender.com';
 var sess={email:''};
@@ -146,7 +157,8 @@ document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('clic
 document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-go'));});});
 $('burger').addEventListener('click',function(){$('side').classList.toggle('open');});
 $('burger2').addEventListener('click',function(){$('side').classList.toggle('open');});
-function loadOv(){$('setEmail').textContent=sess.email;var j=ls('rf_jobs','[]'),ap=ls('rf_apps','[]'),pr=ls('rf_pros','[]');
+function hasCfg(){var c=ls('rf_cfg',null);return !!(c&&c.skills);}
+function loadOv(){$('setEmail').textContent=sess.email;var j=hasCfg()?ls('rf_jobs','[]'):[],ap=ls('rf_apps','[]'),pr=ls('rf_pros','[]');
  $('kMat').textContent=j.length;$('kApps').textContent=ap.length;$('kPros').textContent=pr.length;
  $('brief').innerHTML='Today: <b>'+j.length+'</b> matches · <b>'+ap.length+'</b> proposals · <b>0</b> follow-ups due · plan: <b>Free</b> (3 matches). <a href="#" data-go="plan" style="color:var(--accent)">Upgrade for more →</a>';
  document.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){go(this.getAttribute('data-go'));};});}
@@ -156,9 +168,14 @@ $('saveBtn').addEventListener('click',function(){sv('rf_cfg',{skills:$('skills')
  alert('✓ Settings saved');});
 $('runBtn').addEventListener('click',runEng);$('refBtn').addEventListener('click',runEng);
 function hasCfg(){var c=ls('rf_cfg',null);return !!(c&&c.skills);} function runEng(){if(!hasCfg()){alert('Configure your skills first — My Engine → Save settings.');go('eng');return;} var q=$('skills').value;$('jobsBody').innerHTML='Searching…';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=10').then(function(r){return r.json();}).then(function(d){var rs=d.results||[];sv('rf_jobs',rs);renderJobs(rs);go('jobs');}).catch(function(){$('jobsBody').innerHTML='Search error.';});}
+function proposal(r){var c=ls('rf_cfg',null);var sk=(c&&c.skills)||'this field';return 'Hi there,\n\nI found your opening "'+r.title+'" on '+r.platform+' and I can help you right away.\n\nWhat I offer:\n• Proven experience in '+sk+'\n• Fast, reliable delivery (2-5 days) with clear communication\n• Free support after delivery - you only pay when satisfied\n\nHow I work:\n1. Quick chat to confirm your exact needs\n2. Deliver a working result with updates along the way\n3. Handover + documentation + support\n\nI can start immediately. Reply here or contact me at '+sess.email+'.\n\nBest regards,\n'+sess.email;}
+var CURJOB=null;
+function openModal(r){CURJOB=r;$('propTxt').value=proposal(r);$('modal').style.display='block';}
+$('closeM').addEventListener('click',function(){$('modal').style.display='none';});
+$('sendBtn').addEventListener('click',function(){var r=CURJOB;if(!r)return;var txt=$('propTxt').value;if(navigator.clipboard)navigator.clipboard.writeText(txt);var ap=ls('rf_apps','[]');ap.push(1);sv('rf_apps',ap);var m=(r.title+' '+(r.description||'')).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);$('modal').style.display='none';if(m){location.href='mailto:'+m[0]+'?subject='+encodeURIComponent('Proposal: '+r.title)+'&body='+encodeURIComponent(txt);}window.open(r.url,'_blank');alert('✓ Proposal sent: copied + hirer page opened'+(m?' + email drafted':'')+'.');});
 function renderJobs(rs){if(!rs||!rs.length){$('jobsBody').innerHTML='<p class="muted">No matches. Try different skills.</p>';return;}
- $('jobsBody').innerHTML=rs.map(function(r){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div><button class="btn btn-p" data-u="'+r.url+'">Review</button></div>';}).join('');
- $('jobsBody').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){var p='Hi,\n\nI saw your post and can help immediately.\n\nContact me at '+sess.email+'.\n\nBest,\n'+sess.email;if(navigator.clipboard)navigator.clipboard.writeText(p);var ap=ls('rf_apps','[]');ap.push(1);sv('rf_apps',ap);window.open(b.getAttribute('data-u'),'_blank');});});}
+ $('jobsBody').innerHTML=rs.map(function(r){return '<div class="row"><div><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div><button class="btn btn-p" data-j="'+encodeURIComponent(JSON.stringify(r))+'">Review</button></div>';}).join('');
+ $('jobsBody').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){openModal(JSON.parse(decodeURIComponent(b.getAttribute('data-j'))));});});}
 function loadJobs(){if(!hasCfg()){$('jobsBody').innerHTML='<p class="muted">Configure your engine first (My Engine → save settings), then run it.</p>';return;} renderJobs(ls('rf_jobs','[]'));}
 function cap(s){return '🚀 '+s.name+' — professional service. '+(s.description||'')+' Price: $'+s.price+'. Contact: '+(s.contact_method||'email')+' '+(s.contact_value||sess.email);}
 function share(p,s){var c=cap(s);var mk='https://silentgoodbyelabs.github.io/revenueforge/marketplace.html';var u='';
