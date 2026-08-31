@@ -172,9 +172,14 @@ document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('clic
 document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-go'));});});
 $('burger').addEventListener('click',function(){$('side').classList.toggle('open');});
 $('burger2').addEventListener('click',function(){$('side').classList.toggle('open');});
-function loadOv(){$('setEmail').textContent=sess.email;fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){window.SUB=d;});var j=hasCfg()?ls('rf_jobs','[]'):[],ap=ls('rf_apps','[]'),pr=ls('rf_pros','[]');
+function loadOv(){$('setEmail').textContent=sess.email;
+ var j=hasCfg()?ls('rf_jobs','[]'):[],ap=ls('rf_apps','[]'),pr=ls('rf_pros','[]');
  $('kMat').textContent=j.length;$('kApps').textContent=ap.length;$('kPros').textContent=pr.length;
- $('brief').innerHTML='Today: <b>'+j.length+'</b> matches · <b>'+ap.length+'</b> proposals · <b>0</b> follow-ups due · plan: <b>Free</b> (3 matches). <a href="#" data-go="plan" style="color:var(--accent)">Upgrade for more →</a>';}
+ var due=pr.filter(function(x){return x.s==='Contacted'||x.s==='Replied';}).length;
+ fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){window.SUB=d;renderBrief(j.length,ap.length,due);}).catch(function(){renderBrief(j.length,ap.length,due);});}
+function renderBrief(m,a,due){var plan=(window.SUB&&window.SUB.plan)||'Free';var paid=window.SUB&&window.SUB.paid;
+ $('brief').innerHTML='Today: <b>'+m+'</b> matches · <b>'+a+'</b> proposals · <b>'+due+'</b> follow-ups due · plan: <b>'+plan+'</b>'+(paid?' — active':' (3 matches)')+'. <a href="#" id="briefUp" style="color:var(--accent)">Upgrade for more →</a>';
+ var l=$('briefUp');if(l)l.onclick=function(){go('plan');};}
 function loadEng(){var c=ls('rf_cfg',null);if(c){$('skills').value=c.skills||'';$('target').value=c.target||'';}engUI();}
 $('saveBtn').addEventListener('click',function(){sv('rf_cfg',{skills:$('skills').value,target:$('target').value});
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).catch(function(){});
