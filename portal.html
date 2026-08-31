@@ -127,10 +127,10 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
   <div class="card"><h2><i class="fa-solid fa-chart-pie"></i> Your activity</h2><div id="anaBody"></div></div></div>
 <div id="view-plan" style="display:none"><div class="crumbs">Dashboard / Plan</div><h1>Plan & Billing</h1>
   <div class="card"><h3>Your current plan</h3><p class="muted" id="planNow">Loading…</p></div>
-  <div class="card"><h3>Starter — Free trial</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$0</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>24-hour trial</li><li>5 job results per search</li><li>No publishing / selling</li><li>No alerts / auto-advertise</li></ul></div>
-  <div class="card" style="border:2px solid var(--accent)"><h3>Pro ⚡</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$19/mo</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>Unlimited matches on 30+ platforms</li><li>Publish & sell on marketplace</li><li>Telegram job & sale alerts</li><li>Auto-advertise on 20+ platforms</li><li>Priority autonomous engine</li></ul><button class="btn btn-p" id="buyPro" style="margin-top:12px"><i class="fa-solid fa-bolt"></i> Upgrade now — $19/mo</button></div>
-  <div class="card"><h3>Growth</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$49/mo</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>Everything in Pro</li><li>WhatsApp alerts (connected Twilio)</li><li>Priority engine runs</li></ul><button class="btn btn-p" id="buyGrowth" style="margin-top:12px">Go Growth — $49/mo</button></div>
-  </div>
+  <div class="card"><h3>Starter — Free trial</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$0</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>24-hour trial</li><li>5 job results per search</li><li>No publishing / selling / alerts</li></ul></div>
+  <div class="card" style="border:2px solid var(--accent)"><h3>Pro ⚡</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$19/mo</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>Unlimited matches on 30+ sources</li><li>Publish & sell on marketplace</li><li>Telegram job & sale alerts</li><li>Auto-advertise on 20+ platforms</li></ul><button class="btn btn-p" onclick="payPlan('Pro',19)" style="margin-top:12px"><i class="fa-solid fa-bolt"></i> Upgrade now — $19/mo</button></div>
+  <div class="card"><h3>Growth</h3><div style="font-family:Sora;font-size:1.6rem;font-weight:800">$49/mo</div><ul style="margin-left:18px;line-height:1.9;color:#334155"><li>Everything in Pro</li><li>WhatsApp alerts (connected Twilio)</li><li>Priority engine runs</li></ul><button class="btn btn-p" onclick="payPlan('Growth',49)" style="margin-top:12px">Go Growth — $49/mo</button></div>
+  <p class="muted">Payments processed securely by Paystack — cards from any country (USD). Your plan activates the second payment confirms.</p></div>
 <div id="view-set" style="display:none"><div class="crumbs">Dashboard / Settings</div><h1>Settings & Alerts</h1>
   <div class="card"><p class="muted">Account: <b id="setEmail"></b></p>
     <label>Telegram handle (Pro — job & sale alerts)</label><input id="tg" placeholder="@yourhandle">
@@ -254,5 +254,12 @@ if($('buyPro'))$('buyPro').addEventListener('click',function(){pay('Pro',19);});
 if($('buyGrowth'))$('buyGrowth').addEventListener('click',function(){pay('Growth',49);});
 if($('buyPro'))$('buyPro').onclick=function(){pay('Pro',19);};
 if($('buyGrowth'))$('buyGrowth').onclick=function(){pay('Growth',49);};
+function payPlan(planName, amount){
+  fetch(API+'/api/paystack/init',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,amount:amount,plan:planName})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok&&d.url){location.href=d.url;}
+    else alert(d.error||'Payment could not start. Try again.');
+  }).catch(function(){alert('Payment error — check connection.');});
+}
 var hv=(location.hash||'').replace('#','');var valid=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];go(valid.indexOf(hv)>=0?hv:'ov');
 </script></body></html>
