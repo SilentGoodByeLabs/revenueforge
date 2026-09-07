@@ -175,7 +175,7 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
   </div>
  </div></div>
 <script>
-var API='https://revenueforge-api.onrender.com';
+var API=(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'http://localhost:8502':'https://revenueforge-api.onrender.com';
 var sess={email:''};
 try{var u=new URLSearchParams(location.search);var a=u.get('authed')||u.get('email');if(a){sess={email:a};sessionStorage.setItem('rf_session',JSON.stringify(sess));}}catch(e){}
 if(!sess.email){try{sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');}catch(e){}}
