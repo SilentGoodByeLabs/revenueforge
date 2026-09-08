@@ -1,27 +1,73 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free Audit — RevenueForge</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>body{margin:0;font-family:Inter;background:#F4F6FA;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.card{background:#fff;border-radius:16px;padding:32px;width:min(560px,92vw)}h1{font-family:Sora;font-size:1.4rem;margin:0 0 6px}
-input{width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:10px;margin-top:12px;font-size:14px}
-button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;cursor:pointer}
-.muted{color:#64748B;font-size:.88rem}.row{padding:10px 0;border-bottom:1px solid #E2E8F0;font-size:.9rem}
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free Job Audit — RevenueForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;font-family:Inter;background:#0B2239;color:#fff}
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 22px}
+nav .b{font-family:Sora;font-weight:800}nav .b b{color:#2563EB}
+nav a{color:#fff;text-decoration:none;margin-left:16px;font-weight:600;font-size:.9rem}
+.wrap{max-width:640px;margin:0 auto;padding:30px 16px 60px}
+h1{font-family:Sora;font-size:1.9rem;margin:10px 0 6px}
+.sub{color:#A9BBD0}
+.card{background:#10293F;border:1px solid #1D4E75;border-radius:16px;padding:22px;margin-top:20px}
+label{font-size:.8rem;font-weight:700;color:#A9BBD0;display:block;margin-top:12px}
+input{width:100%;padding:12px;border:1.5px solid #1D4E75;border-radius:10px;margin-top:6px;font-size:14px;background:#0B2239;color:#fff}
+button{width:100%;margin-top:16px;background:#2563EB;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:800;cursor:pointer}
+.tabs{display:flex;gap:8px;margin-top:8px}
+.tab{flex:1;text-align:center;padding:9px;border-radius:10px;border:1.5px solid #1D4E75;cursor:pointer;font-size:.85rem;font-weight:700;color:#A9BBD0}
+.tab.on{background:#2563EB;border-color:#2563EB;color:#fff}
+.row{background:#0B2239;border:1px solid #1D4E75;border-radius:10px;padding:12px;margin-top:10px}
+.row b{display:block;font-size:.92rem}
+.row span{color:#A9BBD0;font-size:.78rem}
+.badge{background:#1D4E75;color:#fff;border-radius:6px;padding:2px 8px;font-size:.7rem;font-weight:700}
+a.cta{display:block;text-align:center;margin-top:16px;color:#2563EB;font-weight:800;text-decoration:none}
 </style></head><body>
-<div class="card"><h1>Free Job Audit</h1><p class="muted">See who is hiring for your skills right now.</p>
-<input id="sk" placeholder="your skills / work type">
-<button id="go">Run my audit</button>
-<div id="out" style="margin-top:16px"></div></div>
+<nav><div class="b">Revenue <b>Forge</b></div><div><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="login.html">Log in</a></div></nav>
+<div class="wrap">
+<h1>Free Job Audit</h1>
+<p class="sub">See exactly who is hiring for your skills right now — across 30+ sources. No card required.</p>
+<div class="card">
+ <label>What work do you do?</label>
+ <input id="sk" placeholder="e.g. cleaning, web design, data entry, python">
+ <div id="authBox">
+  <div class="tabs"><div class="tab on" id="tabNew">Create free account</div><div class="tab" id="tabHave">I have an account</div></div>
+  <label>Email</label><input id="em" type="email" placeholder="you@email.com">
+  <label>Password</label><input id="pw" type="password" placeholder="choose a password">
+ </div>
+ <button id="go">Run my free audit</button>
+ <p class="sub" id="msg" style="margin-top:10px;font-size:.85rem"></p>
+</div>
+<div class="card" id="resBox" style="display:none">
+ <h3 style="font-family:Sora;margin:0 0 4px" id="resTitle">Your audit</h3>
+ <div id="res"></div>
+ <a class="cta" id="dash" href="#">Open your full dashboard →</a>
+</div>
+</div>
 <script>
 var API='https://revenueforge-api.onrender.com';
+var mode='join';
 var sess={};try{sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');}catch(e){}
-if(!sess.email){alert('Create your free account first, then run your audit.');location.href='signup.html';}
-document.getElementById('go').addEventListener('click',function(){
- var q=document.getElementById('sk').value||'hiring';
- document.getElementById('out').innerHTML='<p class="muted">Searching 30+ sources…</p>';
- fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=8&email='+encodeURIComponent(sess.email))
-  .then(function(r){return r.json();}).then(function(d){
-    if(!d.ok){document.getElementById('out').innerHTML='<p class="muted">'+(d.error==='trial_expired'?'Your free trial has ended — upgrade to keep auditing.':'No matches. Try different skills.')+'</p>';return;}
-    var rs=d.results||[];
-    document.getElementById('out').innerHTML=rs.length?rs.map(function(r){return '<div class="row"><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div>';}).join(''):'<p class="muted">No matches. Try different skills.</p>';
-  }).catch(function(){document.getElementById('out').innerHTML='<p class="muted">Search error.</p>';});
-});
+if(sess.email){document.getElementById('authBox').style.display='none';document.getElementById('msg').textContent='Auditing for '+sess.email;}
+document.getElementById('tabNew').onclick=function(){mode='join';this.classList.add('on');document.getElementById('tabHave').classList.remove('on');};
+document.getElementById('tabHave').onclick=function(){mode='login';this.classList.add('on');document.getElementById('tabNew').classList.remove('on');};
+document.getElementById('go').onclick=function(){
+ var sk=document.getElementById('sk').value||'hiring';
+ var em=sess.email||document.getElementById('em').value;
+ var pw=document.getElementById('pw').value;
+ if(!em){document.getElementById('msg').textContent='Enter your email to start the audit.';return;}
+ document.getElementById('msg').textContent='Searching 30+ sources…';
+ function run(){sessionStorage.setItem('rf_session',JSON.stringify({email:em}));audit(em,sk);}
+ if(sess.email){run();return;}
+ var fd=new URLSearchParams();fd.append('email',em);fd.append('password',pw||'audit123');fd.append('captcha','skip');
+ fetch(API+(mode==='join'?'/api/join-form':'/api/login-form'),{method:'POST',body:fd,redirect:'manual'}).then(run).catch(run);
+};
+function audit(em,q){
+ fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=8&email='+encodeURIComponent(em))
+ .then(function(r){return r.json();}).then(function(d){
+  document.getElementById('msg').textContent='';
+  document.getElementById('resBox').style.display='block';
+  document.getElementById('dash').href='portal.html?authed='+encodeURIComponent(em);
+  var rs=d.results||[];
+  document.getElementById('resTitle').textContent='Your audit: '+rs.length+' live matches for “'+q+'”';
+  document.getElementById('res').innerHTML=rs.length?rs.map(function(r){return '<div class="row"><b>'+r.title+'</b><span class="badge">'+r.platform+'</span> <span>match '+r.score+'%</span></div>';}).join(''):'<p class="sub">No matches right now — try broader skills (e.g. “cleaning, housekeeping”).</p>';
+ }).catch(function(){document.getElementById('msg').textContent='Search error — try again.';});
+}
 </script></body></html>
