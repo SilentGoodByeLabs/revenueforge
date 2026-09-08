@@ -199,9 +199,9 @@ function sv(k,v){localStorage.setItem(k+'::'+sess.email,JSON.stringify(v));}
 var SERVICES=[];
 var PLATS=['X','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit','Threads','Tumblr','Bluesky','Mastodon','Quora','Medium','Craigslist','Nextdoor','OfferUp'];
 function hasCfg(){var c=ls('rf_cfg',null);return !!(c&&c.skills);}
-function go(v){var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
+function go(v,noPush){var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
  var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++)bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);
- $('side').classList.remove('open');window.scrollTo(0,0);if(history.replaceState)history.replaceState(null,'','#'+v);
+ $('side').classList.remove('open');window.scrollTo(0,0);if(!noPush&&history.pushState)history.pushState(null,'','#'+v);
  if(v==='ov')loadOv();if(v==='serv')loadServ();if(v==='social')loadSocial();if(v==='pros')loadPros();if(v==='ana')loadAna();if(v==='plan')loadPlan();if(v==='jobs')loadJobs();if(v==='eng')loadEng();if(v==='set')loadTgInfo();}
 document.querySelectorAll('.nav-i').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-view'));});});
 document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(this.getAttribute('data-go'));});});
@@ -303,6 +303,7 @@ function payPlan(planName, amount){
   }).catch(function(){alert('Payment error — check connection.');});
 }
 var hv=(location.hash||'').replace('#','');var valid=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];go(valid.indexOf(hv)>=0?hv:'ov');
+window.addEventListener('popstate',function(){var h=(location.hash||'').replace('#','');var valid=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];if(valid.indexOf(h)>=0)go(h,true);});
 </script>
 <button id="supBtn" style="position:fixed;bottom:18px;right:18px;z-index:250;background:#2563EB;color:#fff;border:0;border-radius:99px;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.4)">💬</button>
 <div id="supPanel" style="display:none;position:fixed;bottom:82px;right:18px;z-index:250;width:min(340px,92vw);background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden">
