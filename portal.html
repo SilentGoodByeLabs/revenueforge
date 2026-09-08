@@ -304,22 +304,41 @@ function payPlan(planName, amount){
 var hv=(location.hash||'').replace('#','');var valid=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];go(valid.indexOf(hv)>=0?hv:'ov');
 </script>
 <button id="supBtn" style="position:fixed;bottom:18px;right:18px;z-index:250;background:#2563EB;color:#fff;border:0;border-radius:99px;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.4)">💬</button>
-<div id="supPanel" style="display:none;position:fixed;bottom:82px;right:18px;z-index:250;width:min(340px,92vw);background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;color:#0B2239">
-<div style="background:#0B2239;color:#fff;padding:12px 14px;font-weight:700">Support <span style="color:#2563EB">Bot</span></div>
-<div id="supMsgs" style="height:220px;overflow:auto;padding:12px;font-size:.85rem;background:#F8FAFC"></div>
-<div style="display:flex;gap:8px;padding:10px;border-top:1px solid #E2E8F0"><input id="supIn" placeholder="Type your question…" style="flex:1;border:1.5px solid #E2E8F0;border-radius:8px;padding:9px;font-size:.85rem"><button id="supSend" style="background:#2563EB;color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer">➤</button></div>
-<div style="padding:8px 10px;border-top:1px solid #E2E8F0"><a style="color:#2563EB;font-size:.8rem;font-weight:700" href="mailto:silentgoodbyelabs@gmail.com?subject=Support%20request">📧 Email support directly</a> · <a style="color:#2563EB;font-size:.8rem;font-weight:700" href="support.html">Support page</a></div></div>
-<script>(function(){var B=document.getElementById('supBtn'),P=document.getElementById('supPanel'),M=document.getElementById('supMsgs'),I=document.getElementById('supIn');
-function add(w,t){var d=document.createElement('div');d.style.margin='6px 0';d.style.padding='8px 10px';d.style.borderRadius='10px';d.style.background=w==='bot'?'#EFF4FF':'#2563EB';d.style.color=w==='bot'?'#0B2239':'#fff';d.style.maxWidth='85%';d.textContent=t;M.appendChild(d);M.scrollTop=M.scrollHeight;}
-function bot(q){q=(q||'').toLowerCase();
- if(/price|plan|cost|billing/.test(q))return 'Free 24h trial, Pro $19/mo, Growth $49/mo. See the Pricing page.';
- if(/audit/.test(q))return 'The Free Audit shows live hiring matches for your skills — click Run free audit on the home page.';
- if(/engine|run|job/.test(q))return 'In your dashboard: My Engine → skills + target → Save → Run engine now.';
- if(/publish|sell|service/.test(q))return 'My Services → Publish. Pro auto-advertises it on the marketplace + Telegram.';
- if(/alert|telegram/.test(q))return 'Pro users link Telegram in Settings & Alerts, then get job alerts automatically.';
- if(/contact|human|email/.test(q))return 'Use "Email support directly" below, or the Support page — a human replies by email.';
- return 'I can help with plans, the audit, the engine, publishing and alerts. Or email support below.';}
-B.onclick=function(){P.style.display=P.style.display==='none'?'block':'none';if(!M.children.length)add('bot','Hi 👋 RevenueForge support bot. Ask me anything, or email support below.');};
-function send(){var q=I.value;add('you',q);I.value='';setTimeout(function(){add('bot',bot(q));},300);}
-document.getElementById('supSend').onclick=send;I.addEventListener('keydown',function(e){if(e.key==='Enter')send();});})();</script>
+<div id="supPanel" style="display:none;position:fixed;bottom:82px;right:18px;z-index:250;width:min(340px,92vw);background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden">
+  <div style="background:#0B2239;color:#fff;padding:12px 14px;font-family:Sora;font-weight:700">Support <span style="color:#2563EB">Bot</span></div>
+  <div id="supMsgs" style="height:220px;overflow:auto;padding:12px;font-size:.85rem;background:#F8FAFC"></div>
+  <div id="supChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 8px;background:#F8FAFC"></div>
+  <div style="display:flex;gap:8px;padding:10px;border-top:1px solid #E2E8F0">
+    <input id="supIn" placeholder="Type your question…" style="flex:1;border:1.5px solid #E2E8F0;border-radius:8px;padding:9px;font-size:.85rem">
+    <button id="supSend" class="btn btn-p" style="padding:9px 14px">➤</button>
+  </div>
+  <div style="padding:8px 10px;border-top:1px solid #E2E8F0"><a style="color:#2563EB;font-size:.8rem;font-weight:700" href="mailto:silentgoodbyelabs@gmail.com?subject=Support%20request">📧 Email a human directly</a> · <a style="color:#2563EB;font-size:.8rem" href="support.html">Support page</a></div>
+</div>
+<script>
+(function(){
+ var B=document.getElementById('supBtn'),P=document.getElementById('supPanel'),M=document.getElementById('supMsgs'),I=document.getElementById('supIn'),C=document.getElementById('supChips');
+ function add(w,x){var d=document.createElement('div');d.style.cssText='margin:6px 0;padding:8px 10px;border-radius:10px;max-width:85%;'+(w==='bot'?'background:#EFF4FF;color:#0B2239':'background:#2563EB;color:#fff;margin-left:auto');d.textContent=x;M.appendChild(d);M.scrollTop=M.scrollHeight;}
+ var KB=[
+  [/how (do|can|to) (i )?(use|start|begin|work)|get started|tutorial|guide|help me use/i,"Quick start: 1) My Engine → add your skills + target → Save → Run engine now (finds people hiring). 2) Jobs & Progress → Review → submit proposal. 3) My Services → publish → it advertises automatically. 4) Track buyers in Prospects."],
+  [/what is|about|who are you|revenueforge/i,"RevenueForge is an autonomous revenue engine: it searches 30+ platforms for people hiring, writes your proposals, publishes & advertises your services on 20+ platforms, and alerts you on Telegram/WhatsApp."],
+  [/price|plan|cost|billing|pay|upgrade|subscription|paystack/i,"Plans: Free = 24h trial (5 results). Pro $19/mo = unlimited matches, publish & sell, Telegram alerts, auto-advertise. Growth $49/mo = + WhatsApp alerts + priority. Upgrade in Plan & Billing via Paystack."],
+  [/engine|run|search|find (work|job)|job/i,"My Engine → set skills + target → Save → Run now. It searches 30+ sources (Remotive, Arbeitnow, RemoteOK, HN, + more) for people actively hiring. Start engine to keep it running in the cloud."],
+  [/publish|sell|service|advertise|marketplace/i,"My Services → fill name/price/description/contact → Publish. It goes live on the marketplace and (Pro) auto-advertises. Each service has Pause (stop ads) and Delete."],
+  [/alert|notif|telegram|whatsapp/i,"Settings & Alerts → add your Telegram (Pro). Then send /start youremail to our bot once to link it — after that every new job match notifies you automatically."],
+  [/delete|pause|remove|cancel service/i,"My Services → each published service shows Pause (hide + stop advertising) and Delete (remove forever)."],
+  [/proposal|apply|submit/i,"Jobs & Progress → Review opens your written proposal → Submit & send copies it, opens the hirer's page, and drafts an email when a contact exists."],
+  [/login|password|sign ?up|account|captcha|log ?in/i,"Use Log in / Sign up at the top. New accounts get a 24h free trial. If locked out, your trial ended — upgrade in Plan & Billing."],
+  [/refund|money|guarantee|charge/i,"Paid plans include a 7-day money-back guarantee. Free trial needs no card."],
+  [/privacy|data|secure|security/i,"Your data is stored per-account and never shared. Payments are processed by Paystack, not by us."],
+  [/contact|human|email|support|ticket|agent/i,"Tap 'Email a human directly' below, or use the Support page to send a ticket — we reply to your email."]
+ ];
+ function bot(q){for(var i=0;i<KB.length;i++){if(KB[i][0].test(q))return KB[i][1];}return "I can help with: using the engine, plans & payment, publishing & advertising, alerts, proposals, or contacting a human. Try one of the quick buttons below."; }
+ var chips=["How do I use it?","Plans & pricing","Publish a service","Set up alerts","Email a human"];
+ C.innerHTML=chips.map(function(c){return '<button style="border:1px solid #E2E8F0;background:#fff;border-radius:99px;padding:5px 10px;font-size:.72rem;cursor:pointer">'+c+'</button>';}).join('');
+ function send(q){q=q||I.value;add('you',q);I.value='';setTimeout(function(){add('bot',bot(q));},250);}
+ C.querySelectorAll('button').forEach(function(b){b.onclick=function(){send(b.textContent);};});
+ B.onclick=function(){P.style.display=P.style.display==='none'?'block':'none';if(M.children.length===0)add('bot','Hi 👋 ask me anything about using RevenueForge, plans, publishing, or alerts.');};
+ document.getElementById('supSend').onclick=function(){send();};I.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
+})();
+</script>
 </body></html>
