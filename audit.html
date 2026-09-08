@@ -19,6 +19,9 @@ button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-
   <a href="login.html" class="btn" style="background:#fff;color:#2563EB;border:1.5px solid #2563EB;margin-left:8px">Log in</a>
 </div></div>
 <script>
+// IMMEDIATE redirect check
+try{var s=JSON.parse(sessionStorage.getItem("rf_session")||"{}");if(!s.email){location.replace("login.html");}}catch(e){location.replace("login.html");}
+
 var API='https://revenueforge-api.onrender.com';
 document.getElementById('go').addEventListener('click',function(){
  var q=document.getElementById('sk').value||'hiring';
