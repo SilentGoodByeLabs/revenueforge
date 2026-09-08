@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<script>try{var s=JSON.parse(sessionStorage.getItem('rf_session')||'{}');if(s.email){var n=new URLSearchParams(location.search).get('next');location.href=n?n:('portal.html?authed='+encodeURIComponent(s.email));}}catch(e){}</script>
 <div id="header"></div>
 <section class="auth-wrap">
   <div class="auth-box">
@@ -51,5 +52,25 @@
 <script src="js/auth.js"></script>
 <script src="js/chatbot.js"></script>
 <script src="js/layout.js"></script>
+
+<button id="supBtn" style="position:fixed;bottom:18px;right:18px;z-index:250;background:#2563EB;color:#fff;border:0;border-radius:99px;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.4)">💬</button>
+<div id="supPanel" style="display:none;position:fixed;bottom:82px;right:18px;z-index:250;width:min(340px,92vw);background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;color:#0B2239">
+<div style="background:#0B2239;color:#fff;padding:12px 14px;font-weight:700">Support <span style="color:#2563EB">Bot</span></div>
+<div id="supMsgs" style="height:220px;overflow:auto;padding:12px;font-size:.85rem;background:#F8FAFC"></div>
+<div style="display:flex;gap:8px;padding:10px;border-top:1px solid #E2E8F0"><input id="supIn" placeholder="Type your question…" style="flex:1;border:1.5px solid #E2E8F0;border-radius:8px;padding:9px;font-size:.85rem"><button id="supSend" style="background:#2563EB;color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer">➤</button></div>
+<div style="padding:8px 10px;border-top:1px solid #E2E8F0"><a style="color:#2563EB;font-size:.8rem;font-weight:700" href="mailto:support@revenueforge.app?subject=Support%20request">📧 Email support directly</a> · <a style="color:#2563EB;font-size:.8rem;font-weight:700" href="support.html">Support page</a></div></div>
+<script>(function(){var B=document.getElementById('supBtn'),P=document.getElementById('supPanel'),M=document.getElementById('supMsgs'),I=document.getElementById('supIn');
+function add(w,t){var d=document.createElement('div');d.style.margin='6px 0';d.style.padding='8px 10px';d.style.borderRadius='10px';d.style.background=w==='bot'?'#EFF4FF':'#2563EB';d.style.color=w==='bot'?'#0B2239':'#fff';d.style.maxWidth='85%';d.textContent=t;M.appendChild(d);M.scrollTop=M.scrollHeight;}
+function bot(q){q=(q||'').toLowerCase();
+ if(/price|plan|cost|billing/.test(q))return 'Free 24h trial, Pro $19/mo, Growth $49/mo. See the Pricing page.';
+ if(/audit/.test(q))return 'The Free Audit shows live hiring matches for your skills — click Run free audit on the home page.';
+ if(/engine|run|job/.test(q))return 'In your dashboard: My Engine → skills + target → Save → Run engine now.';
+ if(/publish|sell|service/.test(q))return 'My Services → Publish. Pro auto-advertises it on the marketplace + Telegram.';
+ if(/alert|telegram/.test(q))return 'Pro users link Telegram in Settings & Alerts, then get job alerts automatically.';
+ if(/contact|human|email/.test(q))return 'Use "Email support directly" below, or the Support page — a human replies by email.';
+ return 'I can help with plans, the audit, the engine, publishing and alerts. Or email support below.';}
+B.onclick=function(){P.style.display=P.style.display==='none'?'block':'none';if(!M.children.length)add('bot','Hi 👋 RevenueForge support bot. Ask me anything, or email support below.');};
+function send(){var q=I.value;add('you',q);I.value='';setTimeout(function(){add('bot',bot(q));},300);}
+document.getElementById('supSend').onclick=send;I.addEventListener('keydown',function(e){if(e.key==='Enter')send();});})();</script>
 </body>
 </html>
