@@ -1,64 +1,33 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free Job Audit — RevenueForge</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>body{margin:0;font-family:Inter;background:#0B2239;color:#fff}
-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 22px}
-nav .b{font-family:Sora;font-weight:800}nav .b b{color:#2563EB}
-nav a{color:#fff;text-decoration:none;margin-left:16px;font-weight:600;font-size:.9rem}
-.wrap{max-width:640px;margin:0 auto;padding:30px 16px 60px}
-h1{font-family:Sora;font-size:1.9rem;margin:10px 0 6px}.sub{color:#A9BBD0}
-.card{background:#10293F;border:1px solid #1D4E75;border-radius:16px;padding:22px;margin-top:20px}
-label{font-size:.8rem;font-weight:700;color:#A9BBD0;display:block;margin-top:12px}
-input{width:100%;padding:12px;border:1.5px solid #1D4E75;border-radius:10px;margin-top:6px;font-size:14px;background:#0B2239;color:#fff}
-button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:800;cursor:pointer}
-.bo{background:transparent;border:1.5px solid #1D4E75;color:#fff}
-.row{background:#0B2239;border:1px solid #1D4E75;border-radius:10px;padding:12px;margin-top:10px}
-.row b{display:block;font-size:.92rem}.row span{color:#A9BBD0;font-size:.78rem}
-.badge{background:#1D4E75;color:#fff;border-radius:6px;padding:2px 8px;font-size:.7rem;font-weight:700}
-a.cta{display:block;text-align:center;margin-top:16px;color:#2563EB;font-weight:800;text-decoration:none}</style></head><body>
-<nav><div class="b">Revenue <b>Forge</b></div><div><a href="index.html">Home</a><a href="pricing.html">Pricing</a><a href="support.html">Support</a></div></nav>
-<div class="wrap"><h1>Free Job Audit</h1><p class="sub">See exactly who is hiring for your skills right now — across 30+ sources.</p>
-<div class="card" id="gateBox"><p class="sub">Log in or create your free account to run your audit (24h full trial, no card).</p>
-<button onclick="location.href='login.html?next=audit.html'">Log in</button>
-<button class="bo" onclick="location.href='signup.html?next=audit.html'">Create free account</button></div>
-<div class="card" id="runBox" style="display:none"><label>What work do you do?</label>
-<input id="sk" placeholder="e.g. cleaning, web design, data entry, python">
-<button id="go">Run my free audit</button><p class="sub" id="msg" style="margin-top:10px;font-size:.85rem"></p></div>
-<div class="card" id="resBox" style="display:none"><h3 style="font-family:Sora;margin:0 0 4px" id="resTitle">Your audit</h3>
-<div id="res"></div><a class="cta" id="dash" href="#">Open your full dashboard →</a></div></div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free Audit — RevenueForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>body{margin:0;font-family:Inter;background:#F4F6FA;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border-radius:16px;padding:32px;width:min(600px,100%)}h1{font-family:Sora;font-size:1.4rem;margin:0 0 6px}
+input{width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:10px;margin-top:12px;font-size:14px}
+button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;cursor:pointer}
+.muted{color:#64748B;font-size:.88rem}.row{padding:10px 0;border-bottom:1px solid #E2E8F0;font-size:.9rem}
+.cta{margin-top:20px;padding:16px;background:#EFF4FF;border-radius:10px;text-align:center}
+.btn{display:inline-block;background:#2563EB;color:#fff;border-radius:10px;padding:12px 24px;text-decoration:none;font-weight:700;margin-top:10px}
+</style></head><body>
+<div class="card"><h1>Free Job Audit</h1><p class="muted">See who is hiring for your skills right now. No account needed to try.</p>
+<input id="sk" placeholder="your skills / work type">
+<button id="go">Run my audit</button>
+<div id="out" style="margin-top:16px"></div>
+<div id="cta" class="cta" style="display:none">
+  <h3 style="font-family:Sora;margin:0 0 8px">Want to save these results & get full access?</h3>
+  <p class="muted">Create a free account to unlock: unlimited searches, auto-advertise, alerts, and more.</p>
+  <a href="signup.html" class="btn">Create free account</a>
+  <a href="login.html" class="btn" style="background:#fff;color:#2563EB;border:1.5px solid #2563EB;margin-left:8px">Log in</a>
+</div></div>
 <script>
 var API='https://revenueforge-api.onrender.com';
-var sess={};try{sess=JSON.parse(sessionStorage.getItem('rf_session')||'{}');}catch(e){}
-if(sess.email){document.getElementById('gateBox').style.display='none';document.getElementById('runBox').style.display='block';}
-document.getElementById('go').onclick=function(){
+document.getElementById('go').addEventListener('click',function(){
  var q=document.getElementById('sk').value||'hiring';
- document.getElementById('msg').textContent='Searching 30+ sources…';
- fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=8&email='+encodeURIComponent(sess.email))
- .then(function(r){return r.json();}).then(function(d){
-  document.getElementById('msg').textContent='';document.getElementById('resBox').style.display='block';
-  document.getElementById('dash').href='portal.html?authed='+encodeURIComponent(sess.email);
-  var rs=d.results||[];
-  document.getElementById('resTitle').textContent='Your audit: '+rs.length+' live matches for “'+q+'”';
-  document.getElementById('res').innerHTML=rs.length?rs.map(function(r){return '<div class="row"><b>'+r.title+'</b><span class="badge">'+r.platform+'</span> <span>match '+r.score+'%</span></div>';}).join(''):'<p class="sub">No matches right now — try broader skills.</p>';
- }).catch(function(){document.getElementById('msg').textContent='Search error — try again.';});
-};
-</script>
-<button id="supBtn" style="position:fixed;bottom:18px;right:18px;z-index:250;background:#2563EB;color:#fff;border:0;border-radius:99px;width:54px;height:54px;font-size:1.3rem;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.4)">💬</button>
-<div id="supPanel" style="display:none;position:fixed;bottom:82px;right:18px;z-index:250;width:min(340px,92vw);background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;color:#0B2239">
-<div style="background:#0B2239;color:#fff;padding:12px 14px;font-weight:700">Support <span style="color:#2563EB">Bot</span></div>
-<div id="supMsgs" style="height:220px;overflow:auto;padding:12px;font-size:.85rem;background:#F8FAFC"></div>
-<div style="display:flex;gap:8px;padding:10px;border-top:1px solid #E2E8F0"><input id="supIn" placeholder="Type your question…" style="flex:1;border:1.5px solid #E2E8F0;border-radius:8px;padding:9px;font-size:.85rem"><button id="supSend" style="background:#2563EB;color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer">➤</button></div>
-<div style="padding:8px 10px;border-top:1px solid #E2E8F0"><a style="color:#2563EB;font-size:.8rem;font-weight:700" href="mailto:support@revenueforge.app?subject=Support%20request">📧 Email support directly</a> · <a style="color:#2563EB;font-size:.8rem;font-weight:700" href="support.html">Support page</a></div></div>
-<script>(function(){var B=document.getElementById('supBtn'),P=document.getElementById('supPanel'),M=document.getElementById('supMsgs'),I=document.getElementById('supIn');
-function add(w,t){var d=document.createElement('div');d.style.margin='6px 0';d.style.padding='8px 10px';d.style.borderRadius='10px';d.style.background=w==='bot'?'#EFF4FF':'#2563EB';d.style.color=w==='bot'?'#0B2239':'#fff';d.style.maxWidth='85%';d.textContent=t;M.appendChild(d);M.scrollTop=M.scrollHeight;}
-function bot(q){q=(q||'').toLowerCase();
- if(/price|plan|cost|billing/.test(q))return 'Free 24h trial, Pro $19/mo, Growth $49/mo. See the Pricing page.';
- if(/audit/.test(q))return 'The Free Audit shows live hiring matches for your skills — click Run free audit on the home page.';
- if(/engine|run|job/.test(q))return 'In your dashboard: My Engine → skills + target → Save → Run engine now.';
- if(/publish|sell|service/.test(q))return 'My Services → Publish. Pro auto-advertises it on the marketplace + Telegram.';
- if(/alert|telegram/.test(q))return 'Pro users link Telegram in Settings & Alerts, then get job alerts automatically.';
- if(/contact|human|email/.test(q))return 'Use "Email support directly" below, or the Support page — a human replies by email.';
- return 'I can help with plans, the audit, the engine, publishing and alerts. Or email support below.';}
-B.onclick=function(){P.style.display=P.style.display==='none'?'block':'none';if(!M.children.length)add('bot','Hi 👋 RevenueForge support bot. Ask me anything, or email support below.');};
-function send(){var q=I.value;add('you',q);I.value='';setTimeout(function(){add('bot',bot(q));},300);}
-document.getElementById('supSend').onclick=send;I.addEventListener('keydown',function(e){if(e.key==='Enter')send();});})();</script>
-</body></html>
+ document.getElementById('out').innerHTML='<p class="muted">Searching 30+ sources…</p>';
+ fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=5')
+  .then(function(r){return r.json();}).then(function(d){
+    var rs=d.results||[];
+    document.getElementById('out').innerHTML=rs.length?rs.map(function(r){return '<div class="row"><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div>';}).join(''):'<p class="muted">No matches. Try different skills.</p>';
+    document.getElementById('cta').style.display='block';
+  }).catch(function(){document.getElementById('out').innerHTML='<p class="muted">Search error.</p>';});
+});
+</script></body></html>
