@@ -22,7 +22,7 @@ button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-
 var API='https://revenueforge-api.onrender.com';
 document.getElementById('go').addEventListener('click',function(){
  var q=document.getElementById('sk').value||'hiring';
- document.getElementById('out').innerHTML='<p class="muted">Searching 30+ sources…</p>';
+ sessionStorage.setItem('rf_pending_audit',JSON.stringify({skills:q}));document.getElementById('out').innerHTML='<p class="muted">Searching 30+ sources…</p>';
  fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=5')
   .then(function(r){return r.json();}).then(function(d){
     var rs=d.results||[];
