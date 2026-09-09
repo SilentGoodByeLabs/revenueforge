@@ -347,14 +347,32 @@ $('saveBtn').onclick=saveSettings; $('startBtn').onclick=startEngine; $('stopBtn
 // ROUTER: refresh keeps your place; back returns to previous section
 (function(){
   var _go=window.go;
-  window.go=function(v,push){ _go(v); try{ if(push===false){history.replaceState({v:v},'','#'+v);} else {history.pushState({v:v},'','#'+v);} }catch(e){} };
-  window.addEventListener('popstate',function(){ var h=(location.hash||'#ov').replace('#',''); _go(h); });
+  window.go=function(v){ 
+    _go(v); 
+    try{ history.pushState({v:v},'','#'+v); }catch(e){} 
+  };
+  window.addEventListener('popstate',function(e){ 
+    if(e.state && e.state.v){ _go(e.state.v); }
+  });
+  // restore hash on load (before go('ov') runs)
   var h0=(location.hash||'').replace('#','');
-  if(h0){ setTimeout(function(){ window.go(h0,false); },300); }
+  if(h0 && h0!=='ov'){ 
+    try{ history.replaceState({v:h0},'','#'+h0); }catch(e){}
+  }
 })();
 // accurate engine status text
 (function(){ var _e=window.engUI; window.engUI=function(){ _e(); var on=(ls('rf_eng',{on:false})||{}).on;
   if($('engStat'))$('engStat').textContent=on?'Running':'Stopped';
   if($('engNote'))$('engNote').textContent=on?'Searching automatically for new matches now.':'Engine is off — start it to search automatically.'; }; })();
+
+function filterBySkills(jobs, skills){
+  if(!skills || !skills.trim()) return jobs;
+  var words = skills.toLowerCase().split(/[,\s\/]+/).filter(function(w){return w.length>2;}).map(function(w){return w.slice(0,5);});
+  if(words.length===0) return jobs;
+  return jobs.filter(function(j){
+    var txt = (j.title||'').toLowerCase() + ' ' + (j.platform||'').toLowerCase();
+    return words.some(function(w){return txt.indexOf(w)>=0;});
+  });
+}
 </script>
 </body></html>
