@@ -344,21 +344,12 @@ function startEngine(){var c=ls('rf_cfg',null);if(!c||!(c.skills||'').trim()){al
 function stopEngine(){sv('rf_eng',{on:false}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:false})}).catch(function(){}); engUI(); alert('✓ Engine stopped.');}
 $('saveBtn').onclick=saveSettings; $('startBtn').onclick=startEngine; $('stopBtn').onclick=stopEngine;
 
-// ROUTER: refresh keeps your place; back returns to previous section
+// ROUTER v3: the URL hash is the only source of truth
 (function(){
   var _go=window.go;
-  window.go=function(v){ 
-    _go(v); 
-    try{ history.pushState({v:v},'','#'+v); }catch(e){} 
-  };
-  window.addEventListener('popstate',function(e){ 
-    if(e.state && e.state.v){ _go(e.state.v); }
-  });
-  // restore hash on load (before go('ov') runs)
+  window.addEventListener('popstate',function(){ var h=(location.hash||'#ov').replace('#',''); _go(h,true); });
   var h0=(location.hash||'').replace('#','');
-  if(h0 && h0!=='ov'){ 
-    try{ history.replaceState({v:h0},'','#'+h0); }catch(e){}
-  }
+  if(h0 && h0!=='ov'){ _go(h0,true); }
 })();
 // accurate engine status text
 (function(){ var _e=window.engUI; window.engUI=function(){ _e(); var on=(ls('rf_eng',{on:false})||{}).on;
