@@ -199,6 +199,7 @@ function sv(k,v){localStorage.setItem(k+'::'+sess.email,JSON.stringify(v));}
 var SERVICES=[];
 var PLATS=['X','Facebook','Instagram','LinkedIn','WhatsApp','Telegram','TikTok','YouTube','Pinterest','Snapchat','Reddit','Threads','Tumblr','Bluesky','Mastodon','Quora','Medium','Craigslist','Nextdoor','OfferUp'];
 function hasCfg(){var c=ls('rf_cfg',null);return !!(c&&c.skills);}
+function loadTgInfo(){}
 function go(v,noPush){var ids=['ov','eng','jobs','serv','social','pros','ana','plan','set','help'];for(var i=0;i<ids.length;i++){var el=$('view-'+ids[i]);if(el)el.style.display=(ids[i]===v)?'block':'none';}
  var bs=document.querySelectorAll('.nav-i');for(var j=0;j<bs.length;j++)bs[j].classList.toggle('active',bs[j].getAttribute('data-view')===v);
  $('side').classList.remove('open');window.scrollTo(0,0);if(!noPush&&history.pushState)history.pushState(null,'','#'+v);
