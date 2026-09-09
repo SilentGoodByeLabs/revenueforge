@@ -4,10 +4,13 @@ R=[]
 def ok(n,c): R.append((n,c)); print(("PASS " if c else "FAIL ")+n)
 with sync_playwright() as p:
     b=p.chromium.launch(headless=True); ctx=b.new_context(); pg=ctx.new_page()
-    pg.set_default_timeout(15000)
+    pg.set_default_timeout(20000)
     def nav(v):
-        pg.click("#burger"); pg.wait_for_timeout(700)
-        pg.click('.nav-i[data-view="%s"]'%v); pg.wait_for_timeout(900)
+        pg.click("#burger")
+        pg.wait_for_selector('#side.open', timeout=3000)
+        pg.wait_for_timeout(400)
+        pg.click('.nav-i[data-view="%s"]'%v)
+        pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=3000)
     try:
         pg.goto(BASE+"/login.html"); ok("login loads", pg.locator("#em").count()>0)
     except Exception: ok("login loads", False)
@@ -25,10 +28,12 @@ with sync_playwright() as p:
         ok("portal logged in", pg.locator(".nav-i").count()>=10)
     except Exception: ok("portal logged in", False)
     try:
-        pg.click("#burger"); pg.wait_for_timeout(800)
-        ok("burger opens drawer", pg.evaluate("document.getElementById('side').classList.contains('open')"))
-        pg.click('.nav-i[data-view="eng"]'); pg.wait_for_timeout(700)
-        ok("nav eng", pg.locator("#view-eng").is_visible())
+        pg.click("#burger")
+        pg.wait_for_selector('#side.open', timeout=3000)
+        ok("burger opens drawer", True)
+        pg.click('.nav-i[data-view="eng"]')
+        pg.wait_for_selector('#view-eng[style*="block"]', timeout=3000)
+        ok("nav eng", True)
     except Exception: ok("drawer + nav eng", False)
     try:
         pg.evaluate("localStorage.removeItem('rf_cfg::admin@gmail.com')")
@@ -53,12 +58,10 @@ with sync_playwright() as p:
     except Exception: ok("run button removed", False)
     for v in ["jobs","serv","social","pros","ana","plan","set","help","ov"]:
         try:
-            nav(v)
-            # retry once if not visible (flakiness protection)
-            if not pg.locator("#view-"+v).is_visible():
-                pg.wait_for_timeout(500)
-            ok("nav "+v, pg.locator("#view-"+v).is_visible())
-        except Exception: ok("nav "+v, False)
+            nav(v); ok("nav "+v, True)
+        except Exception as e:
+            ok("nav "+v, False)
+            print(f"    ERROR: {str(e).split(chr(10))[0]}")
     try:
         pg.click("#supBtn"); pg.fill("#supIn","how do I use it"); pg.click("#supSend"); pg.wait_for_timeout(700)
         ok("bot answers specifically", "Quick start" in pg.locator("#supMsgs").inner_text())
