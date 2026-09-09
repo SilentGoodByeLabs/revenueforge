@@ -99,7 +99,7 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
   <div class="card"><h3><i class="fa-solid fa-power-off"></i> Engine control</h3><p class="muted" id="engStat">Stopped</p>
     <button class="btn btn-p" id="startBtn" style="margin-top:12px"><i class="fa-solid fa-play"></i> Start engine</button>
     <button class="btn btn-d" id="stopBtn" style="margin-top:12px;display:none"><i class="fa-solid fa-stop"></i> Stop engine</button>
-    <p class="muted" style="margin-top:10px">Keeps working in the cloud until you stop it.</p></div>
+    <p class="muted" style="margin-top:10px"><span id="engNote">Engine is off — start it to search automatically.</span></p></div>
 </div>
 <div id="view-jobs" style="display:none"><div class="crumbs">Dashboard / Jobs</div><h1>Jobs & Progress</h1>
   <div class="card"><p class="muted">Every match gets a proposal — review, message, view profile, submit.</p><button class="btn btn-s" id="refBtn" style="margin:12px 0"><i class="fa-solid fa-rotate"></i> Refresh matches</button><div id="jobsBody" class="muted">No jobs yet.</div></div></div>
@@ -217,7 +217,7 @@ function renderBrief(m,a,due){var plan=(window.SUB&&window.SUB.plan)||'Free';var
  var l=$('briefUp');if(l)l.onclick=function(){go('plan');};}
 function loadEng(){var c=ls('rf_cfg',null);if(c){$('skills').value=c.skills||'';$('target').value=c.target||'';}engUI();}
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).catch(function(){});
-function engUI(){var e=ls('rf_eng',{on:false});$('engStat').innerHTML=e.on?'<span class="dot"></span>Running — working for you until you stop it':'Stopped';$('startBtn').style.display=e.on?'none':'inline-flex';$('stopBtn').style.display=e.on?'inline-flex':'none';}
+function engUI(){var e=ls('rf_eng',{on:false});$('engStat').innerHTML=e.on?'<span class="dot"></span>Running — searching automatically':'Stopped';$('startBtn').style.display=e.on?'none':'inline-flex';$('stopBtn').style.display=e.on?'inline-flex':'none';}
 function runEng(){if(!hasCfg()||!$('skills').value.trim()){alert('Set up your profile first: go to My Engine, add your skills + target, then tap Save. Then run the engine.');go('eng');return;}if(window.SUB&&SUB.locked){alert('Your free trial has ended — upgrade to continue.');go('plan');return;} var _c=ls('rf_cfg',null);if(!_c||!(_c.skills||'').trim()){alert('SAVE your settings first: type your skills → tap Save settings.');go('eng');try{$('skills').focus();}catch(e){}return;}
  var q=(_c.skills||$('skills').value);$('jobsBody').innerHTML='Searching many sources…';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(!d.ok){alert('Trial expired — upgrade to continue.');go('plan');return;} var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);sv('rf_jobs',rs);renderJobs(rs);go('jobs');}).catch(function(){$('jobsBody').innerHTML='Search error.';});}
 function proposal(r){var c=ls('rf_cfg',null);var sk=(c&&c.skills)||'this field';return 'Hi there,\n\nI found your opening "'+r.title+'" on '+r.platform+' and I can help you right away.\n\nWhat I offer:\n• Proven experience in '+sk+'\n• Fast, reliable delivery (2-5 days) with clear communication\n• Free support after delivery - you only pay when satisfied\n\nHow I work:\n1. Quick chat to confirm your exact needs\n2. Deliver a working result with updates along the way\n3. Handover + documentation + support\n\nI can start immediately. Reply here or contact me at '+sess.email+'.\n\nBest regards,\n'+sess.email;}
@@ -343,5 +343,18 @@ function saveSettings(){var sk=$('skills').value.trim();if(!sk){alert('Enter you
 function startEngine(){var c=ls('rf_cfg',null);if(!c||!(c.skills||'').trim()){alert('SAVE your settings first: type your skills → tap Save settings.');try{$('skills').focus();}catch(e){}return;} sv('rf_eng',{on:true}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:true})}).catch(function(){}); engUI(); alert('✓ Engine started — searching now.'); runEng();}
 function stopEngine(){sv('rf_eng',{on:false}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:false})}).catch(function(){}); engUI(); alert('✓ Engine stopped.');}
 $('saveBtn').onclick=saveSettings; $('startBtn').onclick=startEngine; $('stopBtn').onclick=stopEngine;
+
+// ROUTER: refresh keeps your place; back returns to previous section
+(function(){
+  var _go=window.go;
+  window.go=function(v,push){ _go(v); try{ if(push===false){history.replaceState({v:v},'','#'+v);} else {history.pushState({v:v},'','#'+v);} }catch(e){} };
+  window.addEventListener('popstate',function(){ var h=(location.hash||'#ov').replace('#',''); _go(h); });
+  var h0=(location.hash||'').replace('#','');
+  if(h0){ setTimeout(function(){ window.go(h0,false); },300); }
+})();
+// accurate engine status text
+(function(){ var _e=window.engUI; window.engUI=function(){ _e(); var on=(ls('rf_eng',{on:false})||{}).on;
+  if($('engStat'))$('engStat').textContent=on?'Running':'Stopped';
+  if($('engNote'))$('engNote').textContent=on?'Searching automatically for new matches now.':'Engine is off — start it to search automatically.'; }; })();
 </script>
 </body></html>
