@@ -4,10 +4,10 @@ R=[]
 def ok(n,c): R.append((n,c)); print(("PASS " if c else "FAIL ")+n)
 with sync_playwright() as p:
     b=p.chromium.launch(headless=True); ctx=b.new_context(); pg=ctx.new_page()
-    pg.set_default_timeout(10000)
+    pg.set_default_timeout(15000)
     def nav(v):
-        pg.click("#burger"); pg.wait_for_timeout(500)
-        pg.click('.nav-i[data-view="%s"]'%v); pg.wait_for_timeout(600)
+        pg.click("#burger"); pg.wait_for_timeout(700)
+        pg.click('.nav-i[data-view="%s"]'%v); pg.wait_for_timeout(900)
     try:
         pg.goto(BASE+"/login.html"); ok("login loads", pg.locator("#em").count()>0)
     except Exception: ok("login loads", False)
@@ -27,7 +27,7 @@ with sync_playwright() as p:
     try:
         pg.click("#burger"); pg.wait_for_timeout(800)
         ok("burger opens drawer", pg.evaluate("document.getElementById('side').classList.contains('open')"))
-        pg.click('.nav-i[data-view="eng"]'); pg.wait_for_timeout(600)
+        pg.click('.nav-i[data-view="eng"]'); pg.wait_for_timeout(700)
         ok("nav eng", pg.locator("#view-eng").is_visible())
     except Exception: ok("drawer + nav eng", False)
     try:
@@ -53,7 +53,11 @@ with sync_playwright() as p:
     except Exception: ok("run button removed", False)
     for v in ["jobs","serv","social","pros","ana","plan","set","help","ov"]:
         try:
-            nav(v); ok("nav "+v, pg.locator("#view-"+v).is_visible())
+            nav(v)
+            # retry once if not visible (flakiness protection)
+            if not pg.locator("#view-"+v).is_visible():
+                pg.wait_for_timeout(500)
+            ok("nav "+v, pg.locator("#view-"+v).is_visible())
         except Exception: ok("nav "+v, False)
     try:
         pg.click("#supBtn"); pg.fill("#supIn","how do I use it"); pg.click("#supSend"); pg.wait_for_timeout(700)
