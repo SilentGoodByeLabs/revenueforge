@@ -345,6 +345,16 @@ function startEngine(){var c=ls('rf_cfg',null);if(!c||!(c.skills||'').trim()){al
 function stopEngine(){sv('rf_eng',{on:false}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:false})}).catch(function(){}); engUI(); alert('✓ Engine stopped.');}
 $('saveBtn').onclick=saveSettings; $('startBtn').onclick=startEngine; $('stopBtn').onclick=stopEngine;
 
+
+// AUTO-REFRESH: If settings exist, automatically search for jobs on load
+(function(){
+  if(hasCfg()){
+    setTimeout(function(){
+      runEng(); // Auto-run search if config exists
+    }, 500);
+  }
+})();
+
 // ROUTER v3: the URL hash is the only source of truth
 (function(){
   var _go=window.go;
