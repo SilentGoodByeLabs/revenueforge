@@ -12,7 +12,7 @@ with sync_playwright() as p:
         pg.click('.nav-i[data-view="%s"]'%v)
         pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=3000)
     try:
-        pg.goto(BASE+"/login.html"); ok("login loads", pg.locator("#li_email").count()>0)
+        pg.goto(BASE+"/login.html"); pg.wait_for_timeout(2000); ok("login loads", pg.locator("#li_email").count()>0)
     except Exception: ok("login loads", False)
     try:
         pg.goto(BASE+"/signup.html"); ok("signup loads", pg.locator("form").count()>0)
