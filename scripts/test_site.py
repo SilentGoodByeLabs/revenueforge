@@ -58,7 +58,9 @@ with sync_playwright() as p:
     except Exception: ok("run button removed", False)
     for v in ["jobs","serv","social","pros","ana","plan","set","help","ov"]:
         try:
-            nav(v); ok("nav "+v, True)
+            nav(v)
+            if v == "set": pg.wait_for_timeout(1500)
+            ok("nav "+v, True)
         except Exception as e:
             ok("nav "+v, False)
             print(f"    ERROR: {str(e).split(chr(10))[0]}")
