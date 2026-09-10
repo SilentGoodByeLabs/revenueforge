@@ -12,7 +12,9 @@ with sync_playwright() as p:
         pg.click('.nav-i[data-view="%s"]'%v)
         pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=3000)
     try:
-        pg.goto(BASE+"/login.html"); pg.wait_for_timeout(2000); ok("login loads", pg.locator("#li_email").count()>0)
+        pg.goto(BASE+"/login.html")
+        pg.wait_for_selector('#li_email', timeout=5000)
+        ok("login loads", True)
     except Exception: ok("login loads", False)
     try:
         pg.goto(BASE+"/signup.html"); ok("signup loads", pg.locator("form").count()>0)
@@ -21,7 +23,7 @@ with sync_playwright() as p:
         pg.goto(BASE+"/support.html"); ok("support page loads", pg.locator("#ms").count()>0)
     except Exception: ok("support page loads", False)
     try:
-        pg.goto(BASE+"/audit.html"); ok("audit redirects to login", ("signin" in pg.url or "login" in pg.url))
+        pg.goto(BASE+"/audit.html"); ok("audit redirects to login", "login" in pg.url or "signin" in pg.url)
     except Exception: ok("audit redirects to login", False)
     try:
         pg.goto(BASE+"/portal.html?authed=admin@gmail.com"); pg.wait_for_timeout(2500)
@@ -58,9 +60,7 @@ with sync_playwright() as p:
     except Exception: ok("run button removed", False)
     for v in ["jobs","serv","social","pros","ana","plan","set","help","ov"]:
         try:
-            nav(v)
-            if v == "set": pg.wait_for_timeout(1500)
-            ok("nav "+v, True)
+            nav(v); ok("nav "+v, True)
         except Exception as e:
             ok("nav "+v, False)
             print(f"    ERROR: {str(e).split(chr(10))[0]}")
