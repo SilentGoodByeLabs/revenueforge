@@ -13,8 +13,7 @@ with sync_playwright() as p:
         pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=5000)
     try:
         pg.goto(BASE+"/login.html")
-        pg.wait_for_timeout(3000)  # Wait 3 seconds for redirect
-        # Check if redirect worked (signin.html) OR if old form is still there (login.html)
+        pg.wait_for_timeout(3000)
         has_new = pg.locator("#li_email").count() > 0
         has_old = pg.locator("#em").count() > 0
         ok("login loads", has_new or has_old)
@@ -28,13 +27,7 @@ with sync_playwright() as p:
         pg.goto(BASE+"/support.html"); ok("support page loads", pg.locator("#ms").count()>0)
     except Exception: ok("support page loads", False)
     try:
-            try:
         r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
-    except Exception: ok("audit page removed", False)
-    except Exception: ok("audit page removed", False)
-            try:
-        r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
-    except Exception: ok("audit page removed", False)
     except Exception: ok("audit page removed", False)
     try:
         pg.goto(BASE+"/portal.html?authed=admin@gmail.com"); pg.wait_for_timeout(2500)
