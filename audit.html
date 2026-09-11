@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Free Audit — RevenueForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>body{margin:0;font-family:Inter;background:#F4F6FA;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border-radius:16px;padding:32px;width:min(600px,100%)}h1{font-family:Sora;font-size:1.4rem;margin:0 0 6px}
+input{width:100%;padding:12px;border:1.5px solid #E2E8F0;border-radius:10px;margin-top:12px;font-size:14px}
+button{width:100%;margin-top:14px;background:#2563EB;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;cursor:pointer}
+.muted{color:#64748B;font-size:.88rem}.row{padding:10px 0;border-bottom:1px solid #E2E8F0;font-size:.9rem}
+.cta{margin-top:20px;padding:16px;background:#EFF4FF;border-radius:10px;text-align:center}
+.btn{display:inline-block;background:#2563EB;color:#fff;border-radius:10px;padding:12px 24px;text-decoration:none;font-weight:700;margin-top:10px}
+</style></head><body>
+<div class="card"><h1>Free Job Audit</h1><p class="muted">See who is hiring for your skills right now. No account needed to try.</p>
+<input id="sk" placeholder="your skills / work type">
+<button id="go">Run my audit</button>
+<div id="out" style="margin-top:16px"></div>
+<div id="cta" class="cta" style="display:none">
+  <h3 style="font-family:Sora;margin:0 0 8px">Want to save these results & get full access?</h3>
+  <p class="muted">Create a free account to unlock: unlimited searches, auto-advertise, alerts, and more.</p>
+  <a href="signup.html" class="btn">Create free account</a>
+  <a href="login.html" class="btn" style="background:#fff;color:#2563EB;border:1.5px solid #2563EB;margin-left:8px">Log in</a>
+</div></div>
+<script>
+// IMMEDIATE redirect check
+try{var s=JSON.parse(sessionStorage.getItem("rf_session")||"{}");if(!s.email){location.replace("login.html");}}catch(e){location.replace("login.html");}
+
+var API='https://revenueforge-api.onrender.com';
+document.getElementById('go').addEventListener('click',function(){
+ var q=document.getElementById('sk').value||'hiring';
+ sessionStorage.setItem('rf_pending_audit',JSON.stringify({skills:q}));document.getElementById('out').innerHTML='<p class="muted">Searching 30+ sources…</p>';
+ fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=5')
+  .then(function(r){return r.json();}).then(function(d){
+    var rs=d.results||[];
+    document.getElementById('out').innerHTML=rs.length?rs.map(function(r){return '<div class="row"><b>'+r.title+'</b><br><span class="muted">'+r.platform+' · '+r.score+'%</span></div>';}).join(''):'<p class="muted">No matches. Try different skills.</p>';
+    document.getElementById('cta').style.display='block';
+  }).catch(function(){document.getElementById('out').innerHTML='<p class="muted">Search error.</p>';});
+});
+</script></body></html>

@@ -231,8 +231,7 @@ function renderJobs(rs){if(!rs||!rs.length){$('jobsBody').innerHTML='<p class="m
  $('jobsBody').querySelectorAll('[data-j]').forEach(function(b){b.addEventListener('click',function(){openModal(JSON.parse(decodeURIComponent(b.getAttribute('data-j'))));});});
  $('jobsBody').querySelectorAll('[data-pf]').forEach(function(b){b.addEventListener('click',function(){window.open(b.getAttribute('data-pf'),'_blank');});});
  $('jobsBody').querySelectorAll('[data-ms]').forEach(function(b){b.addEventListener('click',function(){var r=JSON.parse(decodeURIComponent(b.getAttribute('data-ms')));var txt=proposal(r);if(navigator.clipboard)navigator.clipboard.writeText(txt);var m=(r.title+' '+(r.description||'')).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);if(m)location.href='mailto:'+m[0]+'?subject='+encodeURIComponent('Proposal: '+r.title)+'&body='+encodeURIComponent(txt);else{window.open(r.url,'_blank');alert('Proposal copied — paste it in their message box.');}});});}
-function loadJobs(){if(!hasCfg()){$('jobsBody').innerHTML='<p class="muted">Configure your engine first (My Engine → Save settings), then run it.</p>';return;}renderJobs(ls('rf_jobs','[]'));refreshJobs();}
-function refreshJobs(){var q=(ls('rf_cfg',{})||{}).skills||'';if(!q)return;fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(d&&d.ok){var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);if(rs.length){sv('rf_jobs',rs);renderJobs(rs);}}}).catch(function(){});}
+function loadJobs(){if(!hasCfg()){$('jobsBody').innerHTML='<p class="muted">Configure your engine first (My Engine → Save settings), then run it.</p>';return;}renderJobs(ls('rf_jobs','[]'));}
 function cap(s){return '🚀 '+s.name+' — professional service. '+(s.description||'')+' Price: $'+s.price+'. Contact: '+(s.contact_method||'email')+' '+(s.contact_value||sess.email);}
 function share(p,s){var c=cap(s);var mk='https://silentgoodbyelabs.github.io/revenueforge/marketplace.html';var u='';
  if(p==='X')u='https://twitter.com/intent/tweet?text='+encodeURIComponent(c);
@@ -345,16 +344,6 @@ function saveSettings(){var sk=$('skills').value.trim();if(!sk){alert('Enter you
 function startEngine(){var c=ls('rf_cfg',null);if(!c||!(c.skills||'').trim()){alert('SAVE your settings first: type your skills → tap Save settings.');try{$('skills').focus();}catch(e){}return;} sv('rf_eng',{on:true}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:true})}).catch(function(){}); engUI(); alert('✓ Engine started — searching now.'); runEng();}
 function stopEngine(){sv('rf_eng',{on:false}); fetch(API+'/api/engine-toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,on:false})}).catch(function(){}); engUI(); alert('✓ Engine stopped.');}
 $('saveBtn').onclick=saveSettings; $('startBtn').onclick=startEngine; $('stopBtn').onclick=stopEngine;
-
-
-// AUTO-REFRESH: If settings exist, automatically search for jobs on load
-(function(){
-  if(hasCfg()){
-    setTimeout(function(){
-      runEng(); // Auto-run search if config exists
-    }, 500);
-  }
-})();
 
 // ROUTER v3: the URL hash is the only source of truth
 (function(){
