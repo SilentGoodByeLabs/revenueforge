@@ -28,8 +28,14 @@ with sync_playwright() as p:
         pg.goto(BASE+"/support.html"); ok("support page loads", pg.locator("#ms").count()>0)
     except Exception: ok("support page loads", False)
     try:
+            try:
         r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
+    except Exception: ok("audit page removed", False)
+    except Exception: ok("audit page removed", False)
+            try:
         r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
+    except Exception: ok("audit page removed", False)
+    except Exception: ok("audit page removed", False)
     try:
         pg.goto(BASE+"/portal.html?authed=admin@gmail.com"); pg.wait_for_timeout(2500)
         ok("portal logged in", pg.locator(".nav-i").count()>=10)

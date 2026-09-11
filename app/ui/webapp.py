@@ -238,6 +238,12 @@ def api_search(q: str = ""): return {"results": gather(q), "source": "private-en
 import sys as _sys, subprocess as _sp
 import requests as _rq
 from fastapi import Request as _Req
+
+import re as _re
+def _sanitize(s):
+    if not isinstance(s, str): return s
+    return _re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', s)
+
 CLOUD = "https://revenueforge-api.onrender.com"
 
 def _proxy(path, method="GET", body=None):
