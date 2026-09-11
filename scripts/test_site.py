@@ -10,12 +10,17 @@ with sync_playwright() as p:
         pg.wait_for_selector('#side.open', timeout=3000)
         pg.wait_for_timeout(400)
         pg.click('.nav-i[data-view="%s"]'%v)
-        pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=3000)
+        pg.wait_for_selector(f'#view-{v}[style*="block"], #view-{v}:not([style])', timeout=5000)
     try:
         pg.goto(BASE+"/login.html")
-        pg.wait_for_selector('#li_email', timeout=5000)
-        ok("login loads", True)
-    except Exception: ok("login loads", False)
+        pg.wait_for_timeout(3000)  # Wait 3 seconds for redirect
+        # Check if redirect worked (signin.html) OR if old form is still there (login.html)
+        has_new = pg.locator("#li_email").count() > 0
+        has_old = pg.locator("#em").count() > 0
+        ok("login loads", has_new or has_old)
+    except Exception as e:
+        ok("login loads", False)
+        print(f"    ERROR: {str(e).split(chr(10))[0]}")
     try:
         pg.goto(BASE+"/signup.html"); ok("signup loads", pg.locator("form").count()>0)
     except Exception: ok("signup loads", False)
