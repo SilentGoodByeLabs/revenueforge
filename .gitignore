@@ -1,0 +1,6 @@
+
+# Data files (runtime only)
+data/*.log
+data/*.json
+__pycache__/
+*.pyc
