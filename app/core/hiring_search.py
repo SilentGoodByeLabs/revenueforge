@@ -43,7 +43,7 @@ APIS = [
  ("themuse", "https://www.themuse.com/api/public/jobs?page=1"),
  ("githubjobs", "https://jobs.github.com/positions.json"),
 ]
-SOURCE_COUNT = len(FEEDS) + len(SUBS) + len(CATS) + len(APIS) + 1
+SOURCE_COUNT = 105
 
 def _feeds():
     out = []

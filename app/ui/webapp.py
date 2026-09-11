@@ -1,7 +1,7 @@
 import os, re, json, secrets
 from datetime import datetime
 from pathlib import Path
-from fastapi import FastAPI, Form
+from fastapi import Request, FastAPI, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -237,7 +237,7 @@ def api_search(q: str = ""): return {"results": gather(q), "source": "private-en
 # ===== PORTAL-COMPATIBLE API (local portal on :8600) =====
 import sys as _sys, subprocess as _sp
 import requests as _rq
-from fastapi import Request as _Req
+from fastapi import Request, Request as _Req
 
 import re as _re
 def _sanitize(s):
