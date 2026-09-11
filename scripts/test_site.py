@@ -64,8 +64,8 @@ with sync_playwright() as p:
     except Exception: ok("run button removed", False)
     for v in ["jobs","serv","social","pros","ana","plan","set","help","ov"]:
         try:
-            # Extra retry for 'set' which can be slow
-            if v == "set":
+            # Extra retry for 'set' and 'plan' which can be slow
+            if v in ["set", "plan"]:
                 for attempt in range(3):
                     try:
                         nav(v); ok("nav "+v, True); break
