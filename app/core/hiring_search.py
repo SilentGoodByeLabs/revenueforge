@@ -118,3 +118,18 @@ def search_more(q=""): return _cached("apis", _apis)
 def search_hn(q=""): return _cached("hn", _hn)
 def search_reddit(q=""): return search_reddit_subs(q)
 def search_indeed(q=""): return []  # hook kept; Indeed blocks even home IPs without cookies
+
+def gather_all(q=""):
+    """Gather jobs from all sources with rotation"""
+    out = []
+    try: out += search_rss_all(q) or []
+    except: pass
+    try: out += search_reddit_subs(q) or []
+    except: pass
+    try: out += search_remotive_cats(q) or []
+    except: pass
+    try: out += search_more(q) or []
+    except: pass
+    try: out += search_hn(q) or []
+    except: pass
+    return out
