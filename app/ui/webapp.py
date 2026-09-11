@@ -326,67 +326,19 @@ async def api_paystack_init(request: _Req):
 async def api_paystack_verify(request: _Req):
     b = await request.json(); return _proxy("/api/paystack/verify", "POST", b)
 
+
+
+
 @app.post("/api/chat")
 async def api_chat(request: Request):
-    """RevenueForge Assistant — real conversational AI"""
     try:
         data = await request.json()
-        msg = (data.get("message") or "").strip()
-        if not msg: return {"reply": "I'm listening."}
-        m = msg.lower()
-
-        # Greetings
-        if m in ("hi", "hello", "hey", "sup", "yo"):
-            return {"reply": "Hi — I'm the RevenueForge Assistant. Ask me about jobs, pricing, proposals, sources, or how the platform works."}
-        if "thank" in m:
-            return {"reply": "You're welcome. Anything else I can help with?"}
-
-        # How it works / what it does
-        if any(w in m for w in ["how does", "how it works", "what does it do", "explain", "overview"]):
-            return {"reply": "RevenueForge is a business automation platform with two engines:\n\n1. <b>Job Engine</b> — searches 105+ sources (LinkedIn, Upwork, Fiverr, Reddit, HN, 60+ company career pages) using your home IP so nothing is blocked.\n2. <b>Sales Engine</b> — matches your services to prospects and drafts personalized outreach.\n\nConfigure your skills in 'My Engine', click Start, and jobs appear. You approve every proposal before submission."}
-
-        # Pricing
-        if any(w in m for w in ["price", "pricing", "cost", "how much", "plan", "subscription"]):
-            return {"reply": "Pricing is transparent:\n\n• <b>Free tier</b> — 5 jobs per search, 3 sources.\n• <b>Pro ($30/month)</b> — unlimited searches, all 105+ sources, proposal drafts, sales engine.\n• <b>Build sprints</b> — custom automation work starts from $250-$300 per project with fixed quotes.\n\nCheck the Pricing page for full details."}
-
-        # Job sources
-        if any(w in m for w in ["source", "sources", "where do you", "job boards", "linkedin", "upwork", "fiverr"]):
-            return {"reply": "I search <b>105+ sources</b>:\n\n• 25 RSS feeds (HN, RemoteOK, Jobicy, WeWorkRemotely)\n• 10 Reddit subs (r/forhire, r/hiring, r/remotejobs...)\n• 60+ Greenhouse company boards (Stripe, Coinbase, GitLab, Notion...)\n• Lever boards, Remotive, Arbeitnow, The Muse\n• Hacker News Algolia\n\nPublic sites (LinkedIn, Upwork, Fiverr, Facebook) are accessed via official RSS/APIs where permitted, and email-alert ingestion where not. Your home IP handles the blocked ones."}
-
-        # Proposals / applications
-        if any(w in m for w in ["proposal", "apply", "application", "draft", "submit"]):
-            return {"reply": "For every job you like, I draft a personalized proposal based on your saved skills and the job description. You always review and approve manually — I never submit to restricted platforms automatically. This keeps you compliant with Upwork, Fiverr, LinkedIn rules."}
-
-        # Spam / compliance / safe
-        if any(w in m for w in ["spam", "safe", "legal", "compliance", "rule", "ban"]):
-            return {"reply": "Yes — completely spam-safe. We only use official APIs and permitted channels. No fake accounts, no scraping bans, no mass messaging. Every outbound action waits for human approval, and opt-outs are respected. Platform rules are checked before any automation is built."}
-
-        # Time / speed
-        if any(w in m for w in ["time", "how long", "deadline", "fast", "speed", "weeks"]):
-            return {"reply": "Build sprints run 1–3 weeks depending on scope. Job searches are instant once the engine is running. Refresh shows new sources each time (5-minute cache per source group)."}
-
-        # Refresh / why same jobs
-        if any(w in m for w in ["refresh", "same jobs", "different", "new jobs", "stale"]):
-            return {"reply": "Each refresh pulls from a different subset of the 105+ sources (rotation). Cached for 5 minutes per group to avoid hammering sites, so wait ~5 minutes between refreshes for fully fresh results."}
-
-        # Skills / configure
-        if any(w in m for w in ["skill", "configure", "setup", "my engine", "save"]):
-            return {"reply": "Go to 'My Engine', type your skills (e.g. 'python automation, n8n, api integration') and target market, then click Save. The engine only shows jobs that match your skills."}
-
-        # Products / services / sell
-        if any(w in m for w in ["product", "service", "sell", "sales", "prospect", "client"]):
-            return {"reply": "In the 'Services' tab you add your offerings. The Sales Engine matches them to businesses that have problems your service solves, drafts personalized outreach, and waits for your approval before sending."}
-
-        # Private engine / cloud
-        if any(w in m for w in ["private", "cloud", "render", "local", "localhost"]):
-            return {"reply": "The public site uses a cloud API. Your local portal (localhost:8600) connects to the private engine on your home IP, which accesses all 105+ sources. Both show the same job types — the private one just has fewer blocks."}
-
-        # Help
-        if "help" in m:
-            return {"reply": "I can help with:\n\n• How to configure the engine\n• Understanding pricing\n• Where jobs come from\n• How proposals work\n• Compliance and safety\n• Adding your services\n\nJust ask!"}
-
-        # Smart fallback — acknowledge and offer human
-        return {"reply": "That's a good question I don't have a canned answer for. You can:\n\n1. Rephrase it in the context of jobs, pricing, proposals, or compliance.\n2. Email the founder directly — the 'Talk to a human' chip below opens your mail app."}
-
-    except Exception as e:
+        msg = (data.get("message") or "").strip().lower()
+        if "work" in msg or "how" in msg: return {"reply": "Configure skills in My Engine, click Start, and jobs appear from 105+ sources. You approve every proposal manually."}
+        if "price" in msg or "cost" in msg: return {"reply": "Free tier has 5 jobs/search. Pro is $30/month for unlimited 105+ sources and proposals. Check Pricing page."}
+        if "source" in msg or "where" in msg: return {"reply": "105+ sources: 25 RSS feeds, 10 Reddit subs, 60+ Greenhouse boards, Lever, Remotive, HN. LinkedIn/Upwork via official APIs/alerts."}
+        if "spam" in msg or "safe" in msg: return {"reply": "Completely spam-safe. Official APIs only, no fake accounts, human approval required for every action."}
+        if "proposal" in msg: return {"reply": "I draft personalized proposals based on your skills. You always review and approve manually before submission."}
+        return {"reply": "I can help with jobs, pricing, proposals, and compliance. Click 'Talk to a human' to email the founder."}
+    except Exception:
         return {"reply": "I had trouble thinking. Please try again."}
