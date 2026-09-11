@@ -1,14 +1,7 @@
-const CONTACT_EMAIL = 'adeolaayodeji4666@gmail.com';
-
-const BOT_KB = [
-  { k: ['price', 'pricing', 'cost', 'quote', 'how much'], a: 'Pricing is transparent: a free automation audit, fixed-quote build sprints, and monthly retainers. Every quote is fixed before work begins. See the Pricing page for details.' },
-  { k: ['service', 'what do you do', 'offer', 'build'], a: 'We build AI sales outreach systems, CRM & workflow automation, document/PDF automation, chatbots, and custom AI agents — all compliance-first with human approval on every action.' },
-  { k: ['spam', 'safe', 'legal', 'compliance', 'rule'], a: 'Yes — we only use official APIs and permitted channels. No spam, no scraping bans, no fake accounts. Every message waits for human approval, and opt-outs are always respected.' },
-  { k: ['time', 'long', 'deadline', 'fast'], a: 'Most build sprints run 1–3 weeks depending on scope. You get a fixed timeline with the quote before any work starts.' },
-  { k: ['human', 'person', 'email', 'contact', 'talk'], a: 'You can email the founder directly — the button below opens your mail app pre-filled.', human: true }
-];
-
+/* RevenueForge Assistant — real AI chatbot */
 (function () {
+  const CONTACT_EMAIL = 'adeolaayodeji4666@gmail.com';
+
   const fab = document.createElement('button');
   fab.className = 'bot-fab';
   fab.innerHTML = '<i class="fa-solid fa-comments"></i>';
@@ -17,62 +10,102 @@ const BOT_KB = [
   const panel = document.createElement('div');
   panel.className = 'bot-panel';
   panel.innerHTML =
-    '<div class="bot-head"><span><i class="fa-solid fa-robot"></i> Forge Assistant</span>' +
+    '<div class="bot-head"><span><i class="fa-solid fa-robot"></i> RevenueForge Assistant</span>' +
     '<button id="botClose" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer" aria-label="Close chat"><i class="fa-solid fa-xmark"></i></button></div>' +
     '<div class="bot-body" id="botBody"></div>' +
-    '<div class="bot-chips" id="botChips"></div>';
+    '<div class="bot-chips" id="botChips"></div>' +
+    '<div class="bot-input"><input id="botIn" placeholder="Ask anything..." autocomplete="off"><button id="botSend"><i class="fa-solid fa-paper-plane"></i></button></div>';
 
   document.body.appendChild(fab);
   document.body.appendChild(panel);
 
   const body = panel.querySelector('#botBody');
   const chips = panel.querySelector('#botChips');
+  const inp = panel.querySelector('#botIn');
+  const sendBtn = panel.querySelector('#botSend');
 
   function addMsg(text, who) {
     const d = document.createElement('div');
     d.className = 'msg ' + who;
-    d.textContent = text;
+    if (who === 'bot') d.innerHTML = text.replace(/\n/g, '<br>');
+    else d.textContent = text;
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
+    return d;
   }
 
-  function humanButton() {
-    const b = document.createElement('button');
-    b.className = 'btn btn-primary btn-sm bot-mail';
-    b.innerHTML = '<i class="fa-solid fa-envelope"></i> Email the founder';
-    b.onclick = function () {
-      window.location.href = 'mailto:' + CONTACT_EMAIL +
-        '?subject=' + encodeURIComponent('Question from website chat') +
-        '&body=' + encodeURIComponent('Hi RevenueForge,\n\n(Paste your question here)\n\n— sent from the website chat');
-    };
-    panel.appendChild(b);
+  function thinking() {
+    const d = document.createElement('div');
+    d.className = 'msg bot thinking';
+    d.innerHTML = '<i>RevenueForge Assistant is thinking...</i>';
+    body.appendChild(d);
+    body.scrollTop = body.scrollHeight;
+    return d;
   }
 
-  function answer(q) {
-    const t = q.toLowerCase();
-    for (const item of BOT_KB) {
-      if (item.k.some(k => t.includes(k))) {
-        addMsg(item.a, 'bot');
-        if (item.human) humanButton();
-        return;
-      }
+  async function ask(q) {
+    addMsg(q, 'user');
+    const wait = thinking();
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: q })
+      });
+      const data = await res.json();
+      wait.remove();
+      addMsg(data.reply || "I'm not sure. Try rephrasing your question.", 'bot');
+    } catch (e) {
+      wait.remove();
+      addMsg('Connection issue. Please try again.', 'bot');
     }
-    addMsg('Good question. The fastest way to get an exact answer is to email the founder directly — the button below opens your mail app pre-filled.', 'bot');
-    humanButton();
   }
 
-  ['Services', 'Pricing', 'Is this spam-safe?', 'Talk to a human'].forEach(q => {
+  // Smart chips
+  const quickQs = [
+    'How does it work?',
+    'Show me pricing',
+    'How many job sources?',
+    'Is it spam-safe?',
+    'How do proposals work?',
+    'Talk to a human'
+  ];
+  quickQs.forEach(q => {
     const b = document.createElement('button');
     b.textContent = q;
-    b.onclick = function () { addMsg(q, 'user'); answer(q); };
+    b.onclick = function () {
+      if (q === 'Talk to a human') {
+        addMsg(q, 'user');
+        addMsg('You can email the founder directly at <b>' + CONTACT_EMAIL + '</b> — the button below opens your mail app.', 'bot');
+        const mb = document.createElement('button');
+        mb.className = 'btn btn-primary btn-sm bot-mail';
+        mb.innerHTML = '<i class="fa-solid fa-envelope"></i> Email the founder';
+        mb.onclick = function () {
+          window.location.href = 'mailto:' + CONTACT_EMAIL +
+            '?subject=' + encodeURIComponent('Question from RevenueForge website') +
+            '&body=' + encodeURIComponent('Hi,\n\n(Paste your question here)\n\n— sent from RevenueForge website');
+        };
+        body.appendChild(mb);
+        body.scrollTop = body.scrollHeight;
+      } else {
+        ask(q);
+      }
+    };
     chips.appendChild(b);
   });
 
+  sendBtn.onclick = function () {
+    const q = inp.value.trim();
+    if (!q) return;
+    inp.value = '';
+    ask(q);
+  };
+  inp.onkeypress = function (e) { if (e.key === 'Enter') sendBtn.click(); };
+
   fab.onclick = function () {
     panel.classList.toggle('open');
-    if (!panel.dataset.greeted) {
-      panel.dataset.greeted = '1';
-      addMsg('Hi! I am the Forge Assistant. Ask me about services, pricing or compliance — or jump straight to a human email.', 'bot');
+    if (panel.classList.contains('open')) {
+      setTimeout(function () { inp.focus(); }, 200);
     }
   };
   panel.querySelector('#botClose').onclick = function () { panel.classList.remove('open'); };
