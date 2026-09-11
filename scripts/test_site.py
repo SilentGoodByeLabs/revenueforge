@@ -28,8 +28,8 @@ with sync_playwright() as p:
         pg.goto(BASE+"/support.html"); ok("support page loads", pg.locator("#ms").count()>0)
     except Exception: ok("support page loads", False)
     try:
-        pg.goto(BASE+"/audit.html"); ok("audit redirects to login", "login" in pg.url or "signin" in pg.url)
-    except Exception: ok("audit redirects to login", False)
+        r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
+        r=pg.request.get(BASE+"/audit.html"); ok("audit page removed", r.status==404)
     try:
         pg.goto(BASE+"/portal.html?authed=admin@gmail.com"); pg.wait_for_timeout(2500)
         ok("portal logged in", pg.locator(".nav-i").count()>=10)
