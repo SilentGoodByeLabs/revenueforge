@@ -120,6 +120,14 @@ def search_reddit(q=""): return search_reddit_subs(q)
 def search_indeed(q=""): return []  # hook kept; Indeed blocks even home IPs without cookies
 
 def gather_all(q=""):
+    # Clear source rotation cache to ensure fresh results
+    global _source_rotation
+    _source_rotation = getattr(globals(), '_source_rotation', {'index': 0, 'last_reset': 0})
+    import time
+    if time.time() - _source_rotation.get('last_reset', 0) > 300:  # Reset every 5 min
+        _source_rotation['index'] = 0
+        _source_rotation['last_reset'] = time.time()
+
     """Gather jobs from all sources with rotation"""
     out = []
     try: out += search_rss_all(q) or []
