@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RevenueForge Control Center</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.cc-wrap{max-width:1100px;margin:0 auto;padding:20px}
+.cc-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.cc-tabs button{border:1px solid #e6e9ef;background:#fff;border-radius:20px;padding:8px 16px;cursor:pointer;font-weight:600}
+.cc-tabs button.on{background:#2f6fed;color:#fff;border-color:#2f6fed}
+.cc-card{background:#fff;border:1px solid #e6e9ef;border-radius:12px;padding:16px;margin-bottom:14px}
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.cc-stat{background:#f8fafc;border:1px solid #e6e9ef;border-radius:10px;padding:14px;text-align:center}
+.cc-stat b{font-size:24px;color:#2f6fed;display:block}
+.job-row{border:1px solid #e6e9ef;border-radius:10px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.badge{background:#eaf1fe;color:#2f6fed;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:700}
+.score{font-weight:800;color:#16a34a}
+.btn-sm{padding:6px 12px;border-radius:8px;border:1px solid #e6e9ef;background:#fff;cursor:pointer}
+.btn-pri{background:#2f6fed;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:600}
+.muted{color:#6b7280;font-size:13px}
+textarea{width:100%;min-height:220px;border:1px solid #e6e9ef;border-radius:10px;padding:10px;font-family:monospace;font-size:13px}
+.cc-hide{display:none}
+.spin{animation:ccspin 1s linear infinite;display:inline-block}
+@keyframes ccspin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container" style="display:flex;justify-content:space-between;align-items:center">
+<b><i class="fa-solid fa-fire"></i> RevenueForge <span style="color:#2f6fed">Control Center</span></b>
+<span id="engPill" class="badge">checking engine…</span>
+</div></header>
+
+<div class="cc-wrap">
+<div class="cc-tabs">
+<button data-t="ov" class="on">Overview</button>
+<button data-t="jobs">Jobs (105+ sources)</button>
+<button data-t="prop">Proposals</button>
+<button data-t="prod">Products</button>
+<button data-t="out">Outreach</button>
+<button data-t="ai">Assistant</button>
+</div>
+
+<section id="t-ov">
+<div class="cc-grid">
+<div class="cc-stat"><b>105+</b>job sources wired</div>
+<div class="cc-stat"><b id="stJobs">0</b>jobs in last search</div>
+<div class="cc-stat"><b id="stPool">0</b>jobs pooled in cloud</div>
+<div class="cc-stat"><b>30m</b>auto-push interval</div>
+</div>
+<div class="cc-card"><b>Human-in-the-loop rule</b><p class="muted">Nothing is ever submitted automatically. Every proposal and outreach message waits for your approval here, then you submit manually via the official platform.</p></div>
+</div>
+
+<section id="t-jobs" class="cc-hide">
+<div class="cc-card">
+<input id="q" placeholder="skills / role e.g. python automation" style="flex:1;padding:10px;border:1px solid #e6e9ef;border-radius:8px;width:60%">
+<button class="btn-pri" id="runBtn"><i class="fa-solid fa-magnifying-glass"></i> Search 105+ sources</button>
+<span id="runMsg" class="muted"></span>
+</div>
+<div id="jobList"></div>
+</section>
+
+<section id="t-prop" class="cc-hide">
+<div class="cc-card"><b>Proposal draft for:</b> <span id="propTitle" class="muted">none selected</span>
+<textarea id="propBox" placeholder="Select a job and click Proposal…"></textarea>
+<button class="btn-sm" id="copyProp"><i class="fa-regular fa-copy"></i> Copy</button>
+<button class="btn-pri" id="approveProp"><i class="fa-solid fa-check"></i> Approve (then submit manually)</button>
+<span id="propMsg" class="muted"></span></div>
+</section>
+
+<section id="t-prod" class="cc-hide">
+<div class="cc-card"><b>Add product / service</b><br>
+<input id="pName" placeholder="name" style="padding:8px;border:1px solid #e6e9ef;border-radius:8px;margin:4px 0;width:90%"><br>
+<input id="pDesc" placeholder="what it does" style="padding:8px;border:1px solid #e6e9ef;border-radius:8px;margin:4px 0;width:90%"><br>
+<button class="btn-pri" id="addProd">Publish</button></div>
+<div id="prodList"></div>
+</section>
+
+<section id="t-out" class="cc-hide">
+<div class="cc-card"><b>Outreach drafter</b><p class="muted">Drafts a message for a prospect. You copy + send manually. Zero spam, opt-outs respected.</p>
+<input id="outWho" placeholder="prospect / company" style="padding:8px;border:1px solid #e6e9ef;border-radius:8px;width:60%"><br>
+<button class="btn-pri" id="outBtn">Draft outreach</button>
+<textarea id="outBox" style="min-height:140px;margin-top:10px"></textarea>
+<button class="btn-sm" id="copyOut"><i class="fa-regular fa-copy"></i> Copy</button></div>
+</section>
+
+<section id="t-ai" class="cc-hide">
+<div class="cc-card"><b>RevenueForge Assistant</b>
+<div id="aiMsgs" style="min-height:160px;border:1px solid #e6e9ef;border-radius:10px;padding:10px;margin:8px 0"></div>
+<input id="aiIn" placeholder="ask anything…" style="padding:8px;border:1px solid #e6e9ef;border-radius:8px;width:70%">
+<button class="btn-pri" id="aiSend">Send</button></div>
+</section>
+</div>
+
+<script>
+var E='http://127.0.0.1:8502';
+function $(id){return document.getElementById(id);}
+function show(t){var s=document.querySelectorAll('section[id^="t-"]');for(var i=0;i<s.length;i++)s[i].classList.add('cc-hide');$('t-'+t).classList.remove('cc-hide');var b=document.querySelectorAll('.cc-tabs button');for(var j=0;j<b.length;j++)b[j].classList.toggle('on',b[j].getAttribute('data-t')===t);}
+var tabs=document.querySelectorAll('.cc-tabs button');
+for(var i=0;i<tabs.length;i++){tabs[i].onclick=function(){show(this.getAttribute('data-t'));};}
+function approved(){return JSON.parse(localStorage.getItem('rf_cc_approved')||'[]');}
+function markApproved(u){var a=approved();if(a.indexOf(u)<0){a.push(u);localStorage.setItem('rf_cc_approved',JSON.stringify(a));}}
+fetch(E+'/api/search-hiring?q=status&limit=1&email=owner@local').then(function(r){return r.json();}).then(function(d){$('engPill').textContent='engine online';}).catch(function(){$('engPill').textContent='engine OFFLINE';});
+fetch('https://revenueforge-api.onrender.com/api/pooled-jobs?limit=1').then(function(r){return r.json();}).then(function(d){$('stPool').textContent=d.count||0;}).catch(function(){$('stPool').textContent='?';});
+var LAST=[];
+$('runBtn').onclick=function(){
+  $('runMsg').innerHTML='<i class="fa-solid fa-arrows-rotate spin"></i> searching 105+ sources…';
+  fetch(E+'/api/search-hiring?q='+encodeURIComponent($('q').value||'python')+'&limit=25&email=owner@local').then(function(r){return r.json();}).then(function(d){
+    LAST=d.results||[]; $('stJobs').textContent=LAST.length;
+    $('runMsg').textContent=LAST.length+' jobs from '+new Set(LAST.map(function(j){return j.platform;})).size+' sources';
+    var ap=approved(); var h='';
+    for(var i=0;i<LAST.length;i++){var j=LAST[i];
+      h+='<div class="job-row"><div><b>'+j.title+'</b><br><span class="badge">'+j.platform+'</span> <span class="score">'+j.score+'%</span> '+(ap.indexOf(j.url)>=0?'<span class="badge" style="background:#dcfce7;color:#16a34a">approved</span>':'')+'<br><span class="muted">'+(j.description||'').slice(0,120)+'</span></div><div><button class="btn-sm" data-p="'+i+'">Proposal</button> <button class="btn-sm" data-a="'+i+'">Approve</button> <a class="btn-sm" target="_blank" href="'+j.url+'">Open</a></div></div>';
+    }
+    $('jobList').innerHTML=h||'<p class="muted">no jobs found</p>';
+    var bs=document.querySelectorAll('#jobList button');
+    for(var k=0;k<bs.length;k++){bs[k].onclick=function(){
+      var idx=parseInt(this.getAttribute('data-p')); var idx2=parseInt(this.getAttribute('data-a'));
+      if(!isNaN(idx)){draftProposal(LAST[idx]);}
+      if(!isNaN(idx2)){markApproved(LAST[idx2].url);this.closest('.job-row').innerHTML+='<span class="badge" style="background:#dcfce7;color:#16a34a">approved</span>';}
+    };}
+  }).catch(function(){$('runMsg').textContent='engine unreachable';});
+};
+function draftProposal(j){
+  show('prop'); $('propTitle').textContent=j.title; $('propBox').value='Drafting…';
+  fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Draft a short proposal for this job: '+j.title+' at '+j.platform+'. Description: '+(j.description||'').slice(0,400)})}).then(function(r){return r.json();}).then(function(d){$('propBox').value=d.reply||'draft failed';});
+}
+$('copyProp').onclick=function(){navigator.clipboard.writeText($('propBox').value);$('propMsg').textContent='copied';};
+$('approveProp').onclick=function(){$('propMsg').textContent='Approved. Now submit MANUALLY on the official platform.';};
+function loadProds(){fetch(E+'/api/my/products').then(function(r){return r.json();}).then(function(d){var l=d.products||d.items||d||[];var h='';if(Array.isArray(l))for(var i=0;i<l.length;i++){h+='<div class="cc-card"><b>'+(l[i].name||l[i].title||'')+'</b><br><span class="muted">'+(l[i].description||'')+'</span></div>';}$('prodList').innerHTML=h||'<p class="muted">no products yet</p>';}).catch(function(){});}
+loadProds();
+$('addProd').onclick=function(){fetch(E+'/api/my/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('pName').value,description:$('pDesc').value})}).then(function(){loadProds();});};
+$('outBtn').onclick=function(){fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Write a short friendly outreach message to '+($('outWho').value||'a prospect')+' offering automation services. No spam tone.'})}).then(function(r){return r.json();}).then(function(d){$('outBox').value=d.reply||'';});};
+$('copyOut').onclick=function(){navigator.clipboard.writeText($('outBox').value);};
+function aiSend(){var m=$('aiIn').value;if(!m)return;$('aiMsgs').innerHTML+='<div><b>You:</b> '+m+'</div>';$('aiIn').value='';
+  fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(function(r){return r.json();}).then(function(d){$('aiMsgs').innerHTML+='<div><b>Assistant:</b> '+d.reply+'</div>';$('aiMsgs').scrollTop=99999;});}
+$('aiSend').onclick=aiSend; $('aiIn').onkeypress=function(e){if(e.key==='Enter')aiSend();};
+</script>
+</body>
+</html>
