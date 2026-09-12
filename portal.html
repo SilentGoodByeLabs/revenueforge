@@ -232,7 +232,7 @@ function renderJobs(rs){if(!rs||!rs.length){$('jobsBody').innerHTML='<p class="m
  $('jobsBody').querySelectorAll('[data-pf]').forEach(function(b){b.addEventListener('click',function(){window.open(b.getAttribute('data-pf'),'_blank');});});
  $('jobsBody').querySelectorAll('[data-ms]').forEach(function(b){b.addEventListener('click',function(){var r=JSON.parse(decodeURIComponent(b.getAttribute('data-ms')));var txt=proposal(r);if(navigator.clipboard)navigator.clipboard.writeText(txt);var m=(r.title+' '+(r.description||'')).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);if(m)location.href='mailto:'+m[0]+'?subject='+encodeURIComponent('Proposal: '+r.title)+'&body='+encodeURIComponent(txt);else{window.open(r.url,'_blank');alert('Proposal copied — paste it in their message box.');}});});}
 function loadJobs(){if(!hasCfg()){$('jobsBody').innerHTML='<p class="muted">Configure your engine first (My Engine → Save settings), then run it.</p>';return;}renderJobs(ls('rf_jobs','[]'));refreshJobs();}
-function refreshJobs(){var q=(ls('rf_cfg',{})||{}).skills||'';if(!q)return;fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(d&&d.ok){var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);if(rs.length){sv('rf_jobs',rs);renderJobs(rs);}}}).catch(function(){});}
+function refreshJobs(){var q=(ls('rf_cfg',{})||{}).skills||'';if(!q)return;fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(d&&d.ok){var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);if(rs.length){sv('rf_jobs',rs);renderJobs(rs);}}}).catch(function(){});setTimeout(function(){if(window.mergePooled)mergePooled();},800);}
 function cap(s){return '🚀 '+s.name+' — professional service. '+(s.description||'')+' Price: $'+s.price+'. Contact: '+(s.contact_method||'email')+' '+(s.contact_value||sess.email);}
 function share(p,s){var c=cap(s);var mk='https://silentgoodbyelabs.github.io/revenueforge/marketplace.html';var u='';
  if(p==='X')u='https://twitter.com/intent/tweet?text='+encodeURIComponent(c);
@@ -276,7 +276,7 @@ function loadPros(){var l=ls('rf_pros','[]');var stages=['New','Contacted','Repl
 function loadAna(){var l=ls('rf_pros','[]');var c={New:0,Contacted:0,Replied:0,Won:0};l.forEach(function(p){c[p.s]=(c[p.s]||0)+1;});var tot=Math.max(l.length,1);
  fetch(API+'/api/my/products?email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){var s=(d.products||[]).length;
  $('anaBody').innerHTML=['New','Contacted','Replied','Won'].map(function(st){return '<div class="muted">'+st+' · '+c[st]+'</div><div class="bar"><i style="width:'+(c[st]/tot*100)+'%"></i></div>';}).join('')+
- '<div class="row"><span>Jobs matched</span><b>'+(hasCfg()?ls('rf_jobs','[]').length:0)+'</b></div><div class="row"><span>Proposals submitted</span><b>'+ls('rf_apps','[]').length+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Clients won</span><b>'+c.Won+'</b></div>';}).catch(function(){});}
+ '<div class="row"><span>Jobs matched</span><b>'+(hasCfg()?ls('rf_jobs','[]').length:0)+'</b></div><div class="row"><span>Proposals submitted</span><b>'+ls('rf_apps','[]').length+'</b></div><div class="row"><span>Services live</span><b>'+s+'</b></div><div class="row"><span>Clients won</span><b>'+c.Won+'</b></div>';}).catch(function(){});setTimeout(function(){if(window.mergePooled)mergePooled();},800);}
 function loadPlan(){fetch(API+'/api/sub/'+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){window.SUB=d;renderPlan();}).catch(function(){$('planNow').innerHTML='Plan: <b>Free</b>.';});}
 function renderPlan(){var d=window.SUB||{};if(d.paid)$('planNow').innerHTML='Plan: <b>'+d.plan+'</b> — ACTIVE ✔<br>What you get: unlimited matches on many sources · publish & sell on marketplace · Telegram alerts · auto-advertise on many sources.';else if(d.trial_active)$('planNow').innerHTML='<b>Free trial</b> — '+d.trial_hours_left+'h left · 5 results · selling locked.';else $('planNow').innerHTML='<b>Trial expired.</b> Upgrade to continue — engine paused.';}
 
@@ -381,4 +381,26 @@ function filterBySkills(jobs, skills){
   .container, .wrapper, main, section { max-width: 100% !important; box-sizing: border-box !important; }
 </style>
 
+
+<script id="refresh-pool-patch">
+function mergePooled(){
+  fetch(API+'/api/pooled-jobs?limit=40').then(function(r){return r.json();}).then(function(d){
+    var pool=(d&&d.jobs)||[]; if(!pool.length)return;
+    var cur=ls('rf_jobs','[]'); var seen={}; cur.forEach(function(j){if(j.url)seen[j.url]=1;});
+    var add=pool.filter(function(j){return j.url&&!seen[j.url];}).slice(0,25);
+    if(add.length){ var merged=cur.concat(add); sv('rf_jobs',merged); renderJobs(merged); }
+  }).catch(function(){});
+}
+document.addEventListener('click', function(e){
+  var t=e.target.closest?e.target.closest('button,a,[role="button"],.btn,i'):null;
+  if(!t)return;
+  var txt=(t.textContent||'').toLowerCase(), id=(t.id||'').toLowerCase(), cls=(typeof t.className==='string'?t.className:'').toLowerCase();
+  var icon=t.tagName==='I'&&/fa-(rotate|sync|arrows-rotate|refresh)/.test(t.className||'');
+  if(txt.indexOf('refresh')>=0||id.indexOf('refresh')>=0||cls.indexOf('refresh')>=0||icon||t.closest('[title*="efresh"]')){
+    e.preventDefault();
+    if(window.refreshJobs)refreshJobs();
+    setTimeout(mergePooled,700);
+  }
+});
+</script>
 </body></html>

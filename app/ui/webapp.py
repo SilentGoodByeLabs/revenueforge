@@ -292,6 +292,10 @@ def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
         if u and u in seen: continue
         seen.add(u); ded.append(j)
     sv("jobs.json", ded); audit(f"search-hiring -> {len(ded)} from 105+ sources")
+    try:
+        globals()['_rot_idx'] = (globals().get('_rot_idx', 0) + 7) % max(len(ded), 1)
+        r = globals()['_rot_idx']; ded = ded[r:] + ded[:r]
+    except Exception: pass
     import random as _rnd, threading as _th
     shaped=[{"title":_sanitize(j.get("title","")), "url":j.get("url",""), "platform":_sanitize(j.get("source","home")), "score":_rnd.randint(70,98), "description":_sanitize(j.get("description","")), "profile":""} for j in ded[:limit]]
     if HS and hasattr(HS, "push_jobs"):
