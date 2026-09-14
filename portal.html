@@ -382,25 +382,33 @@ function filterBySkills(jobs, skills){
 </style>
 
 
+
+
 <script id="refresh-pool-patch">
-function mergePooled(){
-  fetch(API+'/api/pooled-jobs?limit=40').then(function(r){return r.json();}).then(function(d){
+function showLoading(m){var jb=document.getElementById('jobsBody');if(jb)jb.innerHTML='<p class="muted"><i class="fa-solid fa-arrows-rotate fa-spin"></i> '+(m||'Refreshing matches…')+'</p>';}
+function mergePooled(min){
+  fetch(API+'/api/pooled-jobs?limit=60').then(function(r){return r.json();}).then(function(d){
     var pool=(d&&d.jobs)||[]; if(!pool.length)return;
     var cur=ls('rf_jobs','[]'); var seen={}; cur.forEach(function(j){if(j.url)seen[j.url]=1;});
-    var add=pool.filter(function(j){return j.url&&!seen[j.url];}).slice(0,25);
-    if(add.length){ var merged=cur.concat(add); sv('rf_jobs',merged); renderJobs(merged); }
+    var add=pool.filter(function(j){return j.url&&!seen[j.url];});
+    add=add.slice(0,Math.max((min||15)-cur.length,10));
+    if(add.length){var merged=cur.concat(add);sv('rf_jobs',merged);renderJobs(merged);}
   }).catch(function(){});
+}
+function hardRefresh(){
+  showLoading('Refreshing matches…');
+  var q=(ls('rf_cfg',{})||{}).skills||'';
+  fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(((window.sess)||{}).email||'')).then(function(r){return r.json();}).then(function(d){
+    var rs=(d&&d.results)||[]; sv('rf_jobs',rs); renderJobs(rs);
+    setTimeout(function(){mergePooled(15);},400);
+  }).catch(function(){showLoading('Connection problem — retrying…'); setTimeout(hardRefresh,3000);});
 }
 document.addEventListener('click', function(e){
   var t=e.target.closest?e.target.closest('button,a,[role="button"],.btn,i'):null;
   if(!t)return;
   var txt=(t.textContent||'').toLowerCase(), id=(t.id||'').toLowerCase(), cls=(typeof t.className==='string'?t.className:'').toLowerCase();
   var icon=t.tagName==='I'&&/fa-(rotate|sync|arrows-rotate|refresh)/.test(t.className||'');
-  if(txt.indexOf('refresh')>=0||id.indexOf('refresh')>=0||cls.indexOf('refresh')>=0||icon||t.closest('[title*="efresh"]')){
-    e.preventDefault();
-    if(window.refreshJobs)refreshJobs();
-    setTimeout(mergePooled,700);
-  }
+  if(txt.indexOf('refresh')>=0||id.indexOf('refresh')>=0||cls.indexOf('refresh')>=0||icon){e.preventDefault();hardRefresh();}
 });
 </script>
 </body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RevenueForge Control Center</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6fa;font:14px/1.6 -apple-system,'Segoe UI',Roboto,Arial;color:#24292f}
+.wrap{max-width:1150px;margin:0 auto;padding:24px 16px 60px}
+.top{background:#fff;border-radius:14px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(20,30,60,.08);margin-bottom:20px}
+.top h1{margin:0;font-size:20px}.top h1 i{color:#2f6fed;margin-right:8px}
+.pill{background:#dcfce7;color:#16a34a;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700}
+.pill.off{background:#fee2e2;color:#dc2626}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tab{background:#fff;border:1px solid #e6e9ef;padding:9px 18px;border-radius:22px;cursor:pointer;font-weight:600;font-size:13px}
+.tab.on{background:#2f6fed;color:#fff;border-color:#2f6fed}
+.sec{display:none}.sec.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-bottom:16px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(20,30,60,.08)}
+.card h3{margin:0 0 10px;font-size:14px;color:#57606a;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.card h3 i{color:#2f6fed;margin-right:6px}
+.big{font-size:30px;font-weight:800;color:#2f6fed}
+.muted{color:#8a919c;font-size:12px}
+.btn{background:#2f6fed;color:#fff;border:0;padding:10px 18px;border-radius:9px;font-weight:700;cursor:pointer;font-size:13px}
+.btn.gh{background:#fff;color:#2f6fed;border:1px solid #2f6fed}
+.btn.sm{padding:7px 12px;font-size:12px}
+.in{width:100%;padding:11px 14px;border:1px solid #d0d7de;border-radius:9px;font:inherit;margin-bottom:10px}
+.in:focus{outline:none;border-color:#2f6fed}
+.row{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(20,30,60,.08);margin-bottom:12px;display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.row b{font-size:14px}
+.tag{background:#eaf1fe;color:#2f6fed;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.tag.gr{background:#dcfce7;color:#16a34a}
+.ta{width:100%;min-height:190px;padding:14px;border:1px solid #d0d7de;border-radius:9px;font-family:ui-monospace,monospace;font-size:12.5px}
+.msgs{min-height:260px;max-height:340px;overflow:auto;border:1px solid #e6e9ef;border-radius:9px;padding:12px;margin-bottom:10px;background:#fafbfc}
+.m{margin-bottom:10px;padding:10px 12px;border-radius:9px;font-size:13px}
+.m.u{background:#eaf1fe}.m.b{background:#fff;border:1px solid #e6e9ef}
+.spin{display:inline-block;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><h1><i class="fa-solid fa-cubes"></i>RevenueForge <span style="color:#2f6fed">Control Center</span></h1><span class="pill" id="pill">checking…</span></div>
+<div class="tabs">
+<div class="tab on" data-s="ov">Overview</div>
+<div class="tab" data-s="jb">Jobs · 105+ sources</div>
+<div class="tab" data-s="pr">Proposals</div>
+<div class="tab" data-s="pd">Products</div>
+<div class="tab" data-s="or">Outreach</div>
+<div class="tab" data-s="ai">Assistant</div>
+</div>
+
+<div class="sec on" id="s-ov">
+<div class="grid">
+<div class="card"><h3><i class="fa-solid fa-database"></i>Sources</h3><div class="big">105+</div><div class="muted">RSS · Reddit · Greenhouse · Lever · HN</div></div>
+<div class="card"><h3><i class="fa-solid fa-briefcase"></i>Last search</h3><div class="big" id="nJobs">0</div><div class="muted">jobs found</div></div>
+<div class="card"><h3><i class="fa-solid fa-cloud"></i>Cloud pool</h3><div class="big" id="nPool">–</div><div class="muted">shared with public site</div></div>
+<div class="card"><h3><i class="fa-solid fa-clock"></i>Auto-push</h3><div class="big">30m</div><div class="muted">home engine → cloud</div></div>
+</div>
+<div class="card"><h3><i class="fa-solid fa-shield-halved"></i>Human-in-the-loop</h3>Nothing is submitted automatically. Every proposal and outreach message waits for your approval here — then you submit manually on the official platform.</div>
+</div>
+
+<div class="sec" id="s-jb">
+<div class="card"><h3><i class="fa-solid fa-magnifying-glass"></i>Search</h3>
+<input class="in" id="q" placeholder="skills / role, e.g. python automation">
+<button class="btn" id="go"><i class="fa-solid fa-search"></i> Search 105+ sources</button> <span class="muted" id="st"></span></div>
+<div id="list"></div>
+</div>
+
+<div class="sec" id="s-pr">
+<div class="card"><h3><i class="fa-solid fa-file-lines"></i>Proposal draft — <span class="muted" id="pT">none selected</span></h3>
+<textarea class="ta" id="pB" placeholder="Pick a job → Draft"></textarea><br>
+<button class="btn sm" id="pC">Copy</button> <button class="btn sm gh" id="pA">Approve (submit manually)</button> <span class="muted" id="pS"></span></div>
+</div>
+
+<div class="sec" id="s-pd">
+<div class="card"><h3><i class="fa-solid fa-box"></i>Add product / service</h3>
+<input class="in" id="pN" placeholder="name"><input class="in" id="pD" placeholder="what it does">
+<button class="btn" id="pAdd">Publish</button></div>
+<div class="card"><h3><i class="fa-solid fa-list"></i>Your products</h3><div id="pL" class="muted">loading…</div></div>
+</div>
+
+<div class="sec" id="s-or">
+<div class="card"><h3><i class="fa-solid fa-paper-plane"></i>Outreach drafter (spam-safe)</h3>
+<input class="in" id="oW" placeholder="prospect / company">
+<button class="btn" id="oG">Draft outreach</button>
+<textarea class="ta" id="oB" style="margin-top:10px" placeholder="message appears here — you copy & send manually"></textarea><br>
+<button class="btn sm gh" id="oC">Copy</button></div>
+</div>
+
+<div class="sec" id="s-ai">
+<div class="card"><h3><i class="fa-solid fa-robot"></i>RevenueForge Assistant</h3>
+<div class="msgs" id="aM"></div>
+<input class="in" id="aI" placeholder="ask anything…" style="width:75%;display:inline-block">
+<button class="btn" id="aS">Send</button></div>
+</div>
+</div>
+<script>
+var E='http://127.0.0.1:8502';
+function $(i){return document.getElementById(i)}
+var tabs=document.querySelectorAll('.tab');
+for(var i=0;i<tabs.length;i++)tabs[i].onclick=function(){for(var j=0;j<tabs.length;j++)tabs[j].classList.remove('on');this.classList.add('on');var s=document.querySelectorAll('.sec');for(var k=0;k<s.length;k++)s[k].classList.remove('on');$('s-'+this.getAttribute('data-s')).classList.add('on');};
+fetch(E+'/api/search-hiring?q=x&limit=1&email=o@l').then(function(r){return r.json()}).then(function(){$('pill').textContent='engine online';}).catch(function(){$('pill').textContent='engine offline';$('pill').className='pill off';});
+fetch('https://revenueforge-api.onrender.com/api/pooled-jobs?limit=1').then(function(r){return r.json()}).then(function(d){$('nPool').textContent=d.count||0;}).catch(function(){$('nPool').textContent='0';});
+var JOBS=[];
+function ap(){return JSON.parse(localStorage.getItem('rf_approved')||'[]')}
+$('go').onclick=function(){
+ $('st').innerHTML='<i class="fa-solid fa-arrows-rotate spin"></i> searching…';
+ fetch(E+'/api/search-hiring?q='+encodeURIComponent($('q').value||'python')+'&limit=25&email=o@l').then(function(r){return r.json()}).then(function(d){
+  JOBS=d.results||[];$('nJobs').textContent=JOBS.length;
+  var src={};for(var i=0;i<JOBS.length;i++)src[JOBS[i].platform]=1;
+  $('st').textContent=JOBS.length+' jobs · '+Object.keys(src).length+' sources';
+  var a=ap(),h='';
+  for(var i=0;i<JOBS.length;i++){var j=JOBS[i];
+   h+='<div class="row"><div style="flex:1;min-width:220px"><b>'+j.title+'</b><br><span class="tag">'+j.platform+'</span> <span class="tag gr">'+j.score+'%</span> '+(a.indexOf(j.url)>=0?'<span class="tag gr">approved</span>':'')+'<br><span class="muted">'+(j.description||'').slice(0,140)+'</span></div><div><button class="btn sm" onclick="DP('+i+')">Draft</button> <button class="btn sm gh" onclick="AP('+i+')">Approve</button> <a class="btn sm gh" target="_blank" href="'+j.url+'">Open</a></div></div>';}
+  $('list').innerHTML=h||'<div class="card muted">no jobs found</div>';
+ }).catch(function(){$('st').textContent='engine unreachable';});
+};
+function DP(i){var j=JOBS[i];document.querySelectorAll('.tab')[2].click();$('pT').textContent=j.title;$('pB').value='drafting…';
+ fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Draft a short proposal for: '+j.title+' at '+j.platform+'. '+ (j.description||'').slice(0,400)})}).then(function(r){return r.json()}).then(function(d){$('pB').value=d.reply||'failed';});}
+function AP(i){var a=ap();if(a.indexOf(JOBS[i].url)<0){a.push(JOBS[i].url);localStorage.setItem('rf_approved',JSON.stringify(a));}alert('Approved — now submit MANUALLY on the official platform.');$('go').click();}
+$('pC').onclick=function(){navigator.clipboard.writeText($('pB').value);$('pS').textContent='copied';};
+$('pA').onclick=function(){$('pS').textContent='approved — submit manually';};
+function LP(){fetch(E+'/api/my/products').then(function(r){return r.json()}).then(function(d){var l=d.products||d.items||(Array.isArray(d)?d:[]);var h='';for(var i=0;i<l.length;i++)h+='<div class="row"><div><b>'+(l[i].name||l[i].title||'')+'</b><br><span class="muted">'+(l[i].description||'')+'</span></div></div>';$('pL').innerHTML=h||'<span class="muted">no products yet</span>';}).catch(function(){$('pL').innerHTML='<span class="muted">offline</span>';});}
+LP();
+$('pAdd').onclick=function(){fetch(E+'/api/my/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('pN').value,description:$('pD').value})}).then(function(){$('pN').value='';$('pD').value='';LP();});};
+$('oG').onclick=function(){$('oB').value='drafting…';fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Write a short friendly spam-safe outreach message to '+($('oW').value||'a prospect')+' offering automation services.'})}).then(function(r){return r.json()}).then(function(d){$('oB').value=d.reply||'';});};
+$('oC').onclick=function(){navigator.clipboard.writeText($('oB').value);};
+function AS(){var m=$('aI').value;if(!m)return;$('aM').innerHTML+='<div class="m u"><b>You:</b> '+m+'</div>';$('aI').value='';
+ fetch(E+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(function(r){return r.json()}).then(function(d){$('aM').innerHTML+='<div class="m b"><b>Assistant:</b> '+d.reply+'</div>';$('aM').scrollTop=99999;});}
+$('aS').onclick=AS;$('aI').onkeypress=function(e){if(e.key==='Enter')AS();};
+</script>
+</body>
+</html>
