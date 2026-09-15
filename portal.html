@@ -220,7 +220,7 @@ function loadEng(){var c=ls('rf_cfg',null);if(c){$('skills').value=c.skills||'';
  fetch(API+'/api/save-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:sess.email,skills:$('skills').value,target:$('target').value})}).catch(function(){});
 function engUI(){var e=ls('rf_eng',{on:false});$('engStat').innerHTML=e.on?'<span class="dot"></span>Running — searching automatically':'Stopped';$('startBtn').style.display=e.on?'none':'inline-flex';$('stopBtn').style.display=e.on?'inline-flex':'none';}
 function runEng(){if(!hasCfg()||!$('skills').value.trim()){alert('Set up your profile first: go to My Engine, add your skills + target, then tap Save. Then run the engine.');go('eng');return;}if(window.SUB&&SUB.locked){alert('Your free trial has ended — upgrade to continue.');go('plan');return;} var _c=ls('rf_cfg',null);if(!_c||!(_c.skills||'').trim()){alert('SAVE your settings first: type your skills → tap Save settings.');go('eng');try{$('skills').focus();}catch(e){}return;}
- var q=(_c.skills||$('skills').value);$('jobsBody').innerHTML='Searching many sources…';fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(!d.ok){alert('Trial expired — upgrade to continue.');go('plan');return;} var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);sv('rf_jobs',rs);renderJobs(rs);go('jobs');}).catch(function(){$('jobsBody').innerHTML='Search error.';});}
+ var q=(_c.skills||$('skills').value);fetch(API+'/api/search-hiring?q='+encodeURIComponent(q)+'&limit=15&email='+encodeURIComponent(sess.email)).then(function(r){return r.json();}).then(function(d){if(!d.ok){alert('Trial expired — upgrade to continue.');go('plan');return;} var rs=d.results||[];if(window.SUB&&!SUB.paid)rs=rs.slice(0,5);sv('rf_jobs',rs);renderJobs(rs);go('jobs');}).catch(function(){$('jobsBody').innerHTML='Search error.';});}
 function proposal(r){var c=ls('rf_cfg',null);var sk=(c&&c.skills)||'this field';return 'Hi there,\n\nI found your opening "'+r.title+'" on '+r.platform+' and I can help you right away.\n\nWhat I offer:\n• Proven experience in '+sk+'\n• Fast, reliable delivery (2-5 days) with clear communication\n• Free support after delivery - you only pay when satisfied\n\nHow I work:\n1. Quick chat to confirm your exact needs\n2. Deliver a working result with updates along the way\n3. Handover + documentation + support\n\nI can start immediately. Reply here or contact me at '+sess.email+'.\n\nBest regards,\n'+sess.email;}
 var CURJOB=null;
 function openModal(r){CURJOB=r;$('propTxt').value=proposal(r);$('modal').style.display='block';}
@@ -411,4 +411,29 @@ document.addEventListener('click', function(e){
   if(txt.indexOf('refresh')>=0||id.indexOf('refresh')>=0||cls.indexOf('refresh')>=0||icon){e.preventDefault();hardRefresh();}
 });
 </script>
+
+<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
+<style>
+#rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
+.rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
+@keyframes rf-spin{to{transform:rotate(360deg);}}
+#rf-spinner p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px;letter-spacing:0.3px;}
+</style>
+<script>
+(function(){
+  const sp = document.getElementById('rf-spinner');
+  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
+  window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
+  const origFetch = window.fetch;
+  window.fetch = function(...args) {
+    const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
+    if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
+      showRfSpinner('Searching 188 sources...');
+      return origFetch.apply(this,args).finally(hideRfSpinner);
+    }
+    return origFetch.apply(this,args);
+  };
+})();
+</script>
+
 </body></html>

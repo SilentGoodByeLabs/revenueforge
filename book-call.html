@@ -47,5 +47,30 @@
 <div id="footer"></div>
 <script src="js/chatbot.js"></script>
 <script src="js/layout.js?v=11"></script>
+
+<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
+<style>
+#rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
+.rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
+@keyframes rf-spin{to{transform:rotate(360deg);}}
+#rf-spinner p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px;letter-spacing:0.3px;}
+</style>
+<script>
+(function(){
+  const sp = document.getElementById('rf-spinner');
+  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
+  window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
+  const origFetch = window.fetch;
+  window.fetch = function(...args) {
+    const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
+    if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
+      showRfSpinner('Searching 188 sources...');
+      return origFetch.apply(this,args).finally(hideRfSpinner);
+    }
+    return origFetch.apply(this,args);
+  };
+})();
+</script>
+
 </body>
 </html>
