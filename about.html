@@ -107,5 +107,17 @@
 })();
 </script>
 
+
+<!-- rfGlobalSpin -->
+<div id="rf-spin-overlay"><div class="rf2-circle"></div><p>Searching 188 sources...</p></div>
+<style>
+#rf-spin-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px)}
+.rf2-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf2spin .8s linear infinite}
+@keyframes rf2spin{to{transform:rotate(360deg)}}
+#rf-spin-overlay p{margin-top:18px;font-weight:600;color:#1e293b}
+</style>
+<script>
+(function(){var ov=document.getElementById('rf-spin-overlay');var of=window.fetch;window.fetch=function(){var a=arguments,u=(typeof a[0]==='string')?a[0]:((a[0]&&a[0].url)||'');if(u.indexOf('search-hiring')>-1||u.indexOf('pooled-jobs')>-1){ov.style.display='flex';return of.apply(this,a).then(function(r){ov.style.display='none';return r},function(e){ov.style.display='none';throw e});}return of.apply(this,a);};})();
+</script>
 </body>
 </html>
