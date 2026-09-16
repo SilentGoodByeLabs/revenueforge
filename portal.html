@@ -184,21 +184,7 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
 <div id="view-help" style="display:none"><div class="crumbs">Dashboard / Help</div><h1>Help & Guide</h1>
   <div class="card"><ol style="margin-left:20px;line-height:2"><li>Configure skills in My Engine.</li><li>Start the engine (keeps running until you stop it).</li><li>Review proposals, message hirers, view profiles.</li><li>Publish services; advertise on many sources.</li><li>Track prospects to WON.</li></ol></div></div>
 
-<div style="margin-top:40px;padding:20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;font-size:13px;color:#475467">
-  <strong style="color:#1e293b">🔍 Honest Sources Disclosure:</strong><br>
-  Jobs in this search come from 12 real platforms: 
-  <span class="sources-pill">LinkedIn</span> 
-  <span class="sources-pill">Jobicy</span> 
-  <span class="sources-pill">RemoteOK</span> 
-  <span class="sources-pill">Hacker News</span> 
-  <span class="sources-pill">Reddit</span> 
-  <span class="sources-pill">WeWorkRemotely</span> 
-  <span class="sources-pill">Greenhouse (20+ companies)</span> 
-  <span class="sources-pill">Ashby</span> 
-  <span class="sources-pill">Lever</span> 
-  <span class="sources-pill">RSS feeds</span>
-  <br><small style="color:#94a3b8">Note: LinkedIn jobs require sign-in to view full posting. Fiverr/Upwork/Indeed are not included (no public API).</small>
-</div>
+
 </main>
 <footer><div class="b">Revenue <b>Forge</b></div><p>The autonomous revenue engine for freelancers and agencies.</p></footer>
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(11,34,57,.6);z-index:300;padding:20px;overflow:auto">
@@ -451,7 +437,7 @@ document.addEventListener('click', function(e){
 });
 </script>
 
-<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
+<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 140+ sources...</p></div>
 <style>
 #rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
 .rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
@@ -461,13 +447,13 @@ document.addEventListener('click', function(e){
 <script>
 (function(){
   const sp = document.getElementById('rf-spinner');
-  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
+  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 140+ sources...'; sp.style.display='flex'; }};
   window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
   const origFetch = window.fetch;
   window.fetch = function(...args) {
     const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
     if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
-      showRfSpinner('Searching 188 sources...');
+      showRfSpinner('Searching 140+ sources...');
       return origFetch.apply(this,args).finally(hideRfSpinner);
     }
     return origFetch.apply(this,args);
@@ -477,7 +463,7 @@ document.addEventListener('click', function(e){
 
 
 <!-- rfGlobalSpin-v2 -->
-<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 188 sources...</p></div>
+<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 140+ sources...</p></div>
 <style>
 #rfSpinOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)}
 .rfCircle{width:56px;height:56px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rfSpinAnim .8s linear infinite;box-shadow:0 8px 20px rgba(37,99,235,.2)}
@@ -488,13 +474,13 @@ document.addEventListener('click', function(e){
 (function(){var ov=document.getElementById('rfSpinOverlay');var origFetch=window.fetch;window.fetch=function(){var args=arguments,url=typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1||url.indexOf('refresh')>-1){if(ov)ov.style.display='flex';return origFetch.apply(this,args).then(function(r){if(ov)ov.style.display='none';return r},function(e){if(ov)ov.style.display='none';throw e});}return origFetch.apply(this,args);};})();
 </script>
 
-<--- SPIN987654321INJECTED --><div id="rfJobSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.95);z-index:999999;align-items:center;justify-content:center;flex-direction:column"><div style="width:64px;height:64px;border:6px solid #e2e8f0;border-top:6px solid #2563eb;border-radius:50%;animation:rfJSpin 1s linear infinite"></div><p style="margin-top:22px;font-size:18px;font-weight:700;color:#1e293b">Searching 188 sources...</p></div><style>@keyframes rfJSpin{to{transform:rotate(360deg)}}</style><script>(function(){var s=document.getElementById("rfJobSpinner"),o=window.fetch;window.fetch=function(){var a=arguments,u=typeof a[0]==="string"?a[0]:(a[0]&&a[0].url)||"";if(u.indexOf("search-hiring")>-1||u.indexOf("pooled-jobs")>-1){s.style.display="flex";return o.apply(this,a).then(function(r){s.style.display="none";return r},function(e){s.style.display="none";throw e})}return o.apply(this,a)}})()</script>
+<div id="rfJobSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.95);z-index:999999;align-items:center;justify-content:center;flex-direction:column"><div style="width:64px;height:64px;border:6px solid #e2e8f0;border-top:6px solid #2563eb;border-radius:50%;animation:rfJSpin 1s linear infinite"></div><p style="margin-top:22px;font-size:18px;font-weight:700;color:#1e293b">Searching 140+ sources...</p></div><style>@keyframes rfJSpin{to{transform:rotate(360deg)}}</style><script>(function(){var s=document.getElementById("rfJobSpinner"),o=window.fetch;window.fetch=function(){var a=arguments,u=typeof a[0]==="string"?a[0]:(a[0]&&a[0].url)||"";if(u.indexOf("search-hiring")>-1||u.indexOf("pooled-jobs")>-1){s.style.display="flex";return o.apply(this,a).then(function(r){s.style.display="none";return r},function(e){s.style.display="none";throw e})}return o.apply(this,a)}})()</script>
 <!-- cache_bust_20260915005043 -->
 
 <!-- SPINNER_LIVE -->
 <div id="rfGlobalSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.96);z-index:9999999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)">
   <div style="width:70px;height:70px;border:6px solid #e2e8f0;border-top:6px solid #2563eb;border-radius:50%;animation:rfGlobalSpin 1s linear infinite;box-shadow:0 8px 24px rgba(37,99,235,.25)"></div>
-  <p style="margin-top:24px;font-size:19px;font-weight:700;color:#1e293b;letter-spacing:.3px">Searching 188 sources...</p>
+  <p style="margin-top:24px;font-size:19px;font-weight:700;color:#1e293b;letter-spacing:.3px">Searching 140+ sources...</p>
 </div>
 <style>@keyframes rfGlobalSpin{to{transform:rotate(360deg)}}</style>
 <script>
@@ -519,4 +505,19 @@ document.addEventListener('click', function(e){
 })();
 </script>
 
+
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a'):null;
+  if(!a)return;
+  var h=a.getAttribute('href')||'';
+  if(!h||h.charAt(0)==='#'||h.indexOf('mailto')===0)return;
+  if(h.indexOf('http')!==0&&h.charAt(0)!=='/'&&h.indexOf('.html')===-1){
+    e.preventDefault();window.open('https://'+h,'_blank');return;
+  }
+  if(a.hostname&&a.hostname.indexOf('linkedin.com')>-1&&a.pathname.indexOf('/jobs/view/')>-1){
+    e.preventDefault();window.open('https://www.linkedin.com/jobs/search/?keywords='+encodeURIComponent(a.textContent.trim()),'_blank');
+  }
+},true);
+</script>
 </body></html>

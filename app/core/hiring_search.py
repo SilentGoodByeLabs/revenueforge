@@ -11,7 +11,7 @@ def ld(n, d):
         try: return json.loads(p.read_text())
         except Exception: pass
     return d
-def sv(n, o): (DATA / n).write_text(json.dumps(o, indent=2))
+def sv(n, o): DATA.mkdir(exist_ok=True); (DATA / n).write_text(json.dumps(o, indent=2))
 
 _rot = {"index": 0, "last": 0}
 
@@ -201,3 +201,126 @@ def push_jobs(jobs):
         urllib.request.urlopen(req, timeout=30)
         sv("push.json",{"time":datetime.now().isoformat(),"total":len(jobs)})
     except Exception: pass
+
+
+# ============ EXTRA PLATFORMS (appended safely) ============
+import urllib.parse as _up
+import concurrent.futures as _cf
+import xml.etree.ElementTree as _ET
+
+GH_EXTRA = ["stripe","shopify","spotify","airbnb","dropbox","gitlab","figma","notion","linear","ramp","brex","plaid","coinbase","cloudflare","datadog","mongodb","elastic","hashicorp","twilio","atlassian","canva","miro","airtable","zapier","hubspot","intercom","asana","slack","pinterest","duolingo"]
+LEVER_EXTRA = ["netflix","kickstarter","square","gusto","flexport","lattice","culture-amp","warby-parker","rappi","anthropic","openai","vercel"]
+ASHBY_EXTRA = ["supabase","neon","fly-io","retool","mercury","scale-ai","ramp","notion","linear","perplexity"]
+RSS_EXTRA = [("workingnomads","https://workingnomads.com/feed?category=development"),("jobspresso","https://jobspresso.co/feed/"),("weworkremotely","https://weworkremotely.com/categories/remote-programming-jobs.rss"),("remotewomen","https://remotewomen.co/feed/")]
+
+def _rss_jobs(url, platform, maxn=15):
+    out=[]
+    try:
+        raw=_get(url, timeout=10)
+        if not raw: return out
+        root=_ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out)>=maxn: break
+            ti=(item.findtext('title') or '').strip(); li=(item.findtext('link') or '').strip()
+            de=item.findtext('description') or ''
+            if ti and li: out.append({"title":ti,"url":li,"source":platform,"platform":platform,"description":re.sub('<[^>]+>','',de)[:300],"score":0})
+        for e in root.iter('{http://www.w3.org/2005/Atom}entry'):
+            if len(out)>=maxn: break
+            ti=(e.findtext('{http://www.w3.org/2005/Atom}title') or '').strip()
+            le=e.find('{http://www.w3.org/2005/Atom}link'); li=le.get('href') if le is not None else ''
+            if ti and li: out.append({"title":ti,"url":li,"source":platform,"platform":platform,"description":"","score":0})
+    except Exception: pass
+    return out
+
+def _linkedin_guest(q=""):
+    out=[]
+    try:
+        url="https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords="+_up.quote(q or "remote")+"&start=0"
+        raw=_get(url, timeout=12) or ""
+        for m in re.finditer(r'href="(https://www\.linkedin\.com/jobs/view/[^"]+)"[^>]*>\s*<h3[^>]*>([^<]+)</h3>', raw):
+            out.append({"title":m.group(2).strip(),"url":m.group(1),"source":"linkedin","platform":"linkedin","description":"","score":0})
+        if not out:
+            for m in re.finditer(r'base-search-card__title[^>]*>\s*([^<]+?)\s*</a>', raw):
+                pass
+    except Exception: pass
+    return out[:15]
+
+def _indeed_rss(q=""):
+    return _rss_jobs("https://rss.indeed.com/rss?q="+_up.quote(q or "remote"), "indeed")
+
+def _arbeitnow(q=""):
+    out=[]
+    try:
+        d=json.loads(_get("https://www.arbeitnow.com/api/job-board-api", timeout=12) or "{}")
+        for j in d.get("jobs",[])[:15]:
+            out.append({"title":j.get("title",""),"url":j.get("url",""),"source":"arbeitnow","platform":"arbeitnow","description":(j.get("description","") or "")[:300],"score":0})
+    except Exception: pass
+    return out
+
+def _gh_extra(q=""):
+    out=[]
+    def one(c):
+        r=[]
+        try:
+            d=json.loads(_get("https://boards-api.greenhouse.io/v1/boards/"+c+"/jobs", timeout=8) or "{}")
+            for j in d.get("jobs",[])[:4]:
+                r.append({"title":j.get("title",""),"url":j.get("absolute_url",""),"source":"greenhouse/"+c,"platform":"greenhouse","description":"","score":0})
+        except Exception: pass
+        return r
+    with _cf.ThreadPoolExecutor(max_workers=10) as ex:
+        for r in ex.map(one, GH_EXTRA): out += r
+    return out
+
+def _lever_extra(q=""):
+    out=[]
+    def one(c):
+        r=[]
+        try:
+            d=json.loads(_get("https://api.lever.co/v0/postings/"+c+"?mode=json", timeout=8) or "[]")
+            for j in (d or [])[:4]:
+                r.append({"title":j.get("text",""),"url":j.get("hostedUrl",""),"source":"lever/"+c,"platform":"lever","description":"","score":0})
+        except Exception: pass
+        return r
+    with _cf.ThreadPoolExecutor(max_workers=10) as ex:
+        for r in ex.map(one, LEVER_EXTRA): out += r
+    return out
+
+def _ashby_extra(q=""):
+    out=[]
+    def one(c):
+        r=[]
+        try:
+            d=json.loads(_get("https://api.ashbyhq.com/posting-api/job-board/"+c, timeout=8) or "{}")
+            for j in (d.get("jobs") or [])[:4]:
+                r.append({"title":j.get("title",""),"url":j.get("jobUrl",""),"source":"ashby/"+c,"platform":"ashby","description":"","score":0})
+        except Exception: pass
+        return r
+    with _cf.ThreadPoolExecutor(max_workers=10) as ex:
+        for r in ex.map(one, ASHBY_EXTRA): out += r
+    return out
+
+def _rss_extra(q=""):
+    out=[]
+    with _cf.ThreadPoolExecutor(max_workers=4) as ex:
+        for r in ex.map(lambda x: _rss_jobs(x[1], x[0]), RSS_EXTRA): out += r
+    return out
+
+_orig_gather_all = gather_all
+def gather_all(q=""):
+    jobs=[]
+    try: jobs=list(_orig_gather_all(q))
+    except Exception: jobs=[]
+    futs=[]
+    with _cf.ThreadPoolExecutor(max_workers=7) as ex:
+        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra)]
+        for fu in _cf.as_completed(futs, timeout=50):
+            try: jobs += fu.result(timeout=1) or []
+            except Exception: pass
+    seen=set(); ded=[]
+    for j in jobs:
+        u=j.get("url") or j.get("title")
+        if not u or u in seen: continue
+        seen.add(u); ded.append(j)
+    return ded
+
+SOURCE_COUNT = len(RSS_FEEDS) + len(GH_EXTRA) + len(LEVER_EXTRA) + len(ASHBY_EXTRA) + len(RSS_EXTRA) + 49

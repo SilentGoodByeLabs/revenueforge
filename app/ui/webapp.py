@@ -1,3 +1,19 @@
+
+# === Self-contained job cache (no dependency on core module) ===
+import time as _time
+_RF_JOB_CACHE = {"query": "", "time": 0, "jobs": []}
+def _get_jobs_cached(q=""):
+    """Return cached results if fresh (<3 min), else fetch new"""
+    global _RF_JOB_CACHE
+    now = _time.time()
+    if _RF_JOB_CACHE["query"] == q and (now - _RF_JOB_CACHE["time"]) < 180:
+        return _RF_JOB_CACHE["jobs"]
+    jobs = HS.gather_all(q) if HS and hasattr(HS, "gather_all") else []
+    _RF_JOB_CACHE = {"query": q, "time": now, "jobs": jobs}
+    return jobs
+# === end cache ===
+
+
 import os, re, json, secrets, threading, random
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -96,7 +112,7 @@ def stat(ic, label, val, note=""):
     n = f"<em>{note}</em>" if note else ""
     return f'<div class="stat"><i class="fa-solid {ic}"></i><div><b>{val}</b><span>{label}</span>{n}</div></div>'
 def pill(cls, txt): return f'<span class="pill {cls}">{txt}</span>'
-def table(heads, rows):
+def table(heads, rows, empty_msg="No data yet"):
     if not rows: return '<div class="empty"><i class="fa-solid fa-arrow-right"></i> Use the form above or <a class="btn sm" href="/jobagent">search jobs first</a></div>'
     h = "".join(f"<th>{x}</th>" for x in heads)
     b = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
@@ -132,6 +148,29 @@ def _run_full():
             except Exception: pass
     finally:
         sv("running.json", {"running": False})
+
+
+@app.get("/sources", response_class=HTMLResponse)
+def sources():
+    try:
+        import app.core.hiring_search as HS
+        stats = HS.ld("source_stats.json", {})
+        total = sum(v for k, v in stats.items() if isinstance(v, int))
+        body = '<div class="stats">'
+        body += stat("fa-satellite-dish", "Total sources", getattr(HS, 'SOURCE_COUNT', 'N/A'))
+        body += stat("fa-database", "Jobs found", total)
+        body += stat("fa-clock", "Last update", stats.get("time", "never"))
+        body += '</div>'
+        
+        body += card("fa-list", "Source breakdown", '<table><tr><th>Source</th><th>Jobs</th></tr>')
+        for k, v in sorted(stats.items()):
+            if isinstance(v, int):
+                body += f'<tr><td>{k}</td><td><b>{v}</b></td></tr>'
+        body += '</table>'
+        
+        return page("/sources", "Sources", "All 188 sources the engine searches across.", body)
+    except Exception as e:
+        return page("/sources", "Sources", "Error loading sources", f'<div class="card"><p class="error">{e}</p></div>')
 
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -401,6 +440,72 @@ def audit_page():
 def api_ping(): return {"ok": True}
 
 @app.get("/api/search-hiring")
+def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
+    try:
+        jobs = _get_jobs_cached(q)
+        jobs = jobs[:limit]
+        return {
+            "ok": True,
+            "count": len(jobs),
+            "results": [
+                {
+                    "title": j.get("title", ""),
+                    "url": j.get("url", ""),
+                    "platform": j.get("source", j.get("platform", "")),
+                    "score": j.get("score", 0),
+                    "description": (j.get("description", "") or "")[:200]
+                }
+                for j in jobs
+            ]
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e), "count": 0, "results": []}
+
+
+def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
+    try:
+        jobs = _get_jobs_cached(q)
+        jobs = jobs[:limit]
+        return {
+            "ok": True,
+            "count": len(jobs),
+            "results": [
+                {
+                    "title": j.get("title", ""),
+                    "url": j.get("url", ""),
+                    "platform": j.get("source", j.get("platform", "")),
+                    "score": j.get("score", 0),
+                    "description": (j.get("description", "") or "")[:200]
+                }
+                for j in jobs
+            ]
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e), "count": 0, "results": []}
+
+
+def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
+    try:
+        jobs = gather_all_cached(q)
+        jobs = jobs[:limit]
+        return {
+            "ok": True,
+            "count": len(jobs),
+            "results": [
+                {
+                    "title": j.get("title", ""),
+                    "url": j.get("url", ""),
+                    "platform": j.get("source", ""),
+                    "score": j.get("score", 0),
+                    "description": (j.get("description", "") or "")[:200]
+                }
+                for j in jobs
+            ]
+        }
+    except Exception as e:
+        return {"ok": False, "error": str(e), "count": 0, "results": []}
+
+
 def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
     out = HS.gather_all(q) if (HS and hasattr(HS, "gather_all")) else []
     seen = set(); ded = []
