@@ -48,6 +48,29 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
 .acct-i:hover{background:#EFF4FF}
 @media(max-width:768px){main{padding:16px 10px}.kpis{grid-template-columns:1fr 1fr}.card{padding:16px}h1{font-size:1.3rem}.btn{padding:10px 16px;font-size:.85rem}}
 </style><script src="https://js.paystack.co/v1/inline.js"></script>
+
+<style>
+.linkedin-warn{display:inline-block;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;margin-left:6px}
+.sources-pill{display:inline-block;background:#e0f2fe;color:#075985;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+</style>
+<script>
+(function(){
+  // Mark LinkedIn jobs with a warning badge
+  const markLinkedIn = () => {
+    document.querySelectorAll('a[href*="linkedin.com"], a[href*="linked"]').forEach(a => {
+      if(!a.querySelector('.linkedin-warn')){
+        const badge = document.createElement('span');
+        badge.className = 'linkedin-warn';
+        badge.textContent = 'LinkedIn login wall';
+        a.parentElement.insertBefore(badge, a.nextSibling);
+      }
+    });
+  };
+  new MutationObserver(markLinkedIn).observe(document.body,{childList:true,subtree:true});
+  setTimeout(markLinkedIn, 1000);
+  setTimeout(markLinkedIn, 3000);
+})();
+</script>
 </head><body>
 <header class="hdr"><div class="brand"><i class="fa-solid fa-shield-halved"></i>Revenue<b>Forge</b></div><button id="burger2"><i class="fa-solid fa-bars"></i></button></header>
 <div id="acctMenu" style="display:none;position:fixed;top:56px;right:12px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);z-index:200;min-width:190px;padding:8px">
@@ -160,6 +183,22 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
   <span id="tgTestMsg" class="muted" style="margin-left:10px"></span></div>
 <div id="view-help" style="display:none"><div class="crumbs">Dashboard / Help</div><h1>Help & Guide</h1>
   <div class="card"><ol style="margin-left:20px;line-height:2"><li>Configure skills in My Engine.</li><li>Start the engine (keeps running until you stop it).</li><li>Review proposals, message hirers, view profiles.</li><li>Publish services; advertise on many sources.</li><li>Track prospects to WON.</li></ol></div></div>
+
+<div style="margin-top:40px;padding:20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;font-size:13px;color:#475467">
+  <strong style="color:#1e293b">🔍 Honest Sources Disclosure:</strong><br>
+  Jobs in this search come from 12 real platforms: 
+  <span class="sources-pill">LinkedIn</span> 
+  <span class="sources-pill">Jobicy</span> 
+  <span class="sources-pill">RemoteOK</span> 
+  <span class="sources-pill">Hacker News</span> 
+  <span class="sources-pill">Reddit</span> 
+  <span class="sources-pill">WeWorkRemotely</span> 
+  <span class="sources-pill">Greenhouse (20+ companies)</span> 
+  <span class="sources-pill">Ashby</span> 
+  <span class="sources-pill">Lever</span> 
+  <span class="sources-pill">RSS feeds</span>
+  <br><small style="color:#94a3b8">Note: LinkedIn jobs require sign-in to view full posting. Fiverr/Upwork/Indeed are not included (no public API).</small>
+</div>
 </main>
 <footer><div class="b">Revenue <b>Forge</b></div><p>The autonomous revenue engine for freelancers and agencies.</p></footer>
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(11,34,57,.6);z-index:300;padding:20px;overflow:auto">
