@@ -82,6 +82,9 @@ document.addEventListener('click',function(e){
 </script>
 
 
+
+
+
 <script>
 /* rfAuthFix - instant client-side auth, never hangs */
 (function(){
@@ -107,28 +110,18 @@ document.addEventListener('click',function(e){
     },800);
     return false;
   }
-  function cutDiv(s,marker){
-    var i=s.find(marker);
-    if(i<0)return s;
-    var start=s.rfind('<div',0,i);
-    if(start<0)return s;
-    var depth=0,j=start,end=-1;
-    while(j<len(s)):
-      pass
-    return s
-  }
   function bind(){
     var forms=document.forms;
     for(var i=0;i<forms.length;i++){
       var f=forms[i];
-      var isAuth=f.querySelector('input[type=password]')||false;
+      var isAuth=f.querySelector('input[type=password]');
       if(!isAuth)continue;
       f.removeAttribute('action');
       f.onsubmit=handler;
       f.addEventListener('submit',handler,true);
     }
     var rc=document.querySelectorAll('.g-recaptcha,[data-sitekey]');
-    for(var j=0;j<rc.length;j++){rc[j].parentNode.removeChild(rc[j]);}
+    for(var j=0;j<rc.length;j++){try{rc[j].parentNode.removeChild(rc[j]);}catch(x){}}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
