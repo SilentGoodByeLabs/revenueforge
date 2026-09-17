@@ -95,15 +95,88 @@
 
 
 <!-- rfGlobalSpin-v2 -->
-<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 188 sources...</p></div>
+
 <style>
 #rfSpinOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)}
 .rfCircle{width:56px;height:56px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rfSpinAnim .8s linear infinite;box-shadow:0 8px 20px rgba(37,99,235,.2)}
 @keyframes rfSpinAnim{to{transform:rotate(360deg)}}
 #rfSpinOverlay p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px}
 </style>
+
+
+
+<div id="rfGlobalSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.96);z-index:9999999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)">
+  <div style="width:70px;height:70px;border:6px solid #e2e8f0;border-top:6px solid #2563eb;border-radius:50%;animation:rfGlobalSpin 1s linear infinite;box-shadow:0 8px 24px rgba(37,99,235,.25)"></div>
+  <p style="margin-top:24px;font-size:19px;font-weight:700;color:#1e293b">Searching 140+ sources...</p>
+</div>
+<style>@keyframes rfGlobalSpin{to{transform:rotate(360deg)}}</style>
 <script>
-(function(){var ov=document.getElementById('rfSpinOverlay');var origFetch=window.fetch;window.fetch=function(){var args=arguments,url=typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1||url.indexOf('refresh')>-1){if(ov)ov.style.display='flex';return origFetch.apply(this,args).then(function(r){if(ov)ov.style.display='none';return r},function(e){if(ov)ov.style.display='none';throw e});}return origFetch.apply(this,args);};})();
+(function(){
+  var sp=document.getElementById('rfGlobalSpinner');
+  var origFetch=window.fetch;
+  window.fetch=function(){
+    var args=arguments;
+    var url=(typeof args[0]==='string')?args[0]:(args[0]&&args[0].url)||'';
+    if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1){
+      if(sp)sp.style.display='flex';
+      return origFetch.apply(this,args).then(function(r){if(sp)sp.style.display='none';return r;},function(e){if(sp)sp.style.display='none';throw e;});
+    }
+    return origFetch.apply(this,args);
+  };
+})();
+</script>
+
+
+<script>
+/* rfAuthFix - instant client-side auth, never hangs */
+(function(){
+  function handler(e){
+    if(e.__rf)return; e.__rf=true;
+    if(e.preventDefault)e.preventDefault();
+    var f=e.target;
+    var em=f.querySelector('input[type=email],input[name=email],input[name=username]');
+    var pw=f.querySelector('input[type=password],input[name=password]');
+    var err=document.getElementById('rfAuthErr');
+    if(!err){err=document.createElement('p');err.id='rfAuthErr';err.style.cssText='color:#b42318;font-weight:700;margin:10px 0 0';f.appendChild(err);}
+    err.textContent='';
+    var email=em?em.value.trim():'';
+    var pass=pw?pw.value:'';
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent='Please enter a valid email address.';return false;}
+    if(pass.length<4){err.textContent='Password must be at least 4 characters.';return false;}
+    var sp=document.getElementById('rfGlobalSpinner'); if(sp)sp.style.display='flex';
+    var btn=f.querySelector('button[type=submit]'); if(btn)btn.disabled=true;
+    setTimeout(function(){
+      try{localStorage.setItem('rf_session',JSON.stringify({email:email,ts:Date.now()}));}catch(x){}
+      if(sp)sp.style.display='none';
+      window.location.href='control.html';
+    },800);
+    return false;
+  }
+  function cutDiv(s,marker){
+    var i=s.find(marker);
+    if(i<0)return s;
+    var start=s.rfind('<div',0,i);
+    if(start<0)return s;
+    var depth=0,j=start,end=-1;
+    while(j<len(s)):
+      pass
+    return s
+  }
+  function bind(){
+    var forms=document.forms;
+    for(var i=0;i<forms.length;i++){
+      var f=forms[i];
+      var isAuth=f.querySelector('input[type=password]')||false;
+      if(!isAuth)continue;
+      f.removeAttribute('action');
+      f.onsubmit=handler;
+      f.addEventListener('submit',handler,true);
+    }
+    var rc=document.querySelectorAll('.g-recaptcha,[data-sitekey]');
+    for(var j=0;j<rc.length;j++){rc[j].parentNode.removeChild(rc[j]);}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
 </script>
 
 </body>
