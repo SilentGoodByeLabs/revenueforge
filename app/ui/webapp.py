@@ -446,29 +446,6 @@ def audit_page():
 @app.get("/api/ping")
 def api_ping(): return {"ok": True}
 
-@app.get("/api/search-hiring")
-def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
-    try:
-        jobs = _get_jobs_cached(q)
-        jobs = jobs[:limit]
-        return {
-            "ok": True,
-            "count": len(jobs),
-            "results": [
-                {
-                    "title": j.get("title", ""),
-                    "url": j.get("url", ""),
-                    "platform": j.get("source", j.get("platform", "")),
-                    "score": j.get("score", 0),
-                    "description": (j.get("description", "") or "")[:200]
-                }
-                for j in jobs
-            ]
-        }
-    except Exception as e:
-        return {"ok": False, "error": str(e), "count": 0, "results": []}
-
-
 def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
     try:
         jobs = _get_jobs_cached(q)
@@ -532,6 +509,22 @@ def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
         threading.Thread(target=HS.push_jobs, args=(ded,), daemon=True).start()
     return {"ok": True, "jobs": shaped, "results": shaped, "count": len(shaped), "source": "private-engine"}
 
+@app.get("/api/search-hiring")
+def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
+    jobs = _get_jobs_cached(q)[:limit]
+    return {
+        "ok": True,
+        "count": len(jobs),
+        "results": [
+            {"title": j.get("title", ""), "url": j.get("url", ""),
+             "platform": j.get("source", j.get("platform", "")),
+             "score": j.get("score", 0),
+             "description": (j.get("description", "") or "")[:200]}
+            for j in jobs
+        ],
+    }
+
+
 @app.post("/api/chat")
 async def api_chat(request: Request):
     try:
@@ -589,6 +582,16 @@ async def api_advertise(request: Request):
     audit("advertise-service: " + str(data.get("name", data.get("product", "")))[:40])
     return {"ok": True}
 
+@app.get("/api/pooled-jobs")
+def api_pooled_jobs(limit: int = 50):
+    try:
+        pool = ld("pooled_jobs.json", [])
+        return {"ok": True, "count": len(pool), "jobs": pool[:limit]}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "count": 0, "jobs": []}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8502)
+
