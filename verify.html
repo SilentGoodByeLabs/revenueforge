@@ -23,7 +23,7 @@ input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,23
 footer{background:#0f172a;color:#94a3b8;padding:22px;text-align:center;font-size:13px}
 footer b{color:#fff}
 </style>
-</head>
+<style>.robot{display:flex;align-items:center;gap:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:13.5px;color:#374151;font-weight:600}.robot input{width:18px;height:18px;margin:0;accent-color:#2563eb}</style></head>
 <body>
 <header><a class="brand" href="index.html">Revenue<b>Forge</b></a><a class="burger" href="index.html">&#9776;</a></header>
 <main><div class="card">
@@ -31,6 +31,7 @@ footer b{color:#fff}
 <p class="sub">Enter the 6-digit code we sent you.</p>
 <form novalidate>
 <label>Verification code<input type="text" name="code" placeholder="123456" required></label>
+<label class="robot"><input type="checkbox" id="rfRobot"><span>I&#39;m not a robot</span></label>
 <button class="btn" type="submit">Continue &rarr;</button>
 </form>
 <p class="alt">Wrong email? <a href="signin.html">Back to sign in</a></p>
@@ -57,6 +58,8 @@ footer b{color:#fff}
     var pass=pw?pw.value:'';
     if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent='Please enter a valid email address.';return false;}
     if(pw&&pass.length<4){err.textContent='Password must be at least 4 characters.';return false;}
+    var rb=document.getElementById('rfRobot');
+    if(rb&&!rb.checked){err.textContent='Please tick I am not a robot to continue.';return false;}
     var sp=document.getElementById('rfGlobalSpinner'); if(sp)sp.style.display='flex';
     var btn=f.querySelector('button[type=submit]'); if(btn)btn.disabled=true;
     setTimeout(function(){
