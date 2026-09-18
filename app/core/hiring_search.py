@@ -262,7 +262,7 @@ def _arbeitnow(q=""):
     out=[]
     try:
         d=json.loads(_get("https://www.arbeitnow.com/api/job-board-api", timeout=12) or "{}")
-        for j in d.get("jobs",[])[:15]:
+        for j in d.get("data",[])[:15]:
             out.append({"title":j.get("title",""),"url":j.get("url",""),"source":"arbeitnow","platform":"arbeitnow","description":(j.get("description","") or "")[:300],"score":0})
     except Exception: pass
     return out
