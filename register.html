@@ -62,7 +62,7 @@ footer b{color:#fff}
     var btn=f.querySelector('button[type=submit]'); if(btn)btn.disabled=true;
     setTimeout(function(){
       try{localStorage.setItem('rf_session',JSON.stringify({email:email,ts:Date.now()}));}catch(x){}
-      window.location.href='control.html';
+      window.location.href='portal.html';
     },800);
     return false;
   }

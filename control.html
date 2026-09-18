@@ -43,7 +43,7 @@
 <div class="top"><h1><i class="fa-solid fa-cubes"></i>RevenueForge <span style="color:#2f6fed">Control Center</span></h1><span class="pill" id="pill">checking…</span></div>
 <div class="tabs">
 <div class="tab on" data-s="ov">Overview</div>
-<div class="tab" data-s="jb">Jobs · 105+ sources</div>
+<div class="tab" data-s="jb">Jobs · 140+ sources</div>
 <div class="tab" data-s="pr">Proposals</div>
 <div class="tab" data-s="pd">Products</div>
 <div class="tab" data-s="or">Outreach</div>
@@ -52,7 +52,7 @@
 
 <div class="sec on" id="s-ov">
 <div class="grid">
-<div class="card"><h3><i class="fa-solid fa-database"></i>Sources</h3><div class="big">105+</div><div class="muted">RSS · Reddit · Greenhouse · Lever · HN</div></div>
+<div class="card"><h3><i class="fa-solid fa-database"></i>Sources</h3><div class="big">140+</div><div class="muted">RSS · Reddit · Greenhouse · Lever · HN</div></div>
 <div class="card"><h3><i class="fa-solid fa-briefcase"></i>Last search</h3><div class="big" id="nJobs">0</div><div class="muted">jobs found</div></div>
 <div class="card"><h3><i class="fa-solid fa-cloud"></i>Cloud pool</h3><div class="big" id="nPool">–</div><div class="muted">shared with public site</div></div>
 <div class="card"><h3><i class="fa-solid fa-clock"></i>Auto-push</h3><div class="big">30m</div><div class="muted">home engine → cloud</div></div>
@@ -63,7 +63,7 @@
 <div class="sec" id="s-jb">
 <div class="card"><h3><i class="fa-solid fa-magnifying-glass"></i>Search</h3>
 <input class="in" id="q" placeholder="skills / role, e.g. python automation">
-<button class="btn" id="go"><i class="fa-solid fa-search"></i> Search 105+ sources</button> <span class="muted" id="st"></span></div>
+<button class="btn" id="go"><i class="fa-solid fa-search"></i> Search 140+ sources</button> <span class="muted" id="st"></span></div>
 <div id="list"></div>
 </div>
 
@@ -182,6 +182,16 @@ document.addEventListener('click',function(e){
     e.preventDefault();window.open('https://www.linkedin.com/jobs/search/?keywords='+encodeURIComponent(a.textContent.trim()),'_blank');
   }
 },true);
+</script>
+
+<script>
+/* cloudModeOverride */
+setTimeout(function(){
+  if(location.hostname!=='127.0.0.1'&&location.hostname!=='localhost'){
+    var p=document.getElementById('pill');
+    if(p){p.textContent='cloud mode';p.classList.remove('off');p.style.background='#dcfce7';p.style.color='#16a34a';}
+  }
+},2500);
 </script>
 </body>
 </html>
