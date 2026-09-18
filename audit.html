@@ -74,7 +74,7 @@
 </section>
 <footer class="site-footer"><div class="container">RevenueForge - automate revenue, not risk. Human approval on everything.</div></footer>
 
-<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
+<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 140+ sources...</p></div>
 <style>
 #rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
 .rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
@@ -84,13 +84,13 @@
 <script>
 (function(){
   const sp = document.getElementById('rf-spinner');
-  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
+  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 140+ sources...'; sp.style.display='flex'; }};
   window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
   const origFetch = window.fetch;
   window.fetch = function(...args) {
     const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
     if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
-      showRfSpinner('Searching 188 sources...');
+      showRfSpinner('Searching 140+ sources...');
       return origFetch.apply(this,args).finally(hideRfSpinner);
     }
     return origFetch.apply(this,args);
@@ -100,7 +100,7 @@
 
 
 <!-- rfGlobalSpin-v2 -->
-<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 188 sources...</p></div>
+<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 140+ sources...</p></div>
 <style>
 #rfSpinOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)}
 .rfCircle{width:56px;height:56px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rfSpinAnim .8s linear infinite;box-shadow:0 8px 20px rgba(37,99,235,.2)}
@@ -111,5 +111,20 @@
 (function(){var ov=document.getElementById('rfSpinOverlay');var origFetch=window.fetch;window.fetch=function(){var args=arguments,url=typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1||url.indexOf('refresh')>-1){if(ov)ov.style.display='flex';return origFetch.apply(this,args).then(function(r){if(ov)ov.style.display='none';return r},function(e){if(ov)ov.style.display='none';throw e});}return origFetch.apply(this,args);};})();
 </script>
 
+
+<script>
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a'):null;
+  if(!a)return;
+  var h=a.getAttribute('href')||'';
+  if(!h||h.charAt(0)==='#'||h.indexOf('mailto')===0)return;
+  if(h.indexOf('http')!==0&&h.charAt(0)!=='/'&&h.indexOf('.html')===-1){
+    e.preventDefault();window.open('https://'+h,'_blank');return;
+  }
+  if(a.hostname&&a.hostname.indexOf('linkedin.com')>-1&&a.pathname.indexOf('/jobs/view/')>-1){
+    e.preventDefault();window.open('https://www.linkedin.com/jobs/search/?keywords='+encodeURIComponent(a.textContent.trim()),'_blank');
+  }
+},true);
+</script>
 </body>
 </html>
