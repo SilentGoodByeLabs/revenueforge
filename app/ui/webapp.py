@@ -218,7 +218,14 @@ def command(run: int = 0, toggle: int = 0):
     return page("/command", "Command Center", "Start searches, toggle auto-run, watch engine health.", body)
 
 @app.get("/jobagent", response_class=HTMLResponse)
-def jobagent(q: str = "", search: int = 0, approve: int = -1):
+def jobagent(q: str = "", search: int = 0, approve: int = -1, skills: str = "", target: str = ""):
+    _prof = ld("profile.json", {"skills": "", "target": ""})
+    if skills.strip() or target.strip():
+        _prof["skills"] = skills.strip() or _prof.get("skills", "")
+        _prof["target"] = target.strip() or _prof.get("target", "")
+        sv("profile.json", _prof)
+    if search and not _prof.get("skills", "").strip():
+        return page("/jobagent", "Job Agent", "Configure your engine first", card("fa-gear", "Configuration required before searching", '<form method="get" action="/jobagent"><input type="hidden" name="search" value="1"><input type="hidden" name="q" value="' + esc(q) + '"><input name="skills" placeholder="your skills, e.g. python automation, n8n, apis" required><input name="target" placeholder="target market, e.g. startups, agencies"><button class="btn">Save & Search</button></form><p class="muted">Results are matched to this profile on the private engine and the public website.</p>'))
     if approve >= 0:
         ls = ld("last_search.json", {"results": []})["results"]
         if 0 <= approve < len(ls):

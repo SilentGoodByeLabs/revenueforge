@@ -520,4 +520,63 @@ document.addEventListener('click',function(e){
   }
 },true);
 </script>
+
+<script>
+/* rfCfgGate - configure before search + match ranking (public site) */
+(function(){
+  var KEY='rf_cfg';
+  function cfg(){try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}}
+  function modal(){
+    if(document.getElementById('rfCfgModal'))return document.getElementById('rfCfgModal');
+    var d=document.createElement('div');d.id='rfCfgModal';
+    d.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px';
+    d.innerHTML='<div style="background:#fff;border-radius:16px;padding:26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)"><h3 style="margin:0 0 6px;font-size:18px">Configure before searching</h3><p style="color:#64748b;font-size:13px;margin:0 0 16px">Jobs are matched to your skills and target market.</p><label style="font-size:12px;font-weight:700">Skills</label><input id="rfCfgSkills" placeholder="e.g. python automation, n8n, apis" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 12px"><label style="font-size:12px;font-weight:700">Target market</label><input id="rfCfgTarget" placeholder="e.g. startups, agencies" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 16px"><button id="rfCfgSave" style="width:100%;background:#2563eb;color:#fff;border:0;padding:12px;border-radius:9px;font-weight:700;cursor:pointer">Save & Search</button></div>';
+    document.body.appendChild(d);return d;
+  }
+  function score(j,c){
+    var t=((j.title||'')+' '+(j.description||'')).toLowerCase();var s=0;
+    var sk=(c.skills||'').toLowerCase().split(/[,;/]+/);
+    for(var i=0;i<sk.length;i++){var k=sk[i].trim();if(k&&t.indexOf(k)>-1)s+=2;}
+    var tg=(c.target||'').toLowerCase().split(/[,;/]+/);
+    for(var i=0;i<tg.length;i++){var k=tg[i].trim();if(k&&t.indexOf(k)>-1)s+=1;}
+    return s;
+  }
+  function wrap(r,c){
+    var cl=r.clone();
+    return cl.json().then(function(d){
+      var list=d.results||d.jobs||null;
+      if(list&&list.length){
+        for(var i=0;i<list.length;i++){list[i].match=score(list[i],c);}
+        var matched=list.filter(function(j){return j.match>0});
+        var use=matched.length?matched:list;
+        use.sort(function(x,y){return (y.match||0)-(x.match||0)||(y.score||0)-(x.score||0)});
+        if(d.results)d.results=use;
+        if(d.jobs)d.jobs=use;
+      }
+      return new Response(JSON.stringify(d),{status:r.status,statusText:r.statusText,headers:r.headers});
+    }).catch(function(){return r});
+  }
+  var of=window.fetch;
+  window.fetch=function(){
+    var args=arguments;
+    var url=(typeof args[0]==='string')?args[0]:(args[0]&&args[0].url)||'';
+    if(url.indexOf('pooled-jobs')===-1&&url.indexOf('search-hiring')===-1)return of.apply(window,args);
+    var c=cfg();
+    if(!c||!(c.skills||'').trim()){
+      var m=modal();
+      return new Promise(function(resolve,reject){
+        m.querySelector('#rfCfgSave').onclick=function(){
+          var sk=m.querySelector('#rfCfgSkills').value.trim();
+          if(!sk){m.querySelector('#rfCfgSkills').style.borderColor='#b42318';return;}
+          var nc={skills:sk,target:m.querySelector('#rfCfgTarget').value.trim()};
+          localStorage.setItem(KEY,JSON.stringify(nc));
+          if(m.parentNode)m.parentNode.removeChild(m);
+          of.apply(window,args).then(function(r){wrap(r,nc).then(resolve,reject)},reject);
+        };
+      });
+    }
+    return of.apply(window,args).then(function(r){return wrap(r,c)});
+  };
+})();
+</script>
 </body></html>

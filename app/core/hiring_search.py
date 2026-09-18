@@ -240,9 +240,19 @@ def _linkedin_guest(q=""):
         for m in re.finditer(r'href="(https://www\.linkedin\.com/jobs/view/[^"]+)"[^>]*>\s*<h3[^>]*>([^<]+)</h3>', raw):
             out.append({"title":m.group(2).strip(),"url":m.group(1),"source":"linkedin","platform":"linkedin","description":"","score":0})
         if not out:
-            for m in re.finditer(r'base-search-card__title[^>]*>\s*([^<]+?)\s*</a>', raw):
-                pass
-    except Exception: pass
+            for m in re.finditer(r'<a[^>]+href="([^"]+/jobs/view/[^"]+)"[^>]*aria-label="([^"]+)"', raw):
+                out.append({"title":m.group(2).strip(),"url":m.group(1),"source":"linkedin","platform":"linkedin","description":"","score":0})
+        if not out:
+            for m in re.finditer(r'<a[^>]+href="([^"]+/jobs/view/[^"]+)"[^>]*>(.*?)</a>', raw, re.S):
+                ti=re.sub(r'<[^>]+>','',m.group(2)).strip()
+                if len(ti)>4:
+                    out.append({"title":ti,"url":m.group(1),"source":"linkedin","platform":"linkedin","description":"","score":0})
+        seen=set(); ded=[]
+        for j in out:
+            if j["url"] not in seen: seen.add(j["url"]); ded.append(j)
+        out=ded
+    except Exception:
+        pass
     return out[:15]
 
 def _indeed_rss(q=""):
