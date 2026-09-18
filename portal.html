@@ -525,12 +525,17 @@ document.addEventListener('click',function(e){
 /* rfCfgGate - configure before search + match ranking (public site) */
 (function(){
   var KEY='rf_cfg';
-  function cfg(){try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}}
+  function cfg(){
+    try{var v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&(v.skills||'').trim())return v;}catch(e){}
+    try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k===KEY)continue;var ob=null;try{ob=JSON.parse(localStorage.getItem(k)||'null')}catch(e){}
+      if(ob&&typeof ob==='object'&&(ob.skills||'').trim())return ob;}}catch(e){}
+    return null;
+  }
   function modal(){
     if(document.getElementById('rfCfgModal'))return document.getElementById('rfCfgModal');
     var d=document.createElement('div');d.id='rfCfgModal';
     d.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px';
-    d.innerHTML='<div style="background:#fff;border-radius:16px;padding:26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)"><h3 style="margin:0 0 6px;font-size:18px">Configure before searching</h3><p style="color:#64748b;font-size:13px;margin:0 0 16px">Jobs are matched to your skills and target market.</p><label style="font-size:12px;font-weight:700">Skills</label><input id="rfCfgSkills" placeholder="e.g. python automation, n8n, apis" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 12px"><label style="font-size:12px;font-weight:700">Target market</label><input id="rfCfgTarget" placeholder="e.g. startups, agencies" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 16px"><button id="rfCfgSave" style="width:100%;background:#2563eb;color:#fff;border:0;padding:12px;border-radius:9px;font-weight:700;cursor:pointer">Save & Search</button></div>';
+    d.innerHTML='<div style="background:#fff;border-radius:16px;padding:26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)"><h3 style="margin:0 0 6px;font-size:18px">Configure My Engine before searching</h3><p style="color:#64748b;font-size:13px;margin:0 0 16px">Set your skills and target market once - Jobs &amp; Progress remembers and never asks again.</p><label style="font-size:12px;font-weight:700">Skills</label><input id="rfCfgSkills" placeholder="e.g. python automation, n8n, apis" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 12px"><label style="font-size:12px;font-weight:700">Target market</label><input id="rfCfgTarget" placeholder="e.g. startups, agencies" style="width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;margin:6px 0 16px"><button id="rfCfgSave" style="width:100%;background:#2563eb;color:#fff;border:0;padding:12px;border-radius:9px;font-weight:700;cursor:pointer">Save & Search</button></div>';
     document.body.appendChild(d);return d;
   }
   function score(j,c){
