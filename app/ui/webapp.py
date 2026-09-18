@@ -446,6 +446,7 @@ def audit_page():
 @app.get("/api/ping")
 def api_ping(): return {"ok": True}
 
+@app.get("/api/search-hiring")
 def api_search_hiring(q: str = "", limit: int = 15, email: str = ""):
     try:
         jobs = _get_jobs_cached(q)
