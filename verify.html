@@ -1,84 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verify email - RevenueForge</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;font:15px/1.6 -apple-system,'Segoe UI',Roboto,Arial;color:#1f2328;display:flex;min-height:100vh;flex-direction:column}
-header{background:#fff;border-bottom:1px solid #e6e9ef;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-size:19px;font-weight:800;color:#0f172a;text-decoration:none}.brand b{color:#2563eb}
-.burger{color:#0f172a;font-size:22px;text-decoration:none}
-main{flex:1;display:flex;align-items:center;justify-content:center;padding:34px 16px}
-.card{background:#fff;border:1px solid #e6e9ef;border-radius:16px;padding:30px 26px;width:100%;max-width:420px;box-shadow:0 6px 24px rgba(16,24,40,.07)}
-h1{margin:0 0 6px;font-size:24px}
-.sub{color:#667085;margin:0 0 20px;font-size:14px}
-label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:14px}
-input{width:100%;padding:11px 13px;margin-top:6px;border:1px solid #d0d5dd;border-radius:9px;font:inherit}
-input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-.btn{width:100%;background:#2563eb;color:#fff;border:0;padding:12px;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px}
-.btn:hover{background:#1d4ed8}
-.alt{margin:18px 0 0;text-align:center;font-size:13.5px;color:#667085}.alt a{color:#2563eb;font-weight:700;text-decoration:none}
-.err{color:#b42318;font-weight:700;font-size:13px;margin:10px 0 0;min-height:18px}
-footer{background:#0f172a;color:#94a3b8;padding:22px;text-align:center;font-size:13px}
-footer b{color:#fff}
-</style>
-<style>.robot{display:flex;align-items:center;gap:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:13.5px;color:#374151;font-weight:600}.robot input{width:18px;height:18px;margin:0;accent-color:#2563eb}</style></head>
-<body>
-<header><a class="brand" href="index.html">Revenue<b>Forge</b></a><a class="burger" href="index.html">&#9776;</a></header>
-<main><div class="card">
-<h1>Verify your email</h1>
-<p class="sub">Enter the 6-digit code we sent you.</p>
-<form novalidate>
-<label>Verification code<input type="text" name="code" placeholder="123456" required></label>
-<label class="robot"><input type="checkbox" id="rfRobot"><span>I&#39;m not a robot</span></label>
-<button class="btn" type="submit">Continue &rarr;</button>
+<!DOCTYPE html><html lang="en"><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Verify Email | RevenueForge</title><link rel="icon" type="image/png" href="assets/logo.png"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="css/style.css">
+<style>.auth-card{max-width:460px;margin:40px auto;border-radius:20px;background:#fff;box-shadow:0 24px 60px rgba(11,34,57,.18);padding:40px 32px}</style></head>
+<body><div id="header"></div>
+<div class="auth-card">
+<h1 style="font-family:'Sora';text-align:center"><i class="fa-solid fa-envelope-circle-check" style="color:var(--accent)"></i> Verify your email</h1>
+<p style="color:var(--muted);text-align:center;margin:8px 0 20px">We sent a 6-digit code to your inbox.</p>
+<form id="vForm" method="get" action="https://revenueforge-api.onrender.com/api/verify">
+<input type="hidden" name="email" id="v_email">
+<label style="font-size:13px;font-weight:700">6-digit code</label>
+<input name="code" id="v_code" inputmode="numeric" maxlength="6" placeholder="••••••" style="text-align:center;font-size:1.4rem;letter-spacing:8px">
+<p id="v_msg" style="color:#B91C1C;min-height:20px;font-size:13.5px"></p>
+<button class="btn btn-primary" style="width:100%" type="submit">Verify & enter →</button>
 </form>
-<p class="alt">Wrong email? <a href="signin.html">Back to sign in</a></p>
-</div></main>
-<footer><b>RevenueForge</b> &middot; The autonomous revenue engine &middot; &copy; 2026</footer>
-<div id="rfGlobalSpinner" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.96);z-index:9999999;align-items:center;justify-content:center;flex-direction:column">
-  <div style="width:64px;height:64px;border:6px solid #e2e8f0;border-top:6px solid #2563eb;border-radius:50%;animation:rfGlobalSpin 1s linear infinite"></div>
-  <p style="margin-top:22px;font-size:17px;font-weight:700;color:#1e293b">Signing you in...</p>
+<p style="text-align:center;margin-top:14px;font-size:13.5px;color:var(--muted)">Didn't get it? <a id="v_resend" href="#">Resend code</a></p>
 </div>
-<style>@keyframes rfGlobalSpin{to{transform:rotate(360deg)}}</style>
+<script src="js/config.js?v=4"></script><script src="js/layout.js?v=11"></script>
 <script>
-/* rfAuthFix */
+var q=new URLSearchParams(location.search);
+var em=q.get('email')||''; var er=q.get('err')||'';
+document.getElementById('v_email').value=em;
+if(er) document.getElementById('v_msg').textContent=er;
+document.getElementById('v_resend').href=(window.RF_API||'')+'/api/resend?email='+encodeURIComponent(em);
+</script><div id="footer"></div>
+
+<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
+<style>
+#rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
+.rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
+@keyframes rf-spin{to{transform:rotate(360deg);}}
+#rf-spinner p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px;letter-spacing:0.3px;}
+</style>
+<script>
 (function(){
-  function handler(e){
-    if(e.__rf)return; e.__rf=true;
-    if(e.preventDefault)e.preventDefault();
-    var f=e.target;
-    var em=f.querySelector('input[type=email],input[name=email]');
-    var pw=f.querySelector('input[type=password]');
-    var err=document.getElementById('rfAuthErr');
-    if(!err){err=document.createElement('p');err.className='err';err.id='rfAuthErr';f.appendChild(err);}
-    err.textContent='';
-    var email=em?em.value.trim():'';
-    var pass=pw?pw.value:'';
-    if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent='Please enter a valid email address.';return false;}
-    if(pw&&pass.length<4){err.textContent='Password must be at least 4 characters.';return false;}
-    var rb=document.getElementById('rfRobot');
-    if(rb&&!rb.checked){err.textContent='Please tick I am not a robot to continue.';return false;}
-    var sp=document.getElementById('rfGlobalSpinner'); if(sp)sp.style.display='flex';
-    var btn=f.querySelector('button[type=submit]'); if(btn)btn.disabled=true;
-    setTimeout(function(){
-      try{localStorage.setItem('rf_session',JSON.stringify({email:email,ts:Date.now()}));}catch(x){}
-      window.location.href='portal.html';
-    },800);
-    return false;
-  }
-  function bind(){
-    var forms=document.forms;
-    for(var i=0;i<forms.length;i++){
-      var f=forms[i];
-      f.removeAttribute('action');
-      f.onsubmit=handler;
-      f.addEventListener('submit',handler,true);
+  const sp = document.getElementById('rf-spinner');
+  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
+  window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
+  const origFetch = window.fetch;
+  window.fetch = function(...args) {
+    const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
+    if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
+      showRfSpinner('Searching 188 sources...');
+      return origFetch.apply(this,args).finally(hideRfSpinner);
     }
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+    return origFetch.apply(this,args);
+  };
 })();
 </script>
-</body>
-</html>
+
+
+<!-- rfGlobalSpin-v2 -->
+<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 188 sources...</p></div>
+<style>
+#rfSpinOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)}
+.rfCircle{width:56px;height:56px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rfSpinAnim .8s linear infinite;box-shadow:0 8px 20px rgba(37,99,235,.2)}
+@keyframes rfSpinAnim{to{transform:rotate(360deg)}}
+#rfSpinOverlay p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px}
+</style>
+<script>
+(function(){var ov=document.getElementById('rfSpinOverlay');var origFetch=window.fetch;window.fetch=function(){var args=arguments,url=typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1||url.indexOf('refresh')>-1){if(ov)ov.style.display='flex';return origFetch.apply(this,args).then(function(r){if(ov)ov.style.display='none';return r},function(e){if(ov)ov.style.display='none';throw e});}return origFetch.apply(this,args);};})();
+</script>
+
+</body></html>
