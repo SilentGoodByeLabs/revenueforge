@@ -175,6 +175,145 @@ def search_hn(q=""):
 def search_imported(q=""):
     return [j for j in ld("imported.json",[]) if _score(j.get("title","")+j.get("description",""),q)>55]
 
+
+
+
+
+# ============ WORKING DIRECT APIS (Phase 2 - Fixed) ============
+def search_usajobs(q=""):
+    """USAJobs government API (free, no auth needed)"""
+    out = []
+    try:
+        url = f"https://data.usajobs.gov/api/Search/Results?Keyword={_up.quote(q)}&WhoMayApply=public&ResultsPerPage=20"
+        headers = {
+            "User-Agent": "Mozilla/5.0",
+            "Host": "data.usajobs.gov",
+            "Authorization-Key": "DEMO_KEY"
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode())
+            for j in data.get("SearchResult", {}).get("SearchResultItems", [])[:20]:
+                out.append({
+                    "title": j.get("MatchedObjectDescriptor", {}).get("PositionTitle", ""),
+                    "url": j.get("MatchedObjectDescriptor", {}).get("PositionURI", ""),
+                    "description": _strip(j.get("MatchedObjectDescriptor", {}).get("PositionLocationDisplay", ""))[:400],
+                    "source": "usajobs",
+                    "platform": "usajobs",
+                    "score": _score(j.get("MatchedObjectDescriptor", {}).get("PositionTitle", ""), q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_devitjobs(q=""):
+    """DevITJobs UK tech jobs RSS"""
+    out = []
+    try:
+        raw = _get("https://devitjobs.uk/job_feed.xml", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "devitjobs",
+                    "platform": "devitjobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_authenticjobs(q=""):
+    """Authentic Jobs RSS feed"""
+    out = []
+    try:
+        raw = _get("https://authenticjobs.com/rss/", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "authenticjobs",
+                    "platform": "authenticjobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_golangprojects(q=""):
+    """Golang Projects RSS feed"""
+    out = []
+    try:
+        raw = _get("https://golangprojects.com/golang-jobs.xml", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "golangprojects",
+                    "platform": "golangprojects",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_euremotejobs(q=""):
+    """EU Remote Jobs RSS feed"""
+    out = []
+    try:
+        raw = _get("https://euremotejobs.com/feed/", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "euremotejobs",
+                    "platform": "euremotejobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
 SOURCE_COUNT = len(RSS_FEEDS)+1+len(REDDIT_SUBS)+len(REMOVIVE_CATS)+len(GREENHOUSE)+len(LEVER)+len(ASHBY)+len(SMARTRECRUITERS)+2
 
 def gather_all(q=""):
@@ -322,7 +461,7 @@ def gather_all(q=""):
     except Exception: jobs=[]
     futs=[]
     with _cf.ThreadPoolExecutor(max_workers=7) as ex:
-        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra)]
+        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra,search_usajobs,search_devitjobs,search_authenticjobs,search_golangprojects,search_euremotejobs)]
         for fu in _cf.as_completed(futs, timeout=50):
             try: jobs += fu.result(timeout=1) or []
             except Exception: pass
@@ -335,5 +474,144 @@ def gather_all(q=""):
         if not u or u in seen: continue
         seen.add(u); ded.append(j)
     return ded
+
+
+
+
+
+# ============ WORKING DIRECT APIS (Phase 2 - Fixed) ============
+def search_usajobs(q=""):
+    """USAJobs government API (free, no auth needed)"""
+    out = []
+    try:
+        url = f"https://data.usajobs.gov/api/Search/Results?Keyword={_up.quote(q)}&WhoMayApply=public&ResultsPerPage=20"
+        headers = {
+            "User-Agent": "Mozilla/5.0",
+            "Host": "data.usajobs.gov",
+            "Authorization-Key": "DEMO_KEY"
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode())
+            for j in data.get("SearchResult", {}).get("SearchResultItems", [])[:20]:
+                out.append({
+                    "title": j.get("MatchedObjectDescriptor", {}).get("PositionTitle", ""),
+                    "url": j.get("MatchedObjectDescriptor", {}).get("PositionURI", ""),
+                    "description": _strip(j.get("MatchedObjectDescriptor", {}).get("PositionLocationDisplay", ""))[:400],
+                    "source": "usajobs",
+                    "platform": "usajobs",
+                    "score": _score(j.get("MatchedObjectDescriptor", {}).get("PositionTitle", ""), q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_devitjobs(q=""):
+    """DevITJobs UK tech jobs RSS"""
+    out = []
+    try:
+        raw = _get("https://devitjobs.uk/job_feed.xml", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "devitjobs",
+                    "platform": "devitjobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_authenticjobs(q=""):
+    """Authentic Jobs RSS feed"""
+    out = []
+    try:
+        raw = _get("https://authenticjobs.com/rss/", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "authenticjobs",
+                    "platform": "authenticjobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_golangprojects(q=""):
+    """Golang Projects RSS feed"""
+    out = []
+    try:
+        raw = _get("https://golangprojects.com/golang-jobs.xml", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "golangprojects",
+                    "platform": "golangprojects",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def search_euremotejobs(q=""):
+    """EU Remote Jobs RSS feed"""
+    out = []
+    try:
+        raw = _get("https://euremotejobs.com/feed/", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 20:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "euremotejobs",
+                    "platform": "euremotejobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
 
 SOURCE_COUNT = len(RSS_FEEDS) + len(GH_EXTRA) + len(LEVER_EXTRA) + len(ASHBY_EXTRA) + len(RSS_EXTRA) + 49
