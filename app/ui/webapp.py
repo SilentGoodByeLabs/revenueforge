@@ -592,6 +592,30 @@ def api_pooled_jobs(limit: int = 50):
         return {"ok": False, "error": str(e), "count": 0, "jobs": []}
 
 
+@app.get("/api/debug")
+def api_debug():
+    import sys
+    info = {"python": sys.version}
+    try:
+        import feedparser
+        info["feedparser_installed"] = feedparser.__version__
+    except ImportError as e:
+        info["feedparser_error"] = str(e)
+    
+    try:
+        from app.core import hiring_search as hs
+        info["HS_imported"] = True
+        if hs:
+            jobs = hs.gather_all("python")
+            info["jobs_count"] = len(jobs)
+            info["sample_platforms"] = list(set(j.get("platform","?") for j in jobs[:5]))
+        else:
+            info["HS_is_None"] = True
+    except Exception as e:
+        info["HS_error"] = str(e)
+    return info
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8502)
