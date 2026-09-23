@@ -328,6 +328,9 @@ def gather_all(q=""):
             except Exception: pass
     seen=set(); ded=[]
     for j in jobs:
+        # Add platform field if missing (use source as platform)
+        if 'platform' not in j and 'source' in j:
+            j['platform'] = j['source']
         u=j.get("url") or j.get("title")
         if not u or u in seen: continue
         seen.add(u); ded.append(j)
