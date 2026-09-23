@@ -314,6 +314,130 @@ def search_euremotejobs(q=""):
         pass
     return out
 
+
+
+# ============ BLOCKED SITES (Private Engine Bridge Only) ============
+def _glassdoor_rss(q=""):
+    """Glassdoor RSS (limited, needs bridge for full access)"""
+    out = []
+    try:
+        # Glassdoor has limited public RSS for some categories
+        raw = _get(f"https://www.glassdoor.com/search/rss.htm?searchSource=GN_TEXTBOX&sc.keyword={_up.quote(q)}", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "glassdoor",
+                    "platform": "glassdoor",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def _wellfound(q=""):
+    """Wellfound (AngelList) job search"""
+    out = []
+    try:
+        # Wellfound has a public job search endpoint
+        url = f"https://wellfound.com/api/v2/search/jobs?q={_up.quote(q)}&page=1"
+        data = json.loads(_get(url, timeout=10) or "{}")
+        for j in data.get("jobs", [])[:15]:
+            out.append({
+                "title": j.get("title", ""),
+                "url": f"https://wellfound.com/jobs/{j.get('id', '')}",
+                "description": _strip(j.get("description", ""))[:400],
+                "source": "wellfound",
+                "platform": "wellfound",
+                "score": _score(j.get("title", "") + " " + j.get("description", ""), q)
+            })
+    except Exception:
+        pass
+    return out
+
+def _dice_rss(q=""):
+    """Dice RSS feed (limited)"""
+    out = []
+    try:
+        raw = _get(f"https://www.dice.com/jobs?q={_up.quote(q)}&format=rss", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "dice",
+                    "platform": "dice",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def _angel_co(q=""):
+    """Angel.co jobs (now Wellfound, but legacy endpoint)"""
+    out = []
+    try:
+        url = f"https://angel.co/api/v1/search/jobs?query={_up.quote(q)}"
+        data = json.loads(_get(url, timeout=10) or "{}")
+        for j in data.get("results", [])[:15]:
+            out.append({
+                "title": j.get("title", ""),
+                "url": j.get("url", ""),
+                "description": _strip(j.get("description", ""))[:400],
+                "source": "angellist",
+                "platform": "angellist",
+                "score": _score(j.get("title", "") + " " + j.get("description", ""), q)
+            })
+    except Exception:
+        pass
+    return out
+
+def _builtin_sf(q=""):
+    """Built In SF tech jobs RSS"""
+    out = []
+    try:
+        raw = _get("https://www.builtinsf.com/jobs/rss", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "builtinsf",
+                    "platform": "builtinsf",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
 SOURCE_COUNT = len(RSS_FEEDS)+1+len(REDDIT_SUBS)+len(REMOVIVE_CATS)+len(GREENHOUSE)+len(LEVER)+len(ASHBY)+len(SMARTRECRUITERS)+2
 
 def gather_all(q=""):
@@ -461,7 +585,7 @@ def gather_all(q=""):
     except Exception: jobs=[]
     futs=[]
     with _cf.ThreadPoolExecutor(max_workers=7) as ex:
-        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra,search_usajobs,search_devitjobs,search_authenticjobs,search_golangprojects,search_euremotejobs)]
+        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra,_glassdoor_rss,_wellfound,_dice_rss,_angel_co,_builtin_sf)]
         for fu in _cf.as_completed(futs, timeout=50):
             try: jobs += fu.result(timeout=1) or []
             except Exception: pass
@@ -607,6 +731,130 @@ def search_euremotejobs(q=""):
                     "url": link,
                     "source": "euremotejobs",
                     "platform": "euremotejobs",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+
+
+# ============ BLOCKED SITES (Private Engine Bridge Only) ============
+def _glassdoor_rss(q=""):
+    """Glassdoor RSS (limited, needs bridge for full access)"""
+    out = []
+    try:
+        # Glassdoor has limited public RSS for some categories
+        raw = _get(f"https://www.glassdoor.com/search/rss.htm?searchSource=GN_TEXTBOX&sc.keyword={_up.quote(q)}", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "glassdoor",
+                    "platform": "glassdoor",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def _wellfound(q=""):
+    """Wellfound (AngelList) job search"""
+    out = []
+    try:
+        # Wellfound has a public job search endpoint
+        url = f"https://wellfound.com/api/v2/search/jobs?q={_up.quote(q)}&page=1"
+        data = json.loads(_get(url, timeout=10) or "{}")
+        for j in data.get("jobs", [])[:15]:
+            out.append({
+                "title": j.get("title", ""),
+                "url": f"https://wellfound.com/jobs/{j.get('id', '')}",
+                "description": _strip(j.get("description", ""))[:400],
+                "source": "wellfound",
+                "platform": "wellfound",
+                "score": _score(j.get("title", "") + " " + j.get("description", ""), q)
+            })
+    except Exception:
+        pass
+    return out
+
+def _dice_rss(q=""):
+    """Dice RSS feed (limited)"""
+    out = []
+    try:
+        raw = _get(f"https://www.dice.com/jobs?q={_up.quote(q)}&format=rss", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "dice",
+                    "platform": "dice",
+                    "description": re.sub('<[^>]+>', '', desc)[:300],
+                    "score": _score(title + " " + desc, q)
+                })
+    except Exception:
+        pass
+    return out
+
+def _angel_co(q=""):
+    """Angel.co jobs (now Wellfound, but legacy endpoint)"""
+    out = []
+    try:
+        url = f"https://angel.co/api/v1/search/jobs?query={_up.quote(q)}"
+        data = json.loads(_get(url, timeout=10) or "{}")
+        for j in data.get("results", [])[:15]:
+            out.append({
+                "title": j.get("title", ""),
+                "url": j.get("url", ""),
+                "description": _strip(j.get("description", ""))[:400],
+                "source": "angellist",
+                "platform": "angellist",
+                "score": _score(j.get("title", "") + " " + j.get("description", ""), q)
+            })
+    except Exception:
+        pass
+    return out
+
+def _builtin_sf(q=""):
+    """Built In SF tech jobs RSS"""
+    out = []
+    try:
+        raw = _get("https://www.builtinsf.com/jobs/rss", timeout=10)
+        if not raw:
+            return out
+        root = _ET.fromstring(raw)
+        for item in root.iter('item'):
+            if len(out) >= 15:
+                break
+            title = (item.findtext('title') or '').strip()
+            link = (item.findtext('link') or '').strip()
+            desc = item.findtext('description') or ''
+            if title and link:
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "source": "builtinsf",
+                    "platform": "builtinsf",
                     "description": re.sub('<[^>]+>', '', desc)[:300],
                     "score": _score(title + " " + desc, q)
                 })
