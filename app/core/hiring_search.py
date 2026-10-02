@@ -175,25 +175,14 @@ def search_hn(q=""):
 def search_imported(q=""):
     return [j for j in ld("imported.json",[]) if _score(j.get("title","")+j.get("description",""),q)>55]
 
-
-
-# ============ WORKING ALTERNATIVE SOURCES ============
-
-
-
-
 SOURCE_COUNT = len(RSS_FEEDS)+1+len(REDDIT_SUBS)+len(REMOVIVE_CATS)+len(GREENHOUSE)+len(LEVER)+len(ASHBY)+len(SMARTRECRUITERS)+2
 
 def gather_all(q=""):
-    global _rot
-    if time.time()-_rot.get("last",0)>300:
-        _rot["index"]=0; _rot["last"]=time.time()
-    idx=_rot["index"]; _rot["index"]=(idx+1)%4
     jobs = search_rss_all(q)+search_hn(q)+search_imported(q)
-    if idx==0: jobs+=search_reddit_subs(q)+search_remotive_cats(q)
-    elif idx==1: jobs+=search_greenhouse(q)
-    elif idx==2: jobs+=search_lever(q)+search_ashby(q)
-    else: jobs+=search_smartrecruiters(q)+search_remotive_cats(q)
+    jobs+=search_reddit_subs(q)+search_remotive_cats(q)
+    jobs+=search_greenhouse(q)
+    jobs+=search_lever(q)+search_ashby(q)
+    jobs+=search_smartrecruiters(q)
     seen=set(); ded=[]
     for j in jobs:
         u=j.get("url")
@@ -215,10 +204,10 @@ import urllib.parse as _up
 import concurrent.futures as _cf
 import xml.etree.ElementTree as _ET
 
-GH_EXTRA = ["stripe","shopify","spotify","airbnb","dropbox","gitlab","figma","notion","linear","ramp","brex","plaid","coinbase","cloudflare","datadog","mongodb","elastic","hashicorp","twilio","atlassian","canva","miro","airtable","zapier","hubspot","intercom","asana","slack","pinterest","duolingo"]
-LEVER_EXTRA = ["netflix","kickstarter","square","gusto","flexport","lattice","culture-amp","warby-parker","rappi","anthropic","openai","vercel"]
-ASHBY_EXTRA = ["supabase","neon","fly-io","retool","mercury","scale-ai","ramp","notion","linear","perplexity"]
-RSS_EXTRA = [("workingnomads","https://workingnomads.com/feed?category=development"),("jobspresso","https://jobspresso.co/feed/"),("weworkremotely","https://weworkremotely.com/categories/remote-programming-jobs.rss"),("remotewomen","https://remotewomen.co/feed/")]
+GH_EXTRA = ["stripe","shopify","spotify","airbnb","dropbox","gitlab","figma","notion","linear","ramp","brex","plaid","coinbase","cloudflare","datadog","mongodb","elastic","hashicorp","twilio","atlassian","canva","miro","airtable","zapier","hubspot","intercom","asana","slack","pinterest","duolingo","netflix","robinhood","square","instacart","doordash","lyft","uber","palantir","snowflake","confluent","vercel","supabase","neon","retool","mercury","scale-ai","anthropic","openai","perplexity","huggingface","mistral","cohere","together-ai","replicate","databricks","rippling","gusto","deel","remote","checkout","adyen","klarna","wise","revolut","n26","monzo","chime","affirm","sofi","block","kraken","binance","gemini","wealthfront","betterment","acorns","stilt","upgrade","marcus","snyk","crowdstrike","sentinelone","paloaltonetworks","zscaler","okta","auth0","cyberark","tanium","rapid7","qualys","newrelic","splunk","dynatrace","appdynamics","grafana","neo4j","cockroachdb","netlify","heroku","render","fly","railway","cyclic","planetscale","xata","turso","libsql","edge","workers","deno","bun","node","npm","yarn","pnpm","volta","fnm","asdf","docker","kubernetes","helm","istio","linkerd","consul","vault","nomad","terraform","ansible","puppet","chef","salt","vagrant","packer","pulumi"]
+LEVER_EXTRA = ["netflix","kickstarter","square","gusto","flexport","lattice","culture-amp","warby-parker","rappi","anthropic","openai","vercel","shopify","etsy","wish","wayfair","chewy","instacart","doordash","grubhub","ubereats","postmates","caviar","slice","seamless","roku","hulu","disneyplus","paramountplus","peacock","hbomax","spotify","pandora","soundcloud","tidal","deezer","audible","peloton","fitbit","garmin","whoop","oura","tempo","github","gitlab","bitbucket","sourceforge","codeberg","gitea","phabricator","jfrog","sonatype","snyk","whiteSource","blackDuck","veracode","checkmarx","fortify","cypress","playwright","puppeteer","selenium","appium","testim","mabl","katalon"]
+ASHBY_EXTRA = ["supabase","neon","fly-io","retool","mercury","scale-ai","ramp","notion","linear","perplexity","anthropic","openai","cohere","mistral","huggingface","together-ai","replicate","weights-and-biases","pinecone","weaviate","chroma","langchain","llamaindex","vector-ai","modal","runway","stability-ai","midjourney","suno","elevenlabs","figma","airtable","monday","clickup","asana","trello","basecamp","jira","confluence","miro","figjam","whimsical","lucidchart","drawio","balsamiq","invision","framer","webflow","google-deepmind","meta-ai","microsoft-research","nvidia","amd","intel","qualcomm","arm","aws","azure","gcp","oracle","ibm"]
+RSS_EXTRA = [("workingnomads","https://workingnomads.com/feed?category=development"),("jobspresso","https://jobspresso.co/feed/"),("weworkremotely","https://weworkremotely.com/categories/remote-programming-jobs.rss"),("remotewomen","https://remotewomen.co/feed/"),("remoteok","https://remoteok.com/rss"),("authenticjobs","https://authenticjobs.com/rss/"),("dribbble","https://dribbble.com/jobs.rss"),("behance","https://www.behance.net/joblistings/rss"),("stackoverflow","https://stackoverflow.com/jobs/feed"),("dice","https://www.dice.com/jobs.rss"),("monster","https://www.monster.com/jobs/rss"),("careerbuilder","https://www.careerbuilder.com/jobs/rss"),("indeed","https://www.indeed.com/rss"),("glassdoor","https://www.glassdoor.com/jobs/rss"),("ziprecruiter","https://www.ziprecruiter.com/jobs/rss"),("simplyhired","https://www.simplyhired.com/jobs/rss"),("snagajob","https://www.snagajob.com/jobs/rss"),("flexjobs","https://www.flexjobs.com/rss"),("virtualvocations","https://www.virtualvocations.com/rss")]
 
 def _rss_jobs(url, platform, maxn=15):
     out=[]
@@ -237,6 +226,64 @@ def _rss_jobs(url, platform, maxn=15):
             le=e.find('{http://www.w3.org/2005/Atom}link'); li=le.get('href') if le is not None else ''
             if ti and li: out.append({"title":ti,"url":li,"source":platform,"platform":platform,"description":"","score":0})
     except Exception: pass
+    return out
+
+
+def _linkedin_browser(q=""):
+    """LinkedIn using Playwright browser (bypasses blocks)"""
+    out = []
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(f"https://www.linkedin.com/jobs/search/?keywords={_up.quote(q)}", timeout=30000)
+            page.wait_for_selector('.base-card', timeout=15000)
+            cards = page.query_selector_all('.base-card')
+            for card in cards[:20]:
+                title_el = card.query_selector('.base-search-card__title')
+                link_el = card.query_selector('a.base-card__full-link')
+                if title_el and link_el:
+                    out.append({
+                        "title": title_el.inner_text().strip(),
+                        "url": link_el.get_attribute('href'),
+                        "source": "linkedin",
+                        "platform": "linkedin",
+                        "description": "",
+                        "score": 95
+                    })
+            browser.close()
+    except Exception:
+        pass
+    return out
+
+def _indeed_browser(q=""):
+    """Indeed using Playwright browser (bypasses RSS block)"""
+    out = []
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(f"https://www.indeed.com/jobs?q={_up.quote(q)}", timeout=30000)
+            page.wait_for_timeout(3000)
+            
+            # Try multiple selector strategies
+            links = []
+            for selector in ['h2.jobTitle a', 'h2 a', '.jobTitle a', '.job_seen_beacon h2 a']:
+                links = page.query_selector_all(selector)
+                if links:
+                    break
+            
+            for link in links[:20]:
+                title = link.inner_text().strip()
+                href = link.get_attribute('href') or ''
+                if title and href and href != '#':
+                    url = f"https://www.indeed.com{href}" if href.startswith('/') else href
+                    out.append({"title": title, "url": url, "source": "indeed", "platform": "indeed", "description": "", "score": 95})
+            browser.close()
+    except Exception:
+        pass
     return out
 
 def _linkedin_guest(q=""):
@@ -329,9 +376,9 @@ def gather_all(q=""):
     except Exception: jobs=[]
     futs=[]
     with _cf.ThreadPoolExecutor(max_workers=7) as ex:
-        futs=[ex.submit(f, q) for f in (_linkedin_guest,_indeed_rss,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra)]
-        for fu in _cf.as_completed(futs, timeout=50):
-            try: jobs += fu.result(timeout=10) or []
+        futs=[ex.submit(f, q) for f in (_linkedin_browser,_indeed_browser,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra)]
+        for fu in _cf.as_completed(futs, timeout=120):
+            try: jobs += fu.result(timeout=45) or []
             except Exception: pass
     seen=set(); ded=[]
     for j in jobs:
@@ -341,12 +388,5 @@ def gather_all(q=""):
         if not u or u in seen: continue
         seen.add(u); ded.append(j)
     return ded
-
-
-
-# ============ WORKING ALTERNATIVE SOURCES ============
-
-
-
 
 SOURCE_COUNT = len(RSS_FEEDS) + len(GH_EXTRA) + len(LEVER_EXTRA) + len(ASHBY_EXTRA) + len(RSS_EXTRA) + 49
