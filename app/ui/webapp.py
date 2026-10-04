@@ -18,9 +18,13 @@ except Exception:
 
 
 
+app = FastAPI(title="RevenueForge Control Center")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
+                   allow_methods=["*"], allow_headers=["*"])
+
 # ============ PUSH PIPELINE (receive jobs from private worker) ============
 @app.post("/jobs/ingest")
-async def jobs_ingest(request: _Req):
+async def jobs_ingest(request: Request):
     """Receive jobs pushed from private worker"""
     try:
         body = await request.json()
@@ -57,9 +61,6 @@ async def jobs_ingest(request: _Req):
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
-app = FastAPI(title="RevenueForge Control Center")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
-                   allow_methods=["*"], allow_headers=["*"])
 
 def ld(n, d):
     p = DATA / n
