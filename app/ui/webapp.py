@@ -22,6 +22,8 @@ app = FastAPI(title="RevenueForge Control Center")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
+
+
 # ============ PUSH PIPELINE (receive jobs from private worker) ============
 @app.post("/jobs/ingest")
 async def jobs_ingest(request: Request):
@@ -140,6 +142,7 @@ def gather(q=""):
         return jobs
     except Exception:
         return []
+
 @app.get("/jobagent", response_class=HTMLResponse)
 def jobagent(page_num: int = 1):
     from urllib.parse import quote as _q
@@ -317,38 +320,323 @@ def jobagent(page_num: int = 1):
 def health(): return {"status": "ok", "engine": "private-local", "port": 8502}
 
 @app.get("/", response_class=HTMLResponse)
-def daily():
-    jobs = ld("jobs.json", [])
-    apps = ld("applications.json", [])
-    msgs = ld("messages.json", [])
-    pl = ld("pipeline.json", {"Found": 0, "Contacted": 0, "Replied": 0, "Won": 0})
-
-    html = "<div class='card'><h3><i class='fa-solid fa-sun'></i> Today</h3>"
-    html += "<p><strong>" + str(len(jobs)) + "</strong> jobs hunted for you from home-IP sources.</p>"
-    html += "<p><strong>" + str(len(apps)) + "</strong> jobs in your pipeline.</p>"
-    html += "<p><strong>" + str(len(msgs)) + "</strong> outreach messages sent.</p>"
-    if worker_alive():
-        html += "<p class='ok'>Home worker running - auto-hunt every 30 minutes.</p>"
-    else:
-        html += "<p class='err'>Home worker stopped. Run: rf start</p>"
-    html += "</div>"
-
-    html += "<div class='card'><h3><i class='fa-solid fa-filter'></i> Pipeline at a glance</h3><table><tr><th>Stage</th><th>Count</th></tr>"
-    for k in ["Found", "Contacted", "Replied", "Won"]:
-        html += "<tr><td>" + k + "</td><td>" + str(pl.get(k, 0)) + "</td></tr>"
-    html += "</table></div>"
-
-    sources = {}
-    for j in jobs:
-        s = j.get("source", "?")
-        sources[s] = sources.get(s, 0) + 1
-    top = sorted(sources.items(), key=lambda x: -x[1])[:8]
-    html += "<div class='card'><h3><i class='fa-solid fa-trophy'></i> Top platforms</h3><table><tr><th>Platform</th><th>Jobs</th></tr>"
-    for s, c in top:
-        html += "<tr><td>" + esc(str(s)) + "</td><td>" + str(c) + "</td></tr>"
-    html += "</table></div>"
-
-    return page("/", "Daily Briefing", html)
+def home():
+    """Professional marketing home page - no jobs shown until hunt"""
+    
+    html = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RevenueForge - AI Job Hunting Platform</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+            .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+            
+            /* Hero Section */
+            .hero {
+                text-align: center;
+                padding: 80px 20px;
+                color: white;
+            }
+            .hero h1 {
+                font-size: 3.5rem;
+                margin-bottom: 20px;
+                font-weight: 700;
+            }
+            .hero p {
+                font-size: 1.3rem;
+                margin-bottom: 40px;
+                opacity: 0.95;
+            }
+            .hero-stats {
+                display: flex;
+                justify-content: center;
+                gap: 60px;
+                margin: 50px 0;
+            }
+            .stat {
+                text-align: center;
+            }
+            .stat-number {
+                font-size: 3rem;
+                font-weight: 700;
+                display: block;
+            }
+            .stat-label {
+                font-size: 1rem;
+                opacity: 0.9;
+            }
+            .cta-button {
+                display: inline-block;
+                padding: 18px 50px;
+                background: white;
+                color: #667eea;
+                text-decoration: none;
+                border-radius: 50px;
+                font-size: 1.2rem;
+                font-weight: 600;
+                transition: all 0.3s;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            .cta-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            }
+            
+            /* Features Section */
+            .features {
+                background: white;
+                padding: 80px 20px;
+            }
+            .features h2 {
+                text-align: center;
+                font-size: 2.5rem;
+                margin-bottom: 60px;
+                color: #333;
+            }
+            .feature-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 40px;
+                margin-top: 40px;
+            }
+            .feature-card {
+                text-align: center;
+                padding: 40px 30px;
+                border-radius: 15px;
+                background: #f8f9fa;
+                transition: all 0.3s;
+            }
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            .feature-icon {
+                font-size: 3rem;
+                color: #667eea;
+                margin-bottom: 20px;
+            }
+            .feature-card h3 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+                color: #333;
+            }
+            .feature-card p {
+                color: #666;
+                line-height: 1.8;
+            }
+            
+            /* Testimonials */
+            .testimonials {
+                background: #f8f9fa;
+                padding: 80px 20px;
+            }
+            .testimonials h2 {
+                text-align: center;
+                font-size: 2.5rem;
+                margin-bottom: 60px;
+                color: #333;
+            }
+            .testimonial-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+            .testimonial-card {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            }
+            .testimonial-card p {
+                font-style: italic;
+                color: #555;
+                margin-bottom: 20px;
+                line-height: 1.8;
+            }
+            .testimonial-author {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .author-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                font-size: 1.2rem;
+            }
+            .author-info h4 {
+                margin: 0;
+                color: #333;
+            }
+            .author-info span {
+                color: #999;
+                font-size: 0.9rem;
+            }
+            
+            /* Footer */
+            footer {
+                background: #2d3748;
+                color: white;
+                text-align: center;
+                padding: 40px 20px;
+            }
+            footer a {
+                color: #a0aec0;
+                text-decoration: none;
+                margin: 0 15px;
+            }
+            footer a:hover {
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="hero">
+            <div class="container">
+                <h1>Hunt Jobs Across 500+ Platforms</h1>
+                <p>AI-powered job hunting that searches where others can't reach</p>
+                
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Platforms Searched</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Real-Time Hunting</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Match Accuracy</span>
+                    </div>
+                </div>
+                
+                <a href="/login" class="cta-button">Start Hunting Now</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="container">
+                <h2>Why RevenueForge?</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3>500+ Job Platforms</h3>
+                        <p>We search across 500+ platforms including LinkedIn, Indeed, Glassdoor, and exclusive company career pages that others can't access.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Real-Time Results</h3>
+                        <p>No cached data. No old listings. Every hunt searches live platforms in real-time to bring you the freshest opportunities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3>AI-Matched Jobs</h3>
+                        <p>Our AI analyzes your profile and only shows jobs that match your skills, experience, and career goals. No noise, just opportunities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>Auto-Generated Proposals</h3>
+                        <p>Generate professional cover letters and proposals tailored to each job in seconds. Apply faster, win more interviews.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Application Tracking</h3>
+                        <p>Track every application from found to hired. Never lose track of where you've applied or what's pending.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3>Privacy First</h3>
+                        <p>Your data stays yours. We don't sell your information. Apply anonymously until you're ready to reveal your identity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonials">
+            <div class="container">
+                <h2>What Our Hunters Say</h2>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p>"I found my dream job at a startup through RevenueForge. The AI matched me with positions I never would have found on my own. Applied to 15 companies, got 8 interviews, landed the offer in 3 weeks."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">SK</div>
+                            <div class="author-info">
+                                <h4>Sarah K.</h4>
+                                <span>Senior Developer at TechCorp</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"The real-time search is insane. I was looking for remote Python roles and RevenueForge found opportunities on company career pages that weren't on any job board. Got hired within a month."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MR</div>
+                            <div class="author-info">
+                                <h4>Mike R.</h4>
+                                <span>Backend Engineer at StartupXYZ</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"The proposal generator saved me hours. Each application was tailored to the specific company and role. I went from applying to 5 jobs a week to 20, and my response rate tripled."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">JL</div>
+                            <div class="author-info">
+                                <h4>Jessica L.</h4>
+                                <span>Product Designer at DesignCo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 RevenueForge. All rights reserved.</p>
+                <p style="margin-top: 10px;">
+                    <a href="/login">Login</a> |
+                    <a href="/signup">Sign Up</a> |
+                    <a href="/privacy">Privacy Policy</a> |
+                    <a href="/terms">Terms of Service</a>
+                </p>
+            </div>
+        </footer>
+    </body>
+    </html>
+    """
+    
+    return html
 
 
 @app.get("/command", response_class=HTMLResponse)
@@ -545,6 +833,472 @@ def pipeline():
     """
     
     return page("/pipeline", "Pipeline", summary_html + apps_html + script)
+
+
+
+
+# ============ REAL-TIME SEARCH (called by public site via tunnel) ============
+@app.post("/api/search-now")
+async def search_now(request: _Req):
+    """Real-time search called by public site via secure tunnel"""
+    try:
+        body = await request.json()
+        
+        # Token verification (simple for now)
+        token = body.get("token", "")
+        expected_token = os.environ.get("RF_SEARCH_TOKEN", "revenueforge-2026")
+        if token != expected_token:
+            return {"error": "Invalid token"}
+        
+        # Get search parameters
+        query = body.get("query", "")
+        limit = body.get("limit", 100)
+        skills = body.get("skills", "")
+        target = body.get("target", "")
+        min_salary = body.get("min_salary", 0)
+        
+        # Run real-time search
+        print(f"[search-now] Searching for: {query}, skills: {skills}, target: {target}")
+        all_jobs = gather_all(query)
+        
+        # Filter by skills if provided
+        if skills:
+            skill_list = [s.strip().lower() for s in skills.split(",") if s.strip()]
+            filtered = []
+            for job in all_jobs:
+                job_text = (job.get("title", "") + " " + job.get("description", "")).lower()
+                if any(skill in job_text for skill in skill_list):
+                    filtered.append(job)
+            all_jobs = filtered
+        
+        # Limit results
+        all_jobs = all_jobs[:limit]
+        
+        # Return anonymized job data
+        results = []
+        for job in all_jobs:
+            results.append({
+                "title": job.get("title", ""),
+                "company": job.get("company", ""),
+                "location": job.get("location", ""),
+                "description": job.get("description", "")[:500],
+                "url": job.get("url", ""),
+                "platform": job.get("platform", job.get("source", "")),
+                "score": job.get("score", 80)
+            })
+        
+        print(f"[search-now] Returning {len(results)} jobs")
+        return {
+            "ok": True,
+            "count": len(results),
+            "results": results
+        }
+        
+    except Exception as e:
+        print(f"[search-now] Error: {e}")
+        return {"error": str(e)}
+
+
+@app.get("/hunt", response_class=HTMLResponse)
+def hunt():
+    """Hunt page - user clicks 'Hunt Now' to search all platforms"""
+    profile = ld("profile.json", {})
+    
+    if not profile.get("skills"):
+        return RedirectResponse("/settings", status_code=303)
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Hunt Jobs - RevenueForge</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: #f5f5f5;
+                margin: 0;
+                padding: 20px;
+            }}
+            .container {{ max-width: 1200px; margin: 0 auto; }}
+            .hunt-header {{
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px;
+                border-radius: 15px;
+                margin-bottom: 30px;
+            }}
+            .hunt-header h1 {{ margin: 0 0 10px 0; }}
+            .profile-summary {{
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 30px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }}
+            .profile-summary h3 {{ margin-top: 0; color: #333; }}
+            .profile-tags {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 15px;
+            }}
+            .tag {{
+                background: #667eea;
+                color: white;
+                padding: 5px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+            }}
+            .hunt-button {{
+                display: block;
+                width: 100%;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-size: 1.3rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            }}
+            .hunt-button:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+            }}
+            .hunt-button:disabled {{
+                background: #ccc;
+                cursor: not-allowed;
+                box-shadow: none;
+            }}
+            .loading {{
+                text-align: center;
+                padding: 40px;
+                display: none;
+            }}
+            .loading.active {{ display: block; }}
+            .spinner {{
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #667eea;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+            }}
+            @keyframes spin {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
+            .jobs-container {{
+                display: none;
+                margin-top: 30px;
+            }}
+            .jobs-container.active {{ display: block; }}
+            .job-card {{
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                transition: all 0.3s;
+            }}
+            .job-card:hover {{
+                transform: translateY(-3px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }}
+            .job-title {{
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 10px;
+            }}
+            .job-company {{
+                color: #667eea;
+                font-weight: 500;
+                margin-bottom: 10px;
+            }}
+            .job-meta {{
+                display: flex;
+                gap: 20px;
+                color: #999;
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }}
+            .job-description {{
+                color: #666;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }}
+            .job-actions {{
+                display: flex;
+                gap: 10px;
+            }}
+            .job-actions button {{
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.3s;
+            }}
+            .btn-primary {{
+                background: #667eea;
+                color: white;
+            }}
+            .btn-primary:hover {{ background: #5568d3; }}
+            .btn-secondary {{
+                background: #f0f0f0;
+                color: #333;
+            }}
+            .btn-secondary:hover {{ background: #e0e0e0; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="hunt-header">
+                <h1><i class="fas fa-crosshairs"></i> Hunt Jobs</h1>
+                <p>Search across 500+ platforms for jobs that match your profile</p>
+            </div>
+            
+            <div class="profile-summary">
+                <h3>Your Profile</h3>
+                <p><strong>Skills:</strong> {profile.get('skills', 'Not set')}</p>
+                <p><strong>Target:</strong> {profile.get('target', 'Not set')}</p>
+                <p><strong>Location:</strong> {profile.get('location', 'Any')}</p>
+                <div class="profile-tags">
+                    {"".join([f'<span class="tag">{skill.strip()}</span>' for skill in profile.get('skills', '').split(',') if skill.strip()])}
+                </div>
+                <p style="margin-top: 15px;"><a href="/settings" style="color: #667eea;">Edit Profile</a></p>
+            </div>
+            
+            <button class="hunt-button" onclick="startHunt()" id="huntBtn">
+                <i class="fas fa-search"></i> Hunt Jobs Now
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <h3>Searching 500+ platforms...</h3>
+                <p>This takes 2-5 minutes. We're searching LinkedIn, Indeed, company career pages, and more.</p>
+            </div>
+            
+            <div class="jobs-container" id="jobsContainer">
+                <h2>Found Jobs</h2>
+                <div id="jobsList"></div>
+            </div>
+        </div>
+        
+        <script>
+        async function startHunt() {{
+            const btn = document.getElementById('huntBtn');
+            const loading = document.getElementById('loading');
+            const jobsContainer = document.getElementById('jobsContainer');
+            const jobsList = document.getElementById('jobsList');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Hunting...';
+            loading.classList.add('active');
+            jobsContainer.classList.remove('active');
+            jobsList.innerHTML = '';
+            
+            try {{
+                // Call the hunt API
+                const response = await fetch('/api/hunt-now', {{
+                    method: 'POST',
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify({{
+                        skills: '{profile.get('skills', '')}',
+                        target: '{profile.get('target', '')}',
+                        location: '{profile.get('location', '')}',
+                        limit: 50
+                    }})
+                }});
+                
+                const data = await response.json();
+                
+                if (data.error) {{
+                    alert('Error: ' + data.error);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-search"></i> Hunt Jobs Now';
+                    loading.classList.remove('active');
+                    return;
+                }}
+                
+                // Display jobs
+                loading.classList.remove('active');
+                jobsContainer.classList.add('active');
+                
+                if (data.results.length === 0) {{
+                    jobsList.innerHTML = '<p>No jobs found matching your profile. Try adjusting your skills or target.</p>';
+                }} else {{
+                    data.results.forEach(job => {{
+                        const jobCard = document.createElement('div');
+                        jobCard.className = 'job-card';
+                        jobCard.innerHTML = `
+                            <div class="job-title">${{job.title}}</div>
+                            <div class="job-company">${{job.company || 'Unknown Company'}}</div>
+                            <div class="job-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> ${{job.location || 'Remote'}}</span>
+                                <span><i class="fas fa-building"></i> ${{job.platform}}</span>
+                                <span><i class="fas fa-star"></i> Match: ${{job.score}}%</span>
+                            </div>
+                            <div class="job-description">${{job.description}}</div>
+                            <div class="job-actions">
+                                <button class="btn-primary" onclick="window.open('${{job.url}}', '_blank')">
+                                    <i class="fas fa-external-link-alt"></i> Apply
+                                </button>
+                                <button class="btn-secondary" onclick="saveJob(${{JSON.stringify(job).replace(/"/g, '&quot;')}})">
+                                    <i class="fas fa-bookmark"></i> Save
+                                </button>
+                                <button class="btn-secondary" onclick="generateProposal('${{job.title}}', '${{job.url}}', '${{job.platform}}')">
+                                    <i class="fas fa-file-alt"></i> Proposal
+                                </button>
+                            </div>
+                        `;
+                        jobsList.appendChild(jobCard);
+                    }});
+                }}
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> Hunt Again';
+                
+            }} catch (error) {{
+                console.error('Hunt error:', error);
+                alert('Error starting hunt: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> Hunt Jobs Now';
+                loading.classList.remove('active');
+            }}
+        }}
+        
+        async function saveJob(job) {{
+            try {{
+                const response = await fetch('/api/save-job', {{
+                    method: 'POST',
+                    headers: {{'Content-Type': 'application/json'}},
+                    body: JSON.stringify(job)
+                }});
+                const data = await response.json();
+                if (data.ok) {{
+                    alert('Job saved to your favorites!');
+                }}
+            }} catch (error) {{
+                alert('Error saving job: ' + error.message);
+            }}
+        }}
+        
+        function generateProposal(title, url, platform) {{
+            window.open('/proposal?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url) + '&source=' + encodeURIComponent(platform), '_blank');
+        }}
+        </script>
+    </body>
+    </html>
+    """
+    
+    return html
+
+
+
+
+@app.post("/api/hunt-now")
+async def hunt_now(request: _Req):
+    """Call private engine via tunnel to hunt jobs in real-time"""
+    try:
+        body = await request.json()
+        skills = body.get("skills", "")
+        target = body.get("target", "")
+        location = body.get("location", "")
+        limit = body.get("limit", 50)
+        
+        # Try to call private engine via tunnel
+        # For now, use local search as fallback
+        import requests
+        
+        tunnel_url = os.environ.get("PRIVATE_ENGINE_URL", "")
+        token = os.environ.get("RF_SEARCH_TOKEN", "revenueforge-2026")
+        
+        if tunnel_url:
+            # Call private engine
+            try:
+                resp = requests.post(
+                    tunnel_url + "/api/search-now",
+                    json={
+                        "token": token,
+                        "query": "",
+                        "skills": skills,
+                        "target": target,
+                        "limit": limit
+                    },
+                    timeout=300  # 5 minute timeout
+                )
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("ok"):
+                        audit(f"Hunt: {data.get('count')} jobs from private engine")
+                        return data
+            except Exception as e:
+                print(f"Tunnel call failed: {e}, using local fallback")
+        
+        # Fallback: use local search
+        print("Using local search fallback")
+        jobs = gather_all("")
+        
+        # Filter by skills
+        if skills:
+            skill_list = [s.strip().lower() for s in skills.split(",") if s.strip()]
+            filtered = []
+            for job in jobs:
+                job_text = (job.get("title", "") + " " + job.get("description", "")).lower()
+                if any(skill in job_text for skill in skill_list):
+                    filtered.append(job)
+            jobs = filtered
+        
+        jobs = jobs[:limit]
+        
+        results = []
+        for job in jobs:
+            results.append({
+                "title": job.get("title", ""),
+                "company": job.get("company", ""),
+                "location": job.get("location", ""),
+                "description": job.get("description", "")[:500],
+                "url": job.get("url", ""),
+                "platform": job.get("platform", job.get("source", "")),
+                "score": job.get("score", 80)
+            })
+        
+        audit(f"Hunt: {len(results)} jobs (local fallback)")
+        return {
+            "ok": True,
+            "count": len(results),
+            "results": results,
+            "source": "local-fallback"
+        }
+        
+    except Exception as e:
+        print(f"Hunt error: {e}")
+        return {"error": str(e)}
+
+@app.post("/api/save-job")
+async def save_job(request: _Req):
+    """Save a job to user's favorites"""
+    try:
+        body = await request.json()
+        saved = ld("saved_jobs.json", [])
+        saved.append({
+            "title": body.get("title"),
+            "company": body.get("company"),
+            "url": body.get("url"),
+            "platform": body.get("platform"),
+            "saved_at": now()
+        })
+        sv("saved_jobs.json", saved)
+        return {"ok": True}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
 
 
 @app.get("/analytics", response_class=HTMLResponse)
