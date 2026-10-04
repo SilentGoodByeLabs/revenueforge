@@ -16,6 +16,47 @@ try:
 except Exception:
     HS = None
 
+
+
+# ============ PUSH PIPELINE (receive jobs from private worker) ============
+@app.post("/jobs/ingest")
+async def jobs_ingest(request: _Req):
+    """Receive jobs pushed from private worker"""
+    try:
+        body = await request.json()
+        jobs = body.get("jobs", [])
+        source = body.get("source", "unknown")
+        
+        # Save to persistent file (survives within deploy cycle)
+        pushed_file = ROOT / "data" / "pushed_jobs.json"
+        pushed_file.parent.mkdir(exist_ok=True)
+        
+        # Merge with existing pushed jobs (dedupe by URL)
+        existing = []
+        if pushed_file.exists():
+            try:
+                existing = json.loads(pushed_file.read_text())
+            except:
+                existing = []
+        
+        # Add new jobs (dedupe)
+        seen_urls = {j.get("url") for j in existing if j.get("url")}
+        for j in jobs:
+            url = j.get("url")
+            if url and url not in seen_urls:
+                existing.append(j)
+                seen_urls.add(url)
+        
+        # Keep last 500 jobs
+        existing = existing[-500:]
+        
+        pushed_file.write_text(json.dumps(existing, indent=2))
+        
+        audit(f"Pushed {len(jobs)} jobs from {source}, total now: {len(existing)}")
+        return {"ok": True, "received": len(jobs), "total": len(existing)}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
 app = FastAPI(title="RevenueForge Control Center")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
@@ -730,56 +771,57 @@ async def api_engine_toggle(request: _Req):
 
 @app.get("/api/search-hiring")
 def api_search_hiring(q: str = "", limit: int = 100, email: str = ""):
-    """Return jobs from cache with smart filtering"""
+    """Return jobs from pushed jobs (first) or cached search"""
     import json as _json
     from pathlib import Path as _Path
     
-    cache_file = _Path("data/last_search.json")
-    if not cache_file.exists():
-        return {"results": [], "count": 0, "message": "Cache not yet populated"}
+    # Try to read pushed jobs first
+    pushed_file = ROOT / "data" / "pushed_jobs.json"
+    jobs = []
     
-    try:
-        data = _json.loads(cache_file.read_text())
-        jobs = data.get("jobs", [])
+    if pushed_file.exists():
+        try:
+            jobs = _json.loads(pushed_file.read_text())
+        except:
+            jobs = []
+    
+    # If no pushed jobs, fall back to live search
+    if not jobs:
+        jobs = gather(q)
+    
+    # Filter by query if provided
+    if q:
+        q_lower = q.lower()
+        query_words = q_lower.split()
+        filtered = []
+        for j in jobs:
+            searchable = " ".join([
+                j.get("title", ""),
+                j.get("description", ""),
+                j.get("source", ""),
+                j.get("platform", "")
+            ]).lower()
+            if any(word in searchable for word in query_words):
+                filtered.append(j)
         
-        # Smart filtering - if query provided, use it; otherwise return all
-        if q:
-            q_lower = q.lower()
-            # Broader matching - check title, description, source, platform
-            filtered = []
-            for j in jobs:
-                searchable = " ".join([
-                    j.get("title", ""),
-                    j.get("description", ""),
-                    j.get("source", ""),
-                    j.get("platform", "")
-                ]).lower()
-                
-                # Match if any word in query appears in job
-                query_words = q_lower.split()
-                if any(word in searchable for word in query_words):
-                    filtered.append(j)
-            
-            # If too few results, return all jobs (don't over-filter)
-            if len(filtered) < 10:
-                jobs = jobs[:limit]
-            else:
-                jobs = filtered[:limit]
-        else:
+        # If too few results, return all jobs
+        if len(filtered) < 10:
             jobs = jobs[:limit]
-        
-        platforms = list(set(j.get("platform", j.get("source", "?")) for j in jobs))
-        
-        return {
-            "results": jobs,
-            "count": len(jobs),
-            "cached": True,
-            "cache_time": data.get("time", ""),
-            "platforms": platforms,
-            "total_in_cache": len(data.get("jobs", []))
-        }
-    except Exception as e:
-        return {"results": [], "error": str(e)}
+        else:
+            jobs = filtered[:limit]
+    else:
+        jobs = jobs[:limit]
+    
+    platforms = list(set(j.get("platform", j.get("source", "?")) for j in jobs))
+    
+    return {
+        "results": jobs,
+        "count": len(jobs),
+        "cached": True,
+        "cache_time": "pushed",
+        "platforms": platforms,
+        "total_in_cache": len(jobs)
+    }
 
 
 @app.get("/api/my/products")
