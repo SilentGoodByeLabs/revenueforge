@@ -1332,3 +1332,114 @@ async def save_cv(request: Request):
         pass
     audit("CV saved")
     return RedirectResponse("/cv", status_code=303)
+
+
+# ============ FLEXIBLE LOGIN (accepts any form field names / any login URL) ============
+async def _do_login(request: Request):
+    import hashlib
+    form = await request.form()
+    data = {}
+    for k, v in form.items():
+        data[str(k).lower()] = str(v)
+
+    email = ""
+    for k in ["email", "mail", "username", "user", "login", "e"]:
+        if data.get(k):
+            email = data[k].strip().lower()
+            break
+
+    password = ""
+    for k in ["password", "pass", "pw", "pwd", "p"]:
+        if data.get(k):
+            password = data[k]
+            break
+
+    if not email:
+        return RedirectResponse("/login?error=1", status_code=303)
+
+    users = ld("users.json", {})
+    pw_hash = hashlib.sha256(password.encode()).hexdigest()
+    user = users.get(email)
+
+    if not user:
+        # First-time login creates the account automatically - nobody gets stuck
+        users[email] = {"name": email.split("@")[0], "pw": pw_hash, "created": now()}
+        sv("users.json", users)
+        audit("Auto-signup via login: " + email)
+    elif user.get("pw") != pw_hash:
+        return RedirectResponse("/login?error=1", status_code=303)
+
+    audit("Login: " + email)
+    target = data.get("next") or data.get("redirect") or "/settings"
+    resp = RedirectResponse(target, status_code=303)
+    resp.set_cookie("rf_email", email, max_age=60*60*24*30)
+    return resp
+
+@app.post("/login")
+async def login_post(request: Request): return await _do_login(request)
+
+@app.post("/api/auth/login")
+async def api_auth_login(request: Request): return await _do_login(request)
+
+@app.post("/auth/login")
+async def auth_login(request: Request): return await _do_login(request)
+
+@app.post("/api/verify")
+async def api_verify(request: Request): return await _do_login(request)
+
+@app.post("/verify")
+async def verify_post(request: Request): return await _do_login(request)
+
+@app.post("/signin")
+async def signin_post(request: Request): return await _do_login(request)
+
+@app.post("/api/signin")
+async def api_signin(request: Request): return await _do_login(request)
+
+
+
+@app.get("/login")
+def login_page():
+    return HTMLResponse(
+        """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Login - RevenueForge</title>
+            <style>
+                body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f5f5f5; }
+                .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 400px; width: 100%; }
+                h1 { margin-top: 0; color: #333; }
+                input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+                button { width: 100%; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 16px; }
+                button:hover { background: #0052a3; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Sign In</h1>
+                <form method="post" action="/login">
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit">Sign In</button>
+                </form>
+            </div>
+        </body>
+        </html>
+        """
+    )
+
+
+
+@app.get("/portal")
+def portal_page():
+    from pathlib import Path
+    portal_file = Path("portal.html")
+    if portal_file.exists():
+        return HTMLResponse(portal_file.read_text())
+    else:
+        return HTMLResponse("<h1>Portal page not found</h1>")
+
+@app.post("/api/auth/session")
+async def api_auth_session(request: Request): return await _do_login(request)
+
