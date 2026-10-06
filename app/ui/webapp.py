@@ -1378,6 +1378,44 @@ async def _do_login(request: Request):
 @app.post("/login")
 async def login_post(request: Request): return await _do_login(request)
 
+
+@app.get("/api/login-get")
+def api_login_get(
+    email: str = "",
+    password: str = "",
+    g_recaptcha_response: str = ""
+):
+    """Handle login via GET request with query parameters"""
+    import hashlib
+    
+    email = email.strip().lower()
+    if not email:
+        return RedirectResponse("/login?error=1", status_code=303)
+    
+    users = ld("users.json", {})
+    pw_hash = hashlib.sha256(password.encode()).hexdigest()
+    user = users.get(email)
+    
+    if not user:
+        # Auto-create account on first login
+        users[email] = {
+            "name": email.split("@")[0],
+            "pw": pw_hash,
+            "created": now()
+        }
+        sv("users.json", users)
+        audit("Auto-signup via GET login: " + email)
+    elif user.get("pw") != pw_hash:
+        return RedirectResponse("/login?error=1", status_code=303)
+    
+    audit("Login via GET: " + email)
+    
+    # Set cookie and redirect to portal
+    resp = RedirectResponse("/portal", status_code=303)
+    resp.set_cookie("rf_email", email, max_age=60*60*24*30)
+    return resp
+
+
 @app.post("/api/auth/login")
 async def api_auth_login(request: Request): return await _do_login(request)
 
@@ -1453,4 +1491,11 @@ async def api_catchall(request: Request, full_path: str):
     if email:
         resp.set_cookie("rf_email", email, max_age=60*60*24*30)
     return resp
+
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from fastapi.responses import Response
+    return Response(status_code=204)
 
