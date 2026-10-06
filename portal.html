@@ -114,8 +114,10 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
 <div id="view-eng" style="display:none"><div class="crumbs">Dashboard / My Engine</div><h1>My Engine</h1>
   <div class="card"><h2><i class="fa-solid fa-robot"></i> Engine configuration</h2>
     <label>Mode</label><select id="mode"><option>Find me jobs</option><option>Sell my services</option><option>Both</option></select>
-    <label>Skills</label><textarea id="skills" rows="3" placeholder="your skills / work type"></textarea>
-    <label>Target</label><input id="target" placeholder="who you want to work for">
+    <label>Skills</label><textarea id="skills" rows="3" placeholder="e.g. python, automation, web development, data analysis, devops"></textarea>
+    <p class="muted" style="margin:4px 0 12px;font-size:12px">💡 Tip: Use broad skill keywords (python, javascript, design, marketing) to match more jobs across all 135 sources.</p>
+    <label>Target</label><input id="target" placeholder="e.g. startups, agencies, remote companies, tech">
+    <p class="muted" style="margin:4px 0 12px;font-size:12px">💡 Tip: Target market filters by company type. Leave broad for maximum results.</p>
     <button class="btn btn-p" id="saveBtn" style="margin-top:18px"><i class="fa-solid fa-save"></i> Save settings</button>
     <span id="saveMsg" class="muted" style="margin-left:10px"></span>
   </div>
@@ -544,8 +546,7 @@ document.addEventListener('click',function(e){
       var list=d.results||d.jobs||null;
       if(list&&list.length){
         for(var i=0;i<list.length;i++){list[i].match=score(list[i],c);}
-        var matched=list.filter(function(j){return j.match>0});
-        var use=matched.length?matched:list;
+        var use=list;
         use.sort(function(x,y){return (y.match||0)-(x.match||0)||(y.score||0)-(x.score||0)});
         if(d.results)d.results=use;
         if(d.jobs)d.jobs=use;
