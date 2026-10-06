@@ -53,7 +53,8 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
 .linkedin-warn{display:inline-block;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;margin-left:6px}
 .sources-pill{display:inline-block;background:#e0f2fe;color:#075985;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
 </style>
-<script>
+<script>function $(id){return document.getElementById(id);}
+
 function $(id){return document.getElementById(id);}
 
 (function(){
@@ -68,7 +69,7 @@ function $(id){return document.getElementById(id);}
       }
     });
   };
-  new MutationObserver(markLinkedIn).observe(document.body,{childList:true,subtree:true});
+  if(document.body)new MutationObserver(markLinkedIn).observe(document.body,{childList:true,subtree:true});
   setTimeout(markLinkedIn, 1000);
   setTimeout(markLinkedIn, 3000);
 })();
