@@ -71,7 +71,7 @@ function $(id){return document.getElementById(id);}
       }
     });
   };
-  if(document.body)if(document.body)new MutationObserver(markLinkedIn).observe(document.body,{childList:true,subtree:true});
+  if(document.body)if(document.body)if(document.body){new MutationObserver(markLinkedIn).observe(document.body,{childList:true,subtree:true});}
   setTimeout(markLinkedIn, 1000);
   setTimeout(markLinkedIn, 3000);
 })();
