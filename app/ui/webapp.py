@@ -1411,7 +1411,7 @@ def api_login_get(
     audit("Login via GET: " + email)
     
     # Set cookie and redirect to portal
-    resp = RedirectResponse("/portal", status_code=303)
+    resp = RedirectResponse("/portal?email=" + email, status_code=303)
     resp.set_cookie("rf_email", email, max_age=60*60*24*30)
     return resp
 
@@ -1499,3 +1499,22 @@ def favicon():
     from fastapi.responses import Response
     return Response(status_code=204)
 
+
+
+@app.get("/login.html", include_in_schema=False)
+def login_html_page():
+    from pathlib import Path as _P
+    f = _P("login.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>login.html missing</h1>")
+
+@app.get("/contact.html", include_in_schema=False)
+def contact_html_page():
+    from pathlib import Path as _P
+    f = _P("contact.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>contact.html missing</h1>")
+
+@app.get("/marketplace.html", include_in_schema=False)
+def marketplace_html_page():
+    from pathlib import Path as _P
+    f = _P("marketplace.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>marketplace.html missing</h1>")
