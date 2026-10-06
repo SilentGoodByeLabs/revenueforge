@@ -1445,69 +1445,6 @@ async def api_auth_session(request: Request): return await _do_login(request)
 
 
 
-# ============ LOGIN SAFETY NET (any destination, any API path) ============
-async def _read_creds(request: Request):
-    ct = request.headers.get("content-type", "")
-    data = {}
-    if "json" in ct:
-        try:
-            raw = await request.json()
-            data = {str(k).lower(): str(v) for k, v in raw.items()}
-        except Exception:
-            data = {}
-    else:
-        try:
-            form = await request.form()
-            data = {str(k).lower(): str(v) for k, v in form.items()}
-        except Exception:
-            data = {}
-    email = ""
-    for k in ["email", "mail", "username", "user", "login", "e"]:
-        if data.get(k):
-            email = data[k].strip().lower()
-            break
-    password = ""
-    for k in ["password", "pass", "pw", "pwd", "p"]:
-        if data.get(k):
-            password = data[k]
-            break
-    return email, password
-
-
-async def _record_login(email, password):
-    import hashlib
-    if not email:
-        return False
-    users = ld("users.json", {})
-    pw_hash = hashlib.sha256(password.encode()).hexdigest()
-    if email not in users:
-        users[email] = {"name": email.split("@")[0], "pw": pw_hash, "created": now()}
-        sv("users.json", users)
-        audit("Auto-signup: " + email)
-    return True
-
-
-@app.post("/portal")
-async def portal_post(request: Request):
-    email, password = await _read_creds(request)
-    await _record_login(email, password)
-    resp = JSONResponse({"ok": True, "email": email, "message": "signed in"})
-    if email:
-        resp.set_cookie("rf_email", email, max_age=60*60*24*30)
-    return resp
-
-
-# Dashboard aliases - wherever login redirects, portal loads
-def _portal_alias():
-    from pathlib import Path as _P
-    f = _P("portal.html")
-    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>Portal missing</h1>")
-
-for _alias in ["/dashboard", "/dash", "/app", "/home", "/my", "/brief", "/engine", "/account", "/me", "/portal.html", "/signin", "/signup"]:
-    app.add_api_route(_alias, _portal_alias, methods=["GET"], include_in_schema=False)
-
-
-# Last-resort: any unknown POST under /api/ acts as login and answers JSON
 @app.post("/api/{full_path:path}", include_in_schema=False)
 async def api_catchall(request: Request, full_path: str):
     email, password = await _read_creds(request)
