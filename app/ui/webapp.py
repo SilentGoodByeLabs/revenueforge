@@ -112,7 +112,7 @@ def page(path, title, body):
 <header><div class="brand"><i class="fa-solid fa-cubes"></i> <b>RevenueForge</b> <span>CONTROL CENTER</span></div>
 <div class="badge"><i class="fa-solid fa-house-laptop"></i> Local &middot; Private</div></header>
 <nav>{nav}</nav><main><h1>{title}</h1>{body}</main>
-<a class="fab" href="https://silentgoodbyelabs.github.io/revenueforge" target="_blank"><i class="fa-solid fa-bullhorn"></i> Advertise</a></body></html>"""
+</body></html>"""
 
 def card(ic, t, inner): return f'<div class="card"><h3><i class="fa-solid {ic}"></i> {t}</h3>{inner}</div>'
 def good(t): return f'<p class="ok"><i class="fa-solid fa-circle-check"></i> {t}</p>'
@@ -863,12 +863,29 @@ def _proxy(path, method="GET", body=None):
         return {"ok": False, "error": str(e)}
 
 @app.get("/api/sub/{email}")
-def api_sub(email: str): return _proxy("/api/sub/" + email)
+def api_sub(email: str):
+    """Get subscription status from local data"""
+    import json, os
+    profile_path = "data/profile.json"
+    if os.path.exists(profile_path):
+        with open(profile_path) as f:
+            profile = json.load(f)
+        return {
+            "ok": True,
+            "plan": profile.get("plan", "free"),
+            "paid": profile.get("paid", False),
+            "trial_end": profile.get("trial_end", ""),
+            "email": email
+        }
+    return {"ok": True, "plan": "free", "paid": False, "email": email}
 
 @app.post("/api/save-profile")
 async def api_save_profile(request: _Req):
-    b = await request.json(); sv("profile.json", b)
-    return _proxy("/api/save-profile", "POST", b)
+    """Save profile locally"""
+    b = await request.json()
+    sv("data/profile.json", b)
+    audit("Profile saved: " + b.get("email", "unknown"))
+    return {"ok": True, "message": "Profile saved"}
 
 @app.post("/api/engine-toggle")
 async def api_engine_toggle(request: _Req):
@@ -944,7 +961,15 @@ def api_search_hiring(q: str = "", limit: int = 100, email: str = ""):
 
 
 @app.get("/api/my/products")
-def api_my_products(email: str = ""): return _proxy("/api/my/products?email=" + email)
+def api_my_products(email: str = ""):
+    """Get user's published services from local data"""
+    import json, os
+    products_path = "data/products.json"
+    if os.path.exists(products_path):
+        with open(products_path) as f:
+            products = json.load(f)
+        return {"ok": True, "products": products.get(email, [])}
+    return {"ok": True, "products": []}
 
 @app.post("/api/my/products")
 async def api_my_products_post(request: _Req):
