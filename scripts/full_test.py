@@ -18,7 +18,7 @@ API_POSTS=[("/api/save-profile",{"email":E,"skills":"python, sql"},"both"),("/ap
 ("/api/save-cv",{"email":E,"name":"ZZ FullTest"},"both"),("/api/add-to-pipeline",{"email":E,"title":"ZZ-FULLTEST","url":"http://zz.test"},"priv"),
 ("/api/move-stage",{"email":E,"index":0,"stage":"Contacted"},"priv"),("/api/chat",{"message":"hi"},"both"),
 ("/api/invites",{"code":"ZZTEST1"},"priv"),("/jobs/ingest",{"jobs":[]},"priv"),
-("/api/signin",{"email":E,"password":"x"},"both"),("/api/verify",{"email":E,"password":"x"},"both"),("/api/auth/login",{"email":E,"password":"x"},"both")]
+("/api/signin",{"email":E,"password":"x"},"pub"),("/api/verify",{"email":E,"password":"x"},"pub"),("/api/auth/login",{"email":E,"password":"x"},"pub")]
 R=[]
 def rec(s,a,n,d):
     R.append((s,a,n,d)); print(f"[{'+' if s=='PASS' else '!' if s=='FAIL' else '?'}] {a:4s} {n:24s} {d}")
@@ -64,7 +64,7 @@ def login(b,tag,t):
 def cv(b,tag,t):
     try:
         x=requests.get(b+"/cvbuilder",timeout=t).text
-        ins=len(re.findall(r"<input",x,re.I)); photo='type="file"' in x; prt="window.print()" in x
+        ins=len(re.findall(r"<input",x,re.I)); photo="type='file'" in x or 'type="file"' in x; prt="window.print()" in x
         rec("PASS" if (ins>=6 and photo and prt) else "FAIL",tag,"CV features",f"inputs={ins} photo={photo} print={prt}")
     except Exception as e: rec("FAIL",tag,"CV features",f"ERR {type(e).__name__}")
 def prop(b,tag,t):

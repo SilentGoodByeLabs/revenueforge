@@ -2,7 +2,7 @@ import os, re, json, secrets
 from datetime import datetime
 from pathlib import Path
 from fastapi import Request, FastAPI, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 def now():
@@ -1299,6 +1299,67 @@ def cvbuilder(job: str = "", req: str = ""):
     
     html += "<button type='submit' style='padding:12px 24px;background:#3498db;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px'>💾 Save CV</button> "
     html += "<a href='/cv' style='margin-left:20px;padding:12px 24px;background:#2ecc71;color:white;text-decoration:none;border-radius:5px'>👁️ Preview CV</a>"
+    
+    html += """
+    <div style='margin-top:30px;display:flex;gap:15px;flex-wrap:wrap'>
+      <button type='button' onclick='showPreview()' style='padding:14px 28px;background:#0066cc;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600'>
+        <i class='fa-solid fa-eye'></i> Preview CV
+      </button>
+      <button type='button' onclick='printCV()' style='padding:14px 28px;background:#16a34a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600'>
+        <i class='fa-solid fa-print'></i> Print / Save PDF
+      </button>
+    </div>
+    """
+    
+    # Add modal + JavaScript
+    html += """
+    <div id='cvModal' style='display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;padding:40px 20px'>
+      <div style='background:white;max-width:850px;margin:0 auto;padding:50px;border-radius:10px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.3)'>
+        <button onclick='document.getElementById("cvModal").style.display="none"' style='position:absolute;top:15px;right:15px;background:#e2e8f0;border:0;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px'>Close</button>
+        <div id='cvContent'></div>
+        <button onclick='window.print()' style='margin-top:30px;padding:14px 28px;background:#16a34a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px'>Print Now</button>
+      </div>
+    </div>
+    <style>
+      @media print {
+        body > *:not(#cvModal) { display: none !important; }
+        #cvModal { position: static !important; background: white !important; padding: 0 !important; }
+        #cvModal button { display: none !important; }
+      }
+    </style>
+    <script>
+    function showPreview() {
+      var name = document.querySelector('input[name="name"]').value || 'Your Name';
+      var email = document.querySelector('input[name="email"]').value || '';
+      var phone = document.querySelector('input[name="phone"]').value || '';
+      var city = document.querySelector('input[name="city"]').value || '';
+      var links = document.querySelector('input[name="links"]').value || '';
+      var summary = document.querySelector('textarea[name="summary"]').value || '';
+      var skills = document.querySelector('textarea[name="skills"]').value || '';
+      var exp = document.querySelector('textarea[name="experience"]').value || '';
+      var edu = document.querySelector('textarea[name="education"]').value || '';
+      var certs = document.querySelector('textarea[name="certs"]').value || '';
+      
+      var html = '<h1 style="margin:0 0 10px 0;font-size:36px;color:#0f172a;border-bottom:3px solid #0066cc;padding-bottom:15px">' + name + '</h1>';
+      html += '<p style="margin:0 0 30px 0;font-size:16px;color:#475569">' + (email ? email + ' | ' : '') + (phone ? phone + ' | ' : '') + city + '</p>';
+      
+      if (summary) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Professional Summary</h2><p style="line-height:1.7">' + summary + '</p>';
+      if (skills) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Skills</h2><p style="line-height:1.7">' + skills + '</p>';
+      if (exp) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Experience</h2><div style="white-space:pre-line;line-height:1.8">' + exp + '</div>';
+      if (edu) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Education</h2><div style="white-space:pre-line;line-height:1.8">' + edu + '</div>';
+      if (certs) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Certifications</h2><div style="white-space:pre-line;line-height:1.8">' + certs + '</div>';
+      
+      document.getElementById('cvContent').innerHTML = html;
+      document.getElementById('cvModal').style.display = 'block';
+    }
+    
+    function printCV() {
+      showPreview();
+      setTimeout(function() { window.print(); }, 500);
+    }
+    </script>
+    """
+
     html += "</form></div>"
     
     html += "<script>function addBullet(txt){var b=document.getElementById('expbox');b.value = b.value + (b.value ? '\\n' : '') + txt;}</script>"
