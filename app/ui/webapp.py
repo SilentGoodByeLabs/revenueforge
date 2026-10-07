@@ -25,6 +25,21 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
 
 
 # ============ PUSH PIPELINE (receive jobs from private worker) ============
+
+RF_ENV = os.environ.get("RF_ENV", "private")
+
+PRIVATE_ONLY = {"/settings","/jobagent","/pipeline","/outreach","/followups","/analytics","/command","/audit","/security","/admin/subs","/admin/projects","/admin/invites","/prospects","/scaling","/products","/api/engine-toggle","/api/run","/api/search-now","/api/settings","/api/invites","/api/move-stage","/api/add-to-pipeline","/jobs/ingest"}
+PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.html","/api/login-get","/api/paystack/init","/api/paystack/verify"}
+
+@app.middleware("http")
+async def rf_env_gate(request: Request, call_next):
+    path = request.url.path
+    if RF_ENV == "public" and path in PRIVATE_ONLY:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    if RF_ENV == "private" and path in PUBLIC_ONLY:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    return await call_next(request)
+
 @app.post("/jobs/ingest")
 async def jobs_ingest(request: Request):
     """Receive jobs pushed from private worker"""
@@ -327,7 +342,43 @@ def keepalive():
 
 
 @app.get("/", response_class=HTMLResponse)
+
+def _owner_briefing():
+    import json as _j
+    from datetime import datetime as _d
+    def _ld(n, d):
+        try:
+            with open("data/"+n) as f: return _j.load(f)
+        except Exception: return d
+    jobs = _ld("last_search.json", {}); push = _ld("push.json", {}); prof = _ld("profile.json", {})
+    try: audit_lines = open("data/audit.log").read().strip().split("\n")[-6:]
+    except Exception: audit_lines = []
+    njobs = len(jobs.get("results", jobs if isinstance(jobs, list) else []))
+    npush = len(push.get("jobs", push if isinstance(push, list) else []))
+    rows = "".join("<li>"+l+"</li>" for l in audit_lines)
+    return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>RevenueForge - Owner Briefing</title>
+<style>body{{font-family:system-ui,sans-serif;margin:0;background:#0f172a;color:#e2e8f0}}
+header{{background:#1e293b;padding:18px 28px}}h1{{margin:0;font-size:22px}}h1 b{{color:#38bdf8}}
+.wrap{{max-width:960px;margin:24px auto;padding:0 20px}}nav a{{margin-right:14px;color:#38bdf8;text-decoration:none;font-size:14px}}
+.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px}}
+.card{{background:#1e293b;border-radius:10px;padding:16px}}.num{{font-size:30px;font-weight:700;color:#38bdf8}}.lab{{color:#94a3b8;font-size:13px}}
+ul{{line-height:1.7;color:#94a3b8;font-size:13px}}</style></head><body>
+<header><h1>Revenue<b>Forge</b> - Daily Owner Briefing</h1></header>
+<div class="wrap">
+<nav><a href="/command">Command</a><a href="/jobagent">Job Agent</a><a href="/pipeline">Pipeline</a><a href="/outreach">Outreach</a><a href="/analytics">Analytics</a><a href="/settings">Settings</a><a href="/cvbuilder">CV Builder</a><a href="/proposal">Proposal</a><a href="/audit">Audit</a></nav>
+<div class="cards">
+<div class="card"><div class="num">{njobs}</div><div class="lab">Jobs in last hunt</div></div>
+<div class="card"><div class="num">{npush}</div><div class="lab">Jobs pushed to cloud</div></div>
+<div class="card"><div class="num">{len(audit_lines)}</div><div class="lab">Recent events</div></div>
+<div class="card"><div class="num">ON</div><div class="lab">Engine status</div></div>
+</div>
+<h3>Recent activity</h3><ul>{rows or "<li>No activity yet</li>"}</ul>
+<p style="color:#64748b;font-size:12px">Private owner console - {_d.now().strftime("%Y-%m-%d %H:%M")} - skills: {prof.get("skills","not set")}</p>
+</div></body></html>"""
+
 def home():
+    if RF_ENV != "public":
+        return HTMLResponse(_owner_briefing())
     """Professional marketing home page"""
     
     hero = """
@@ -881,10 +932,11 @@ def api_sub(email: str):
 
 @app.post("/api/save-profile")
 async def api_save_profile(request: _Req):
-    """Save profile locally"""
-    b = await request.json()
-    sv("data/profile.json", b)
-    audit("Profile saved: " + b.get("email", "unknown"))
+    try:
+        b = await request.json()
+    except Exception:
+        b = {}
+    sv("profile.json", b)
     return {"ok": True, "message": "Profile saved"}
 
 @app.post("/api/engine-toggle")

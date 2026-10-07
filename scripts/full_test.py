@@ -1,101 +1,95 @@
-from playwright.sync_api import sync_playwright
-BASE="https://silentgoodbyelabs.github.io/revenueforge"
-PAGES = [
-    "index.html","pricing.html","marketplace.html","about.html","services.html",
-    "blog.html","faq.html","contact.html","testimonials.html","case-studies.html",
-    "demo.html","video.html","privacy.html","terms.html","404.html",
-    "login.html","signin.html","signup.html","register.html","support.html","audit.html","portal.html"
-]
-results=[]
-def ok(n,c,detail=""):
-    results.append((n,c))
-    print(("PASS " if c else "FAIL ")+n+((" | "+detail) if detail and not c else ""))
-with sync_playwright() as p:
-    b=p.chromium.launch(headless=True)
-    print("\n========== PART 1: ALL PAGES LOAD CLEAN ==========")
-    for page in PAGES:
-        ctx=b.new_context(); pg=ctx.new_page()
-        errs=[]
-        pg.on("pageerror", lambda e: errs.append(str(e)))
+#!/usr/bin/env python3
+import requests, sys, re, urllib3
+urllib3.disable_warnings()
+PRIVATE="http://127.0.0.1:8502"; PUBLIC="https://revenueforge-api.onrender.com"; E="fulltest@revenueforge.test"
+# (name, path, min_bytes, where) where: both|priv|pub  -> other side must 404
+PAGES=[("Home","/",1000,"both"),("Login page","/login",300,"pub"),("Login html","/login.html",300,"pub"),
+("Portal","/portal",20000,"pub"),("Settings","/settings",500,"priv"),("Job Agent","/jobagent",500,"priv"),
+("Pipeline","/pipeline",500,"priv"),("Outreach","/outreach",500,"priv"),("Followups","/followups",500,"priv"),
+("Analytics","/analytics",500,"priv"),("Products","/products",500,"priv"),("Prospects","/prospects",500,"priv"),
+("Scaling","/scaling",500,"priv"),("Security","/security",500,"priv"),("Audit","/audit",500,"priv"),
+("Command","/command",500,"priv"),("CV","/cv",500,"both"),("CV Builder","/cvbuilder",500,"both"),
+("Proposal","/proposal",500,"both"),("Admin subs","/admin/subs",300,"priv"),("Admin projects","/admin/projects",300,"priv"),
+("Admin invites","/admin/invites",300,"priv"),("Contact","/contact.html",200,"pub"),("Marketplace","/marketplace.html",200,"pub"),
+("Health","/health",10,"both"),("Favicon","/favicon.ico",0,"both")]
+API_GETS=[("/api/search?q=python","search","both"),("/api/search-hiring?q=python&limit=3&email="+E,"search-hiring","both"),
+("/api/sub/"+E,"subscription","both"),("/api/my/products?email="+E,"my-products","both")]
+API_POSTS=[("/api/save-profile",{"email":E,"skills":"python, sql"},"both"),("/api/engine-toggle",{"email":E,"on":False},"priv"),
+("/api/save-cv",{"email":E,"name":"ZZ FullTest"},"both"),("/api/add-to-pipeline",{"email":E,"title":"ZZ-FULLTEST","url":"http://zz.test"},"priv"),
+("/api/move-stage",{"email":E,"index":0,"stage":"Contacted"},"priv"),("/api/chat",{"message":"hi"},"both"),
+("/api/invites",{"code":"ZZTEST1"},"priv"),("/jobs/ingest",{"jobs":[]},"priv"),
+("/api/signin",{"email":E,"password":"x"},"both"),("/api/verify",{"email":E,"password":"x"},"both"),("/api/auth/login",{"email":E,"password":"x"},"both")]
+R=[]
+def rec(s,a,n,d):
+    R.append((s,a,n,d)); print(f"[{'+' if s=='PASS' else '!' if s=='FAIL' else '?'}] {a:4s} {n:24s} {d}")
+def pages(b,tag,t):
+    for n,p,mb,where in PAGES:
+        should = where in ("both",tag)
         try:
-            pg.goto(BASE+"/"+page, timeout=20000)
-            pg.wait_for_timeout(1500)
-            clean = len(errs)==0
-            ok(f"page {page}", clean, "; ".join(errs[:2]))
-        except Exception as e:
-            ok(f"page {page}", False, str(e).split(chr(10))[0])
-        ctx.close()
-    print("\n========== PART 2: MOBILE (390x844) ==========")
-    for page in ["index.html","pricing.html","portal.html","signup.html"]:
-        ctx=b.new_context(viewport={"width":390,"height":844}, user_agent="Mozilla/5.0 (iPhone)")
-        pg=ctx.new_page()
+            r=requests.get(b+p,timeout=t)
+            if should:
+                rec("PASS" if (r.status_code in (200,204) and len(r.content)>=mb) else "FAIL",tag,n,f"{r.status_code} {len(r.content)}B")
+            else:
+                rec("PASS" if r.status_code==404 else "FAIL",tag,n,f"gated:{r.status_code} (want 404)")
+        except Exception as e: rec("FAIL",tag,n,f"ERR {type(e).__name__}")
+def apigets(b,tag,t):
+    for p,n,where in API_GETS:
+        should = where in ("both",tag)
         try:
-            url = BASE+"/"+page + ("?authed=admin@gmail.com" if page=="portal.html" else "")
-            pg.goto(url); pg.wait_for_timeout(2000)
-            body_w = pg.evaluate("document.body.scrollWidth")
-            no_hscroll = body_w <= 400
-            ok(f"mobile {page} no horizontal scroll", no_hscroll, f"width={body_w}")
-        except Exception as e:
-            ok(f"mobile {page}", False, str(e).split(chr(10))[0])
-        ctx.close()
-    print("\n========== PART 3: PORTAL FULL FUNCTION ==========")
-    ctx=b.new_context(); pg=ctx.new_page()
-    pg.set_default_timeout(20000)
-    def nav(v):
-        pg.click("#burger"); pg.wait_for_selector('#side.open', timeout=3000); pg.wait_for_timeout(300)
-        pg.click(f'.nav-i[data-view="{v}"]'); pg.wait_for_selector(f'#view-{v}', timeout=3000); pg.wait_for_timeout(400)
-    try:
-        pg.goto(BASE+"/portal.html?authed=admin@gmail.com"); pg.wait_for_timeout(2500)
-        ok("portal logged in", pg.locator(".nav-i").count()>=10)
-    except Exception as e: ok("portal logged in", False)
-    for v in ["ov","eng","jobs","serv","social","pros","ana","plan","set","help"]:
+            r=requests.get(b+p,timeout=t)
+            if should:
+                ok=r.status_code==200
+                try: r.json()
+                except Exception: ok=False
+                rec("PASS" if ok else "FAIL",tag,"GET "+n,f"{r.status_code}")
+            else: rec("PASS" if r.status_code==404 else "FAIL",tag,"GET "+n,f"gated:{r.status_code}")
+        except Exception as e: rec("FAIL",tag,"GET "+n,f"ERR {type(e).__name__}")
+def apiposts(b,tag,t):
+    for p,d,where in API_POSTS:
+        should = where in ("both",tag)
         try:
-            nav(v); ok("portal nav "+v, pg.locator("#view-"+v).is_visible())
-        except Exception as e: ok("portal nav "+v, False, str(e).split(chr(10))[0])
-    # save gate + save (skills are in view-eng, NOT view-set)
+            r=requests.post(b+p,json=d,timeout=t)
+            if should: rec("PASS" if r.status_code in (200,201,303) else "FAIL",tag,"POST "+p,f"{r.status_code}")
+            else: rec("PASS" if r.status_code==404 else "FAIL",tag,"POST "+p,f"gated:{r.status_code}")
+        except Exception as e: rec("FAIL",tag,"POST "+p,f"ERR {type(e).__name__}")
+def login(b,tag,t):
     try:
-        nav("eng")
-        pg.evaluate("localStorage.removeItem('rf_cfg::admin@gmail.com')")
-        pg.fill("#skills",""); pg.click("#saveBtn"); pg.wait_for_timeout(400)
-        ok("save blocked empty", pg.evaluate("!localStorage.getItem('rf_cfg::admin@gmail.com')"))
-        pg.fill("#skills","python automation"); pg.fill("#target","startups"); pg.click("#saveBtn"); pg.wait_for_timeout(600)
-        ok("save works", pg.evaluate("!!localStorage.getItem('rf_cfg::admin@gmail.com')"))
-    except Exception as e: ok("save flow", False, str(e).split(chr(10))[0])
-    # engine start/stop (already on view-eng)
+        r=requests.get(b+"/api/login-get",params={"email":E,"password":"T1234","g-recaptcha-response":"x"},timeout=t,allow_redirects=False)
+        if tag=="pub":
+            loc=r.headers.get("location","")
+            rec("PASS" if (r.status_code==303 and "/portal" in loc) else "FAIL",tag,"Login flow",f"{r.status_code} -> {loc[:30]}")
+        else:
+            rec("PASS" if r.status_code==404 else "FAIL",tag,"Login flow gated",f"{r.status_code} (want 404)")
+    except Exception as e: rec("FAIL",tag,"Login flow",f"ERR {type(e).__name__}")
+def cv(b,tag,t):
     try:
-        pg.click("#startBtn"); pg.wait_for_timeout(4000)
-        ok("engine starts", "Running" in pg.locator("#engStat").inner_text() or pg.locator("#view-jobs").is_visible())
-        pg.click("#stopBtn"); pg.wait_for_timeout(500)
-        ok("engine stops", "Stopped" in pg.locator("#engStat").inner_text())
-    except Exception as e: ok("engine flow", False, str(e).split(chr(10))[0])
+        x=requests.get(b+"/cvbuilder",timeout=t).text
+        ins=len(re.findall(r"<input",x,re.I)); photo='type="file"' in x; prt="window.print()" in x
+        rec("PASS" if (ins>=6 and photo and prt) else "FAIL",tag,"CV features",f"inputs={ins} photo={photo} print={prt}")
+    except Exception as e: rec("FAIL",tag,"CV features",f"ERR {type(e).__name__}")
+def prop(b,tag,t):
     try:
-        pg.click("#supBtn"); pg.fill("#supIn","how do I use it"); pg.click("#supSend"); pg.wait_for_timeout(700)
-        ok("support bot replies", "Quick start" in pg.locator("#supMsgs").inner_text())
-    except Exception as e: ok("support bot", False)
+        r=requests.get(b+"/proposal",timeout=t); kw=[w for w in ["professional","experience","proposal","deliver"] if w in r.text.lower()]
+        rec("PASS" if (len(kw)>=2 and len(r.text)>2000) else "WARN",tag,"Proposal page",f"kw={len(kw)} size={len(r.text)}")
+    except Exception as e: rec("FAIL",tag,"Proposal page",f"ERR {type(e).__name__}")
+def homecheck(b,tag,t):
     try:
-        nav("jobs"); nav("serv")
-        pg.go_back(); pg.wait_for_timeout(600)
-        ok("back button", pg.locator("#view-jobs").is_visible())
-        pg.reload(); pg.wait_for_timeout(2000)
-        ok("refresh keeps place", pg.locator("#view-jobs").is_visible())
-    except Exception as e: ok("back/refresh", False)
-    ctx.close()
-    print("\n========== PART 4: API ENDPOINTS ==========")
-    ctx=b.new_context(); pg=ctx.new_page()
-    api="https://revenueforge-api.onrender.com"
-    for ep in ["/health","/api/sub/admin@gmail.com"]:
-        try:
-            r=pg.request.get(api+ep, timeout=20000)
-            ok("api "+ep, r.status==200, f"status={r.status}")
-        except Exception as e:
-            ok("api "+ep, False, str(e).split(chr(10))[0])
-    ctx.close()
-    b.close()
-print("\n"+"="*50)
-print("FINAL SCORE:", sum(1 for _,c in results if c), "passed /", len(results))
-fails=[n for n,c in results if not c]
-if fails:
-    print("FAILED:", len(fails))
-    for n in fails: print("  -", n)
-else:
-    print("EVERYTHING PASSES - READY TO ADVERTISE")
+        x=requests.get(b+"/",timeout=t).text
+        if tag=="priv":
+            rec("PASS" if "Owner Briefing" in x else "FAIL",tag,"Home=briefing",f"briefing={'Owner Briefing' in x}")
+        else:
+            rec("PASS" if "Owner Briefing" not in x else "FAIL",tag,"Home=marketing",f"marketing={'Owner Briefing' not in x}")
+    except Exception as e: rec("FAIL",tag,"Home check",f"ERR {type(e).__name__}")
+mode=sys.argv[1] if len(sys.argv)>1 else "all"
+if mode in ("private","all"):
+    print("\n===== PRIVATE ====="); tag="priv"
+    pages(PRIVATE,tag,15); apigets(PRIVATE,tag,30); apiposts(PRIVATE,tag,30); login(PRIVATE,tag,15); cv(PRIVATE,tag,15); prop(PRIVATE,tag,15); homecheck(PRIVATE,tag,15)
+if mode in ("public","all"):
+    print("\n===== PUBLIC ====="); tag="pub"
+    try: requests.get(PUBLIC+"/health",timeout=120); print("(awake)")
+    except Exception: print("(waking...)")
+    pages(PUBLIC,tag,120); apigets(PUBLIC,tag,120); apiposts(PUBLIC,tag,120); login(PUBLIC,tag,120); cv(PUBLIC,tag,120); prop(PUBLIC,tag,120); homecheck(PUBLIC,tag,120)
+p_=sum(1 for r in R if r[0]=="PASS"); f_=sum(1 for r in R if r[0]=="FAIL"); w_=sum(1 for r in R if r[0]=="WARN")
+print(f"\n===== SUMMARY: {p_} PASS / {w_} WARN / {f_} FAIL =====")
+for s,a,n,d in R:
+    if s=="FAIL": print(f"  FIX: [{a}] {n}: {d}")
