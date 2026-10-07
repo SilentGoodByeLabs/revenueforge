@@ -7,3 +7,12 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+  - type: cron
+    name: revenueforge-keepalive
+    schedule: "*/5 * * * *"
+    runtime: static
+    buildCommand: ""
+    startCommand: curl -s https://revenueforge-api.onrender.com/keepalive
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

@@ -319,6 +319,13 @@ def jobagent(page_num: int = 1):
 @app.get("/health")
 def health(): return {"status": "ok", "engine": "private-local", "port": 8502}
 
+
+@app.get("/keepalive")
+def keepalive():
+    """Lightweight endpoint for keeping service awake"""
+    return {"status": "awake", "timestamp": str(datetime.now())}
+
+
 @app.get("/", response_class=HTMLResponse)
 def home():
     """Professional marketing home page"""
