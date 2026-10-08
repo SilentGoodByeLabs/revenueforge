@@ -31,12 +31,20 @@ RF_ENV = os.environ.get("RF_ENV", "private")
 PRIVATE_ONLY = {"/settings","/jobagent","/pipeline","/outreach","/followups","/analytics","/command","/audit","/security","/admin/subs","/admin/projects","/admin/invites","/prospects","/scaling","/products","/api/engine-toggle","/api/run","/api/search-now","/api/settings","/api/invites","/api/move-stage","/api/add-to-pipeline","/jobs/ingest"}
 PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.html","/api/login-get","/api/paystack/init","/api/paystack/verify"}
 
+def _env_for(request: Request) -> str:
+    override = os.environ.get("RF_ENV", "")
+    if override in ("public", "private"):
+        return override
+    host = request.headers.get("host", "")
+    return "private" if host.startswith(("127.0.0.1", "localhost")) else "public"
+
 @app.middleware("http")
 async def rf_env_gate(request: Request, call_next):
     path = request.url.path
-    if RF_ENV == "public" and path in PRIVATE_ONLY:
+    env = _env_for(request)
+    if env == "public" and path in PRIVATE_ONLY:
         return JSONResponse({"detail": "Not Found"}, status_code=404)
-    if RF_ENV == "private" and path in PUBLIC_ONLY:
+    if env == "private" and path in PUBLIC_ONLY:
         return JSONResponse({"detail": "Not Found"}, status_code=404)
     return await call_next(request)
 
@@ -376,8 +384,8 @@ ul{{line-height:1.7;color:#94a3b8;font-size:13px}}</style></head><body>
 <p style="color:#64748b;font-size:12px">Private owner console - {_d.now().strftime("%Y-%m-%d %H:%M")} - skills: {prof.get("skills","not set")}</p>
 </div></body></html>"""
 
-def home():
-    if RF_ENV != "public":
+def home(request: Request):
+    if _env_for(request) != "public":
         return HTMLResponse(_owner_briefing())
     """Professional marketing home page"""
     
