@@ -33,7 +33,7 @@ PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.ht
 
 
 MARKETING = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RevenueForge - Professional Job Search Platform</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#1e293b}header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:80px 20px;text-align:center}header h1{font-size:46px;margin-bottom:16px}header p{font-size:19px;max-width:640px;margin:0 auto;opacity:.92}.wrap{max-width:1100px;margin:0 auto;padding:60px 20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin:36px 0}.card{background:#f8fafc;padding:28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}.card h3{color:#667eea;margin-bottom:10px}.cta{background:#667eea;color:#fff;padding:15px 30px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;margin:8px}.cta:hover{background:#5568d3}footer{background:#1e293b;color:#94a3b8;text-align:center;padding:36px}</style></head>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#1e293b}header{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff;padding:80px 20px;text-align:center}header h1{font-size:46px;margin-bottom:16px}header p{font-size:19px;max-width:640px;margin:0 auto;opacity:.92}.wrap{max-width:1100px;margin:0 auto;padding:60px 20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin:36px 0}.card{background:#f8fafc;padding:28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}.card h3{color:#38bdf8;margin-bottom:10px}.cta{background:#38bdf8;color:#fff;padding:15px 30px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;margin:8px}.cta:hover{background:#0ea5e9}footer{background:#1e293b;color:#94a3b8;text-align:center;padding:36px}</style></head>
 <body><header><h1>RevenueForge</h1><p>Professional job search across 291+ sources with personalized proposals and a print-ready CV builder.</p><a class="cta" href="/login.html">Get Started</a><a class="cta" href="/marketplace.html">Marketplace</a></header>
 <div class="wrap"><div class="grid">
 <div class="card"><h3>Smart Job Search</h3><p>Live matches from 291+ platforms scored against your skills.</p></div>
@@ -404,7 +404,7 @@ def home(request: Request):
     """Professional marketing home page"""
     
     hero = """
-    <div style="text-align:center; padding:40px 20px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:15px; color:white; margin-bottom:30px;">
+    <div style="text-align:center; padding:40px 20px; background:linear-gradient(135deg, #38bdf8 0%, #0f172a 100%); border-radius:15px; color:white; margin-bottom:30px;">
         <h1 style="font-size:2.5rem; margin-bottom:15px;">Hunt Jobs Across 500+ Platforms</h1>
         <p style="font-size:1.2rem; opacity:0.95; margin-bottom:30px;">AI-powered job hunting that searches where others can't reach</p>
         
@@ -414,7 +414,7 @@ def home(request: Request):
             <div><strong style="font-size:2rem;">100%</strong><br><small>Real-Time</small></div>
         </div>
         
-        <a href="/settings" style="display:inline-block; padding:15px 40px; background:white; color:#667eea; text-decoration:none; border-radius:50px; font-weight:600; margin-top:20px;">Configure Your Profile</a>
+        <a href="/settings" style="display:inline-block; padding:15px 40px; background:white; color:#38bdf8; text-decoration:none; border-radius:50px; font-weight:600; margin-top:20px;">Configure Your Profile</a>
     </div>
     """
     
@@ -471,7 +471,7 @@ def home(request: Request):
     <div style="text-align:center; padding:40px; background:#f8f9fa; border-radius:15px; margin:30px 0;">
         <h2 style="margin-bottom:20px;">Ready to Start Hunting?</h2>
         <p style="font-size:1.1rem; margin-bottom:25px;">Configure your profile and let our AI find the perfect opportunities for you.</p>
-        <a href="/settings" style="display:inline-block; padding:15px 40px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; text-decoration:none; border-radius:50px; font-weight:600;">Get Started Now</a>
+        <a href="/settings" style="display:inline-block; padding:15px 40px; background:linear-gradient(135deg, #38bdf8 0%, #0f172a 100%); color:white; text-decoration:none; border-radius:50px; font-weight:600;">Get Started Now</a>
     </div>
     """
     
@@ -980,59 +980,19 @@ async def api_engine_toggle(request: _Req):
     return {"ok": True, "on": False}
 
 @app.get("/api/search-hiring")
-def api_search_hiring(q: str = "", limit: int = 100, email: str = ""):
-    """Return jobs from pushed jobs (first) or cached search"""
-    import json as _json
-    from pathlib import Path as _Path
-    
-    # Try to read pushed jobs first
-    pushed_file = ROOT / "data" / "pushed_jobs.json"
-    jobs = []
-    
-    if pushed_file.exists():
-        try:
-            jobs = _json.loads(pushed_file.read_text())
-        except:
-            jobs = []
-    
-    # If no pushed jobs, fall back to live search
+def api_search_hiring(q: str = "", limit: int = 50, email: str = ""):
+    jobs = ld("push.json", {})
+    if isinstance(jobs, dict): jobs = jobs.get("jobs", [])
     if not jobs:
-        jobs = gather(q)
-    
-    # Filter by query if provided
-    if q:
-        q_lower = q.lower()
-        query_words = q_lower.split()
-        filtered = []
-        for j in jobs:
-            searchable = " ".join([
-                j.get("title", ""),
-                j.get("description", ""),
-                j.get("source", ""),
-                j.get("platform", "")
-            ]).lower()
-            if any(word in searchable for word in query_words):
-                filtered.append(j)
-        
-        # If too few results, return all jobs
-        if len(filtered) < 10:
-            jobs = jobs[:limit]
-        else:
-            jobs = filtered[:limit]
-    else:
-        jobs = jobs[:limit]
-    
-    platforms = list(set(j.get("platform", j.get("source", "?")) for j in jobs))
-    
-    return {
-        "results": jobs,
-        "count": len(jobs),
-        "cached": True,
-        "cache_time": "pushed",
-        "platforms": platforms,
-        "total_in_cache": len(jobs)
-    }
-
+        jobs = ld("last_search.json", {})
+        if isinstance(jobs, dict): jobs = jobs.get("results", [])
+    if not isinstance(jobs, list): jobs = []
+    ql = (q or "").lower()
+    out = []
+    for j in jobs:
+        hay = (str(j.get("title","")) + " " + str(j.get("skills","")) + " " + str(j.get("description",""))).lower()
+        if not ql or ql in hay: out.append(j)
+    return {"ok": True, "results": out[:limit], "count": len(out[:limit])}
 
 @app.get("/api/my/products")
 def api_my_products(email: str = ""):
@@ -1171,7 +1131,7 @@ def proposal(job: str = "", company: str = "", reqs: str = ""):
         words = len(txt.split())
         body = "<div id='ptxt' style='background:#fff;padding:30px;border-radius:8px;white-space:pre-wrap;line-height:1.8'>" + esc(txt) + "</div>"
         body += "<p style='margin-top:10px;color:#666'>Length: " + str(words) + " words (professional long-form)</p>"
-        body += "<button onclick='navigator.clipboard.writeText(document.getElementById(\'ptxt\').innerText)' style='margin:10px 6px 0 0;padding:10px 20px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Copy</button>"
+        body += "<button onclick='navigator.clipboard.writeText(document.getElementById(&quot;ptxt&quot;).innerText)' style='margin:10px 6px 0 0;padding:10px 20px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Copy</button>"
         body += "<button onclick='window.print()' style='padding:10px 20px;background:#16a34a;color:#fff;border:0;border-radius:5px;cursor:pointer'>Print</button>"
     form = "<form method='get' style='background:#fff;padding:20px;border-radius:8px;margin-bottom:20px'>"
     form += "<label>Job Title:<br><input name='job' value='" + esc(job) + "' style='width:100%;padding:8px;margin:6px 0'></label>"
@@ -1554,3 +1514,9 @@ def marketplace_html_page():
     from pathlib import Path as _P
     f = _P("marketplace.html")
     return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>marketplace.html missing</h1>")
+
+
+@app.get("/version")
+def rf_version():
+    import os as _os
+    return {"build": _os.environ.get("RENDER_GIT_COMMIT", "local-dev"), "status": "ok"}
