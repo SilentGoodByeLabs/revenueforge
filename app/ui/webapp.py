@@ -31,6 +31,19 @@ RF_ENV = os.environ.get("RF_ENV", "private")
 PRIVATE_ONLY = {"/settings","/jobagent","/pipeline","/outreach","/followups","/analytics","/command","/audit","/security","/admin/subs","/admin/projects","/admin/invites","/prospects","/scaling","/products","/api/engine-toggle","/api/run","/api/search-now","/api/settings","/api/invites","/api/move-stage","/api/add-to-pipeline","/jobs/ingest"}
 PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.html","/api/login-get","/api/paystack/init","/api/paystack/verify"}
 
+
+MARKETING = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RevenueForge - Professional Job Search Platform</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#1e293b}header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:80px 20px;text-align:center}header h1{font-size:46px;margin-bottom:16px}header p{font-size:19px;max-width:640px;margin:0 auto;opacity:.92}.wrap{max-width:1100px;margin:0 auto;padding:60px 20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin:36px 0}.card{background:#f8fafc;padding:28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}.card h3{color:#667eea;margin-bottom:10px}.cta{background:#667eea;color:#fff;padding:15px 30px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;margin:8px}.cta:hover{background:#5568d3}footer{background:#1e293b;color:#94a3b8;text-align:center;padding:36px}</style></head>
+<body><header><h1>RevenueForge</h1><p>Professional job search across 291+ sources with personalized proposals and a print-ready CV builder.</p><a class="cta" href="/login.html">Get Started</a><a class="cta" href="/marketplace.html">Marketplace</a></header>
+<div class="wrap"><div class="grid">
+<div class="card"><h3>Smart Job Search</h3><p>Live matches from 291+ platforms scored against your skills.</p></div>
+<div class="card"><h3>CV Builder</h3><p>Photo upload, every section, print / save-as-PDF output.</p></div>
+<div class="card"><h3>Proposal Generator</h3><p>Long-form professional proposals written to win the job.</p></div>
+<div class="card"><h3>Pipeline Tracking</h3><p>Every application tracked from found to hired.</p></div>
+<div class="card"><h3>Marketplace</h3><p>Publish your services and get hired directly.</p></div>
+<div class="card"><h3>Trial & Billing</h3><p>24-hour free trial, simple upgrades, invite codes.</p></div>
+</div><div style="text-align:center"><a class="cta" href="/login.html">Start Free Trial</a><a class="cta" href="/contact.html">Contact</a></div></div>
+<footer>&copy; 2026 RevenueForge</footer></body></html>"""
 def _env_for(request: Request) -> str:
     override = os.environ.get("RF_ENV", "")
     if override in ("public", "private"):
@@ -385,8 +398,9 @@ ul{{line-height:1.7;color:#94a3b8;font-size:13px}}</style></head><body>
 </div></body></html>"""
 
 def home(request: Request):
-    if _env_for(request) != "public":
+    if _env_for(request) == "private":
         return HTMLResponse(_owner_briefing())
+    return HTMLResponse(MARKETING)
     """Professional marketing home page"""
     
     hero = """
@@ -1116,142 +1130,55 @@ def move_stage(data: dict):
         return {"ok": False, "error": str(_e)}
 
 
+
+def _long_proposal(job, company, reqs, cv):
+    name = cv.get("name") or "The Applicant"
+    skills = cv.get("skills") or "a broad, production-tested skill set"
+    exp_lines = [l for l in (cv.get("experience") or "").split("\n") if l.strip()]
+    top_exp = exp_lines[0].split("|")[0].strip() if exp_lines else "senior-level delivery"
+    req_list = [r.strip() for r in reqs.replace("|", "\n").split("\n") if r.strip()] or ["the core requirements listed in the posting"]
+    req_sentence = "; ".join(req_list[:4])
+    p = []
+    p.append("Subject: Application for " + job + ((" at " + company) if company else ""))
+    p.append("")
+    p.append("Dear " + (company or "Hiring") + " Team,")
+    p.append("")
+    p.append("I am writing to express my strong interest in the " + job + " position" + ((" at " + company) if company else "") + ". Having reviewed the role in detail, I am confident that my background in " + skills + " aligns closely with what your team needs, and I would welcome the opportunity to contribute from day one.")
+    p.append("")
+    p.append("What draws me to this role is the clear emphasis on " + req_sentence + ". These are areas where I have delivered measurable results in production environments, not simply studied in theory. In my most recent work as " + top_exp + ", I owned end-to-end delivery of features and systems, balancing speed with the discipline required to keep quality high.")
+    p.append("")
+    p.append("A few highlights that I believe are directly relevant:")
+    for r in req_list[:3]:
+        p.append("   - " + r + ": I have hands-on experience addressing exactly this, and can point to concrete outcomes where similar challenges were solved efficiently and sustainably.")
+    p.append("")
+    p.append("Beyond technical execution, I bring clear communication, an ownership mindset, and a habit of documenting decisions so that teams move faster over time. I collaborate well across functions and am comfortable turning ambiguous requirements into a concrete, shippable plan.")
+    p.append("")
+    p.append("I would be glad to walk through specific examples relevant to " + (job or "this role") + " in more detail, and to discuss how I can help your team reach its next milestones. Thank you for your time and consideration - I look forward to the possibility of speaking with you.")
+    p.append("")
+    p.append("Warm regards,")
+    p.append(name)
+    if cv.get("email"): p.append(cv.get("email"))
+    if cv.get("phone"): p.append(cv.get("phone"))
+    if cv.get("links"): p.append(cv.get("links"))
+    return "\n".join(p)
+
 @app.get("/proposal", response_class=HTMLResponse)
-def proposal(title: str = "", url: str = "", source: str = ""):
-    try:
-        NL = chr(10)
-        Q = chr(34)
-        profile = ld("profile.json", {})
-        skills = str(profile.get("skills", "software development"))
-        target = str(profile.get("target", ""))
-        experience = str(profile.get("experience", "Mid-Level"))
-        location = str(profile.get("location", "Remote"))
-        min_sal = str(profile.get("min_salary", ""))
-
-        skill_list = [s.strip() for s in skills.split(",") if s.strip()]
-        if not skill_list:
-            skill_list = ["software development"]
-        skills_txt = ", ".join(skill_list)
-        primary = skill_list[0]
-
-        L = []
-        L.append("Subject: Application and Proposal - " + str(title))
-        L.append("")
-        L.append("Dear Hiring Team,")
-        L.append("")
-        L.append("I am writing to express my sincere interest in the " + str(title) + " position currently advertised on " + str(source) + ". After reviewing the role and your company's mission, I am convinced that my background in " + skills_txt + " and my proven ability to deliver end-to-end technical solutions make me a strong candidate for this opportunity. I would like to submit both a cover letter and a brief proposal for your consideration.")
-        L.append("")
-        L.append("COVER LETTER")
-        L.append("--------------")
-        L.append("")
-        L.append("Over the past several years I have worked across the full product and engineering lifecycle - from requirements gathering, architecture and design, through implementation, testing, deployment and monitoring. My primary strength lies in " + primary + ", but I am equally comfortable working with " + skills_txt + " in production environments where reliability, performance and code quality matter.")
-        L.append("")
-        L.append("In my most recent work I have:")
-        L.append("- Designed and shipped features that moved measurable business outcomes for " + (target if target else "fast-moving product teams") + ".")
-        L.append("- Built maintainable, well-documented services backed by automated tests and clear observability.")
-        L.append("- Collaborated closely with product, design and operations teams to translate ambiguous problems into shippable increments.")
-        L.append("- Operated effectively in fully remote, asynchronous environments with clear written communication and proactive stakeholder updates.")
-        L.append("")
-        L.append("What sets me apart is my ownership mindset. I do not simply close tickets - I think about the long-term health of the systems I build, the experience of the users who depend on them, and the team that will maintain them after me. I treat every engagement as a partnership: your goals become my goals, and I iterate until we have a shared definition of done.")
-        L.append("")
-        L.append("PROPOSAL FOR ENGAGEMENT")
-        L.append("-----------------------")
-        L.append("")
-        L.append("To demonstrate the value I can bring quickly, I propose the following structure for our working relationship:")
-        L.append("")
-        L.append("1. DISCOVERY (first 1-2 weeks)")
-        L.append("   - Technical and product onboarding with your team.")
-        L.append("   - Audit of current architecture, codebase, tooling and delivery process.")
-        L.append("   - Delivery of a written findings document highlighting quick wins and medium-term risks.")
-        L.append("")
-        L.append("2. FIRST DELIVERY (weeks 2-6)")
-        L.append("   - Pick one high-impact, well-scoped item from the findings.")
-        L.append("   - Deliver it end-to-end with tests, documentation and deployment.")
-        L.append("   - Weekly written status updates and a short demo at the end of each sprint.")
-        L.append("")
-        L.append("3. ONGOING ENGAGEMENT (month 2 onwards)")
-        L.append("   - Continue delivering features with the same cadence.")
-        L.append("   - Mentor junior engineers where helpful.")
-        L.append("   - Propose improvements to architecture, tooling and process based on real patterns I observe in the codebase.")
-        L.append("")
-        L.append("I am comfortable working at " + (experience if experience else "Mid-Level") + " capacity, in " + (location if location else "Remote") + " settings, and I am available to begin immediately. Compensation expectations are in the range of " + (min_sal + " USD/year" if min_sal else "competitive, aligned with the role and scope") + " - but I am flexible and happy to discuss a structure that works for both sides, including a paid trial period to de-risk the engagement for you.")
-        L.append("")
-        L.append("NEXT STEPS")
-        L.append("----------")
-        L.append("")
-        L.append("I would welcome a 30-minute conversation to:")
-        L.append("- Understand the most important outcomes your team needs in the next 90 days.")
-        L.append("- Walk you through one or two relevant projects from my recent work.")
-        L.append("- Complete any technical exercise, take-home assignment or pair-programming session you feel would help assess fit.")
-        L.append("")
-        L.append("Please feel free to suggest a time that suits you, or to share any additional information you would find useful from my side. I am responsive and easy to reach.")
-        L.append("")
-        L.append("Thank you very much for your time and consideration. I look forward to the possibility of working together.")
-        L.append("")
-        L.append("Kind regards,")
-        L.append("[Your full name]")
-        L.append("[Your email]")
-        L.append("[Your phone]")
-        L.append("[Your portfolio / GitHub / LinkedIn]")
-        proposal_text = NL.join(L)
-
-        C = []
-        C.append("CURRICULUM VITAE")
-        C.append("================")
-        C.append("")
-        C.append("[YOUR FULL NAME]")
-        C.append("[email]  |  [phone]  |  [city, country]  |  [github/portfolio link]")
-        C.append("")
-        C.append("PROFESSIONAL SUMMARY")
-        C.append("Software professional specialised in " + skills_txt + ", with a track record of delivering reliable, production-grade systems in fast-moving " + (target if target else "product") + " environments. Comfortable working end-to-end from requirements through deployment and monitoring.")
-        C.append("")
-        C.append("CORE TECHNICAL SKILLS")
-        C.append("- Languages and frameworks: " + skills_txt)
-        C.append("- APIs, backend services, relational and document databases")
-        C.append("- Testing strategies, CI/CD, infrastructure as code, observability")
-        C.append("- Remote collaboration, written communication, code review, mentoring")
-        C.append("")
-        C.append("EXPERIENCE")
-        C.append("")
-        C.append("Most Recent Role - [Company] - [dates]")
-        C.append("  * Led design and delivery of features using " + primary + " that shipped to production and drove measurable outcomes.")
-        C.append("  * Improved system reliability through automated tests, monitoring and careful refactoring.")
-        C.append("  * Mentored teammates and contributed to a strong engineering culture of ownership.")
-        C.append("")
-        C.append("Previous Role - [Company] - [dates]")
-        C.append("  * Delivered end-to-end projects with modern tooling and clean code practices.")
-        C.append("  * Partnered with product and design to translate ambiguous problems into shippable increments.")
-        C.append("")
-        C.append("EDUCATION AND CERTIFICATIONS")
-        C.append("[Degree / certification - institution - year]")
-        C.append("")
-        C.append("SELECTED PROJECTS")
-        C.append("  * [Project 1] - brief description and outcome.")
-        C.append("  * [Project 2] - brief description and outcome.")
-        C.append("")
-        C.append("REFERENCES")
-        C.append("Available on request.")
-        cv_text = NL.join(C)
-
-        h = []
-        h.append("<div class='card'>")
-        h.append("<h3><i class='fa-solid fa-file-lines'></i> Application and Proposal for: " + str(title) + "</h3>")
-        if url:
-            h.append("<p><a href='" + str(url) + "' target='_blank'>Open original job posting</a></p>")
-        h.append("<pre id='prop' style='white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:6px;max-height:600px;overflow:auto'>" + str(proposal_text) + "</pre>")
-        h.append("<button onclick=" + Q + "copyEl('prop')" + Q + ">Copy proposal</button> ")
-        h.append("<button onclick='window.print()'>Print / Save as PDF</button>")
-        h.append("</div>")
-        h.append("<div class='card'>")
-        h.append("<h3><i class='fa-solid fa-id-card'></i> Matching CV</h3>")
-        h.append("<pre id='cv' style='white-space:pre-wrap;background:#f5f5f5;padding:14px;border-radius:6px;max-height:600px;overflow:auto'>" + str(cv_text) + "</pre>")
-        h.append("<button onclick=" + Q + "copyEl('cv')" + Q + ">Copy CV</button> ")
-        h.append("<button onclick='window.print()'>Print / Save as PDF</button>")
-        h.append("</div>")
-        h.append("<script>function copyEl(id){var el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.innerText).then(function(){alert('Copied to clipboard');});}</script>")
-        return page("/proposal", "Proposal and CV", NL.join(h))
-    except Exception as _e:
-        return "<h1>Error: " + str(_e) + "</h1>"
+def proposal(job: str = "", company: str = "", reqs: str = ""):
+    cv = ld("cv.json", {})
+    body = ""
+    if job:
+        txt = _long_proposal(job, company, reqs, cv)
+        words = len(txt.split())
+        body = "<div id='ptxt' style='background:#fff;padding:30px;border-radius:8px;white-space:pre-wrap;line-height:1.8'>" + esc(txt) + "</div>"
+        body += "<p style='margin-top:10px;color:#666'>Length: " + str(words) + " words (professional long-form)</p>"
+        body += "<button onclick='navigator.clipboard.writeText(document.getElementById(\'ptxt\').innerText)' style='margin:10px 6px 0 0;padding:10px 20px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Copy</button>"
+        body += "<button onclick='window.print()' style='padding:10px 20px;background:#16a34a;color:#fff;border:0;border-radius:5px;cursor:pointer'>Print</button>"
+    form = "<form method='get' style='background:#fff;padding:20px;border-radius:8px;margin-bottom:20px'>"
+    form += "<label>Job Title:<br><input name='job' value='" + esc(job) + "' style='width:100%;padding:8px;margin:6px 0'></label>"
+    form += "<label>Company:<br><input name='company' value='" + esc(company) + "' style='width:100%;padding:8px;margin:6px 0'></label>"
+    form += "<label>Requirements (one per line):<br><textarea name='reqs' rows='5' style='width:100%;padding:8px;margin:6px 0'>" + esc(reqs) + "</textarea></label>"
+    form += "<button type='submit' style='padding:12px 24px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Generate Professional Proposal</button></form>"
+    return page("/proposal", "Proposal Generator", form + body)
 
 @app.get("/cvbuilder", response_class=HTMLResponse)
 def cvbuilder(job: str = "", req: str = ""):
@@ -1377,94 +1304,50 @@ def cvbuilder(job: str = "", req: str = ""):
 
 @app.get("/cv", response_class=HTMLResponse)
 def cv_preview():
+    import base64, os
     cv = ld("cv.json", {})
-    name = cv.get("name") or "YOUR FULL NAME"
-    title = cv.get("title") or "Software Engineer"
-    email = cv.get("email") or "your.email@example.com"
-    phone = cv.get("phone") or "+000 000 0000"
-    city = cv.get("city") or "City, Country"
-    links = cv.get("links") or "github.com/yourhandle  |  linkedin.com/in/yourhandle"
-    summary = cv.get("summary") or "Results-driven software engineer with a proven record of designing and delivering scalable, production-grade systems. Combines deep technical expertise with clear written communication, an ownership mindset and a focus on measurable business outcomes."
-    skills = cv.get("skills") or "Python, JavaScript, SQL, React, Docker, AWS, Git, REST APIs"
-    experience = cv.get("experience") or ("Senior Software Engineer | TechCorp | 2023 - Present | Led delivery of scalable backend services serving 1M+ users; cut API latency by 45%" + chr(10) + "Software Engineer | StartupXYZ | 2021 - 2023 | Built REST APIs and dashboards; introduced automated testing raising coverage to 90%")
-    education = cv.get("education") or "BSc Computer Science | University Name | 2017 - 2021"
-    certs = cv.get("certs") or "AWS Certified Developer" + chr(10) + "Professional Scrum Master I"
-
+    name = cv.get("name") or "Your Full Name"
+    title = cv.get("title") or "Professional"
+    email = cv.get("email") or ""; phone = cv.get("phone") or ""
+    city = cv.get("city") or ""; links = cv.get("links") or ""
+    summary = cv.get("summary") or ""; skills = cv.get("skills") or ""
+    experience = cv.get("experience") or ""; education = cv.get("education") or ""
+    certs = cv.get("certs") or ""; photo = cv.get("photo") or ""
     photo_html = ""
-    pf = DATA / "cv_photo.b64"
-    if pf.exists():
-        photo_html = "<img class='cvphoto' src='data:image/jpeg;base64," + pf.read_text().strip() + "' alt='photo'>"
-
-    skill_tags = ""
-    for s in str(skills).split(","):
-        s = s.strip()
-        if s:
-            skill_tags += "<span class='tag'>" + esc(s) + "</span>"
-
+    if photo:
+        if photo.startswith("data:"):
+            photo_html = "<img src='" + photo + "' class='pphoto'>"
+        else:
+            pth = os.path.join("data", photo) if not os.path.isabs(photo) else photo
+            if os.path.exists(pth):
+                with open(pth, "rb") as f:
+                    photo_html = "<img src='data:image/png;base64," + base64.b64encode(f.read()).decode() + "' class='pphoto'>"
     exp_html = ""
-    for line in str(experience).split(chr(10)):
-        line = line.strip()
-        if not line:
-            continue
-        parts = [x.strip() for x in line.split("|")]
-        exp_html += "<div class='item'>"
-        exp_html += "<div class='ihead'>" + esc(parts[0]) + "</div>"
-        if len(parts) > 1:
-            meta = esc(parts[1])
-            if len(parts) > 2:
-                meta += " &bull; " + esc(parts[2])
-            exp_html += "<div class='imeta'>" + meta + "</div>"
-        if len(parts) > 3:
-            exp_html += "<div class='ibody'>" + esc(parts[3]) + "</div>"
-        exp_html += "</div>"
-    if not exp_html:
-        exp_html = "<div class='ibody'>Add your experience in the CV Builder.</div>"
-
-    edu_html = ""
-    for line in str(education).split(chr(10)):
-        if line.strip():
-            edu_html += "<div class='item'><div class='ibody'>" + esc(line.strip()) + "</div></div>"
-
-    cert_html = ""
-    for line in str(certs).split(chr(10)):
-        if line.strip():
-            cert_html += "<li>" + esc(line.strip()) + "</li>"
-
-    css = "<style>"
-    css += "@media print { .noprint { display:none !important; } body { background:white !important; } .sheet { box-shadow:none !important; margin:0 !important; max-width:100% !important; } }"
-    css += "body { background:#e8ecf1; margin:0; font-family:'Segoe UI',Arial,Helvetica,sans-serif; }"
-    css += ".sheet { max-width:820px; margin:24px auto; background:white; box-shadow:0 2px 18px rgba(0,0,0,.18); }"
-    css += ".head { display:flex; gap:26px; align-items:center; padding:36px 42px; background:#1f3b57; color:white; }"
-    css += ".cvphoto { width:104px; height:104px; border-radius:50%; object-fit:cover; border:3px solid white; flex:none; }"
-    css += ".head h1 { margin:0; font-size:30px; letter-spacing:1px; }"
-    css += ".head h2 { margin:4px 0 10px; font-size:16px; font-weight:400; color:#bcd3e8; }"
-    css += ".contact { font-size:13px; line-height:1.7; color:#dce8f3; }"
-    css += ".body { padding:30px 42px 44px; }"
-    css += "h3.sec { font-size:13px; letter-spacing:2px; color:#1f3b57; border-bottom:2px solid #1f3b57; padding-bottom:6px; margin:26px 0 14px; text-transform:uppercase; }"
-    css += ".tag { display:inline-block; background:#eef3f8; color:#1f3b57; border:1px solid #c9d8e6; border-radius:14px; padding:3px 12px; font-size:12px; margin:0 6px 6px 0; }"
-    css += ".item { margin-bottom:14px; border-left:3px solid #2e6da4; padding-left:14px; }"
-    css += ".ihead { font-weight:600; color:#22303c; font-size:14.5px; }"
-    css += ".imeta { font-size:12px; color:#7a8794; margin:2px 0; }"
-    css += ".ibody { font-size:13.5px; color:#3d4a56; line-height:1.6; }"
-    css += ".bar { position:fixed; top:12px; right:12px; }"
-    css += ".bar a, .bar button { display:inline-block; margin-left:8px; padding:9px 16px; background:#2e6da4; color:white; border:none; border-radius:4px; text-decoration:none; font-size:13px; cursor:pointer; }"
-    css += "</style>"
-
-    h = css
-    h += "<div class='bar noprint'><button onclick='window.print()'>Print / Save PDF</button><a href='/cvbuilder'>Edit CV</a></div>"
-    h += "<div class='sheet'>"
-    h += "<div class='head'>" + photo_html + "<div><h1>" + esc(name) + "</h1><h2>" + esc(title) + "</h2>"
-    h += "<div class='contact'>" + esc(email) + " &bull; " + esc(phone) + " &bull; " + esc(city) + "<br>" + esc(links) + "</div></div></div>"
-    h += "<div class='body'>"
-    h += "<h3 class='sec'>Professional Summary</h3><p class='ibody'>" + esc(summary) + "</p>"
-    h += "<h3 class='sec'>Core Skills</h3><div>" + skill_tags + "</div>"
-    h += "<h3 class='sec'>Professional Experience</h3>" + exp_html
-    h += "<h3 class='sec'>Education</h3>" + edu_html
-    if cert_html:
-        h += "<h3 class='sec'>Certifications</h3><ul class='ibody'>" + cert_html + "</ul>"
-    h += "</div></div>"
-    return HTMLResponse(content=h)
-
+    for line in [l for l in experience.split("\n") if l.strip()]:
+        parts = [p.strip() for p in line.split("|")]
+        if len(parts) >= 3:
+            ach = ("<p style='margin:4px 0 0 0;color:#444'>" + esc(parts[3]) + "</p>") if len(parts) > 3 and parts[3] else ""
+            exp_html += "<div class='entry'><div style='display:flex;justify-content:space-between'><b>" + esc(parts[0]) + "</b><span style='color:#666'>" + esc(parts[2]) + "</span></div><div style='color:#3498db'>" + esc(parts[1]) + "</div>" + ach + "</div>"
+        else:
+            exp_html += "<div class='entry'>" + esc(line) + "</div>"
+    def sec(t, c):
+        return ("<h2 class='sec'>" + t + "</h2>" + c) if c else ""
+    contact = " | ".join([x for x in [email, phone, city] if x])
+    html = "<style>.pphoto{width:110px;height:110px;object-fit:cover;border-radius:50%;float:right;border:3px solid #3498db}.sec{color:#3498db;border-bottom:2px solid #3498db;padding-bottom:4px;margin-top:22px;font-size:16px;text-transform:uppercase;letter-spacing:1px}.entry{margin:12px 0}@media print{.noprint{display:none!important}body{background:#fff}}</style>"
+    html += "<div class='noprint' style='margin-bottom:14px'><button onclick='window.print()' style='padding:10px 22px;background:#16a34a;color:#fff;border:0;border-radius:5px;cursor:pointer'>Print / Save PDF</button> <a href='/cvbuilder' style='margin-left:10px'>Edit</a></div>"
+    html += "<div style='background:#fff;padding:40px;max-width:820px;margin:0 auto;border-radius:8px'>"
+    html += photo_html + "<h1 style='margin:0;color:#0f172a'>" + esc(name) + "</h1>"
+    html += "<div style='font-size:18px;color:#3498db;margin:4px 0'>" + esc(title) + "</div>"
+    html += "<div style='color:#666;margin-bottom:8px'>" + esc(contact) + "</div>"
+    if links: html += "<div style='color:#666;font-size:13px'>" + esc(links) + "</div>"
+    html += "<div style='clear:both'></div>"
+    html += sec("Professional Summary", "<p style='line-height:1.7'>" + esc(summary) + "</p>" if summary else "")
+    html += sec("Core Skills", "<p style='line-height:1.7'>" + esc(skills) + "</p>" if skills else "")
+    html += sec("Experience", exp_html)
+    html += sec("Education", "<div style='white-space:pre-line;line-height:1.7'>" + esc(education) + "</div>" if education else "")
+    html += sec("Certifications", "<div style='white-space:pre-line;line-height:1.7'>" + esc(certs) + "</div>" if certs else "")
+    html += "</div>"
+    return page("/cv", "CV", html)
 
 @app.post("/api/save-cv")
 async def save_cv(request: Request):
