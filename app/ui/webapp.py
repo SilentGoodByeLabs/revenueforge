@@ -370,8 +370,6 @@ def keepalive():
     return {"status": "awake", "timestamp": str(datetime.now())}
 
 
-@app.get("/", response_class=HTMLResponse)
-
 def _owner_briefing():
     import json as _j
     from datetime import datetime as _d
@@ -405,9 +403,9 @@ ul{{line-height:1.7;color:#94a3b8;font-size:13px}}</style></head><body>
 <p style="color:#64748b;font-size:12px">Private owner console - {_d.now().strftime("%Y-%m-%d %H:%M")} - skills: {prof.get("skills","not set")}</p>
 </div></body></html>"""
 
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    """Return briefing on private, marketing on public"""
     if _env_for(request) == "private":
         return HTMLResponse(_owner_briefing())
     return HTMLResponse(MARKETING)
