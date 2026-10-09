@@ -54,12 +54,12 @@ input.hp{position:absolute;left:-9999px}
     </div>
     <h1>Client Login</h1>
     <p class="sub">Access your professional dashboard</p>
-    <form id="loginForm">
+    <form id="loginForm" action="/api/login-get" method="GET">
       <label for="em">Email address</label>
-      <input id="em" type="email" required autocomplete="email" placeholder="you@company.com">
+      <input id="em" name="email" type="email" required autocomplete="email" placeholder="you@company.com">
       
       <label for="password">Password</label>
-      <input id="password" type="password" required autocomplete="current-password" placeholder="Enter your password">
+      <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Enter your password">
       
       <input class="hp" id="website" type="text" tabindex="-1" autocomplete="off">
       
@@ -67,7 +67,7 @@ input.hp{position:absolute;left:-9999px}
       <div class="captcha-box">
         <span class="q" id="captchaQ"></span>
         <div class="captcha-wrap">
-          <input id="captchaA" type="text" inputmode="numeric" required placeholder="Your answer" aria-label="CAPTCHA answer">
+          <input id="captchaA" name="captcha" type="text" inputmode="numeric" required placeholder="Your answer" aria-label="CAPTCHA answer">
           <button type="button" class="captcha-refresh" onclick="RFSecurity.newCaptcha()" aria-label="New CAPTCHA">
             <i class="fa-solid fa-rotate"></i>
           </button>
@@ -77,6 +77,8 @@ input.hp{position:absolute;left:-9999px}
       <div class="recaptcha-wrap">
         <div class="g-recaptcha" data-sitekey="6Lc-5ogtAAAAALRP2NOwo5mPU0MUf1MITyOAwJW4"></div>
       </div>
+      
+      <input type="hidden" id="gRecaptchaResponse" name="g-recaptcha-response">
       
       <button class="btn-primary" type="submit" id="loginBtn">
         <i class="fa-solid fa-right-to-bracket"></i>
@@ -100,79 +102,25 @@ input.hp{position:absolute;left:-9999px}
 
 <script>
 (function(){
-  var s = sessionStorage.getItem('rf_session');
-  if(s){
-    try{
-      s = JSON.parse(s);
-      if(s.email){
-        var n = new URLSearchParams(location.search).get('next');
-        location.href = n ? n : ('/portal?email=' + encodeURIComponent(s.email));
-      }
-    }catch(e){}
-  }
-})();
-</script>
-
-<script>
-(function(){
   var form = document.getElementById('loginForm');
   var btn = document.getElementById('loginBtn');
   var msg = document.getElementById('formMsg');
   
   form.addEventListener('submit', function(e){
-    e.preventDefault();
-    
     var w = document.querySelector('.g-recaptcha');
-    if(w && window.grecaptcha && !grecaptcha.getResponse()){
-      msg.className = 'form-msg err';
-      msg.textContent = 'Please complete the reCAPTCHA';
-      return;
+    if(w && window.grecaptcha){
+      var resp = grecaptcha.getResponse();
+      if(!resp){
+        e.preventDefault();
+        msg.className = 'form-msg err';
+        msg.textContent = 'Please complete the reCAPTCHA';
+        return;
+      }
+      document.getElementById('gRecaptchaResponse').value = resp;
     }
-    
-    var email = document.getElementById('em').value;
-    var password = document.getElementById('password').value;
-    var captchaA = document.getElementById('captchaA').value;
-    var recaptchaResp = grecaptcha.getResponse();
     
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span><span>Signing in...</span>';
-    msg.className = 'form-msg';
-    
-    fetch('/api/login-get', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: email,
-        password: password,
-        captcha: captchaA,
-        'g-recaptcha-response': recaptchaResp
-      })
-    })
-    .then(r => r.json())
-    .then(d => {
-      if(d.ok){
-        msg.className = 'form-msg ok';
-        msg.textContent = 'Login successful! Redirecting...';
-        setTimeout(function(){
-          location.href = '/portal?email=' + encodeURIComponent(email);
-        }, 1000);
-      }else{
-        msg.className = 'form-msg err';
-        msg.textContent = d.detail || 'Login failed';
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Log In</span>';
-        grecaptcha.reset();
-        if(window.RFSecurity && RFSecurity.newCaptcha) RFSecurity.newCaptcha();
-      }
-    })
-    .catch(err => {
-      msg.className = 'form-msg err';
-      msg.textContent = 'Network error. Please try again.';
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Log In</span>';
-      grecaptcha.reset();
-      if(window.RFSecurity && RFSecurity.newCaptcha) RFSecurity.newCaptcha();
-    });
   });
 })();
 </script>
