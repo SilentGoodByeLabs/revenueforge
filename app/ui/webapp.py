@@ -405,85 +405,12 @@ ul{{line-height:1.7;color:#94a3b8;font-size:13px}}</style></head><body>
 <p style="color:#64748b;font-size:12px">Private owner console - {_d.now().strftime("%Y-%m-%d %H:%M")} - skills: {prof.get("skills","not set")}</p>
 </div></body></html>"""
 
+@app.get("/", response_class=HTMLResponse)
 def home(request: Request):
+    """Return briefing on private, marketing on public"""
     if _env_for(request) == "private":
         return HTMLResponse(_owner_briefing())
     return HTMLResponse(MARKETING)
-    """Professional marketing home page"""
-    
-    hero = """
-    <div style="text-align:center; padding:40px 20px; background:linear-gradient(135deg, #38bdf8 0%, #0f172a 100%); border-radius:15px; color:white; margin-bottom:30px;">
-        <h1 style="font-size:2.5rem; margin-bottom:15px;">Hunt Jobs Across 500+ Platforms</h1>
-        <p style="font-size:1.2rem; opacity:0.95; margin-bottom:30px;">AI-powered job hunting that searches where others can't reach</p>
-        
-        <div style="display:flex; justify-content:center; gap:40px; margin:30px 0;">
-            <div><strong style="font-size:2rem;">500+</strong><br><small>Platforms</small></div>
-            <div><strong style="font-size:2rem;">291</strong><br><small>Live Sources</small></div>
-            <div><strong style="font-size:2rem;">100%</strong><br><small>Real-Time</small></div>
-        </div>
-        
-        <a href="/settings" style="display:inline-block; padding:15px 40px; background:white; color:#38bdf8; text-decoration:none; border-radius:50px; font-weight:600; margin-top:20px;">Configure Your Profile</a>
-    </div>
-    """
-    
-    features = """
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin:30px 0;">
-        <div class="card" style="text-align:center;">
-            <h3>🌍 500+ Platforms</h3>
-            <p>We search LinkedIn, Indeed, Glassdoor, and 291+ company career pages that others can't access.</p>
-        </div>
-        <div class="card" style="text-align:center;">
-            <h3>⚡ Real-Time Results</h3>
-            <p>No cached data. Every hunt searches live platforms in real-time for the freshest opportunities.</p>
-        </div>
-        <div class="card" style="text-align:center;">
-            <h3>🎯 AI-Matched Jobs</h3>
-            <p>Our AI analyzes your profile and only shows jobs that match your skills and career goals.</p>
-        </div>
-        <div class="card" style="text-align:center;">
-            <h3>📝 Auto Proposals</h3>
-            <p>Generate professional cover letters tailored to each job in seconds.</p>
-        </div>
-        <div class="card" style="text-align:center;">
-            <h3>📊 Application Tracking</h3>
-            <p>Track every application from found to hired. Never lose track again.</p>
-        </div>
-        <div class="card" style="text-align:center;">
-            <h3>🔒 Privacy First</h3>
-            <p>Your data stays yours. Apply anonymously until you're ready.</p>
-        </div>
-    </div>
-    """
-    
-    testimonials = """
-    <div style="margin:40px 0;">
-        <h2 style="text-align:center; margin-bottom:30px;">What Our Hunters Say</h2>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
-            <div class="card">
-                <p style="font-style:italic; margin-bottom:15px;">"Found my dream job through RevenueForge. Applied to 15 companies, got 8 interviews, landed the offer in 3 weeks."</p>
-                <p><strong>Sarah K.</strong><br><small>Senior Developer</small></p>
-            </div>
-            <div class="card">
-                <p style="font-style:italic; margin-bottom:15px;">"The real-time search found opportunities on company career pages that weren't on any job board. Got hired within a month."</p>
-                <p><strong>Mike R.</strong><br><small>Backend Engineer</small></p>
-            </div>
-            <div class="card">
-                <p style="font-style:italic; margin-bottom:15px;">"The proposal generator saved me hours. My response rate tripled."</p>
-                <p><strong>Jessica L.</strong><br><small>Product Designer</small></p>
-            </div>
-        </div>
-    </div>
-    """
-    
-    cta = """
-    <div style="text-align:center; padding:40px; background:#f8f9fa; border-radius:15px; margin:30px 0;">
-        <h2 style="margin-bottom:20px;">Ready to Start Hunting?</h2>
-        <p style="font-size:1.1rem; margin-bottom:25px;">Configure your profile and let our AI find the perfect opportunities for you.</p>
-        <a href="/settings" style="display:inline-block; padding:15px 40px; background:linear-gradient(135deg, #38bdf8 0%, #0f172a 100%); color:white; text-decoration:none; border-radius:50px; font-weight:600;">Get Started Now</a>
-    </div>
-    """
-    
-    return page("/", "Welcome to RevenueForge", hero + features + testimonials + cta)
 
 
 @app.get("/command", response_class=HTMLResponse)
