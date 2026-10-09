@@ -1,0 +1,25 @@
+:root{--bg:#0f172a;--panel:#1e293b;--line:#334155;--sky:#38bdf8;--sky2:#0ea5e9;--txt:#e2e8f0;--mut:#94a3b8;--err:#f87171;--ok:#34d399}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(160deg,#0f172a,#16283f);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:var(--txt)}
+.auth-wrap{width:100%;max-width:440px}
+.auth-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:36px 32px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.logo{text-align:center;font-size:26px;font-weight:800;color:#fff;margin-bottom:26px}
+.logo b{color:var(--sky)}
+h1{font-size:22px;color:#fff;text-align:center;margin-bottom:6px}
+.sub{color:var(--mut);text-align:center;font-size:14px;margin-bottom:26px}
+label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px}
+input{width:100%;padding:12px 14px;background:#0f172a;border:1px solid var(--line);border-radius:8px;color:var(--txt);font-size:14px}
+input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+.recaptcha-wrap{margin-top:18px;display:flex;justify-content:center}
+.btn-primary{width:100%;margin-top:22px;padding:14px;background:var(--sky);color:#082f49;border:0;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:var(--sky2)}
+.btn-primary:disabled{background:var(--line);color:var(--mut)}
+.form-msg{margin-top:14px;padding:10px;border-radius:8px;font-size:13px;text-align:center;display:none}
+.form-msg.err{display:block;background:rgba(248,113,113,.12);color:var(--err)}
+.form-msg.ok{display:block;background:rgba(52,211,153,.12);color:var(--ok)}
+.auth-alt{margin-top:22px;text-align:center;font-size:14px;color:var(--mut)}
+.auth-alt a{color:var(--sky);text-decoration:none;font-weight:600}
+.auth-alt a:hover{text-decoration:underline}
+.note{background:#0f172a;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px;color:var(--mut);line-height:1.6;margin-top:16px}
+@media(max-width:480px){.auth-card{padding:26px 20px}}

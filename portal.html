@@ -74,6 +74,16 @@ footer .b{font-family:'Sora';font-weight:800}footer .b b{color:var(--accent)}foo
   setTimeout(markLinkedIn, 3000);
 })();
 </script>
+<style id="rf-mobile-fix">
+html,body{overflow-x:hidden;max-width:100%}
+img,table,pre,code,svg{max-width:100%}
+@media(max-width:900px){
+  aside,[class*="side"],[class*="sidebar"]{width:100%!important;position:static!important;height:auto!important;flex-direction:row!important;flex-wrap:wrap!important}
+  main,[class*="main"],[class*="content"]{margin-left:0!important;width:100%!important;padding:12px!important}
+  [class*="grid"],[class*="cards"]{grid-template-columns:1fr!important}
+  header h1{font-size:18px!important}
+}
+</style>
 </head><body>
 <header class="hdr"><div class="brand"><i class="fa-solid fa-shield-halved"></i>Revenue<b>Forge</b></div><button id="burger2"><i class="fa-solid fa-bars"></i></button></header>
 <div id="acctMenu" style="display:none;position:fixed;top:56px;right:12px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.15);z-index:200;min-width:190px;padding:8px">

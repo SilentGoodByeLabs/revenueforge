@@ -29,7 +29,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
 RF_ENV = os.environ.get("RF_ENV", "private")
 
 PRIVATE_ONLY = {"/settings","/jobagent","/pipeline","/outreach","/followups","/analytics","/command","/audit","/security","/admin/subs","/admin/projects","/admin/invites","/prospects","/scaling","/products","/api/engine-toggle","/api/run","/api/search-now","/api/settings","/api/invites","/api/move-stage","/api/add-to-pipeline","/jobs/ingest"}
-PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.html","/api/login-get","/api/paystack/init","/api/paystack/verify"}
+PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.html","/signup.html","/forgot.html","/api/signup","/api/login-get","/api/paystack/init","/api/paystack/verify"}
 
 
 
@@ -1308,7 +1308,7 @@ async def _do_login(request: Request):
             break
 
     if not email:
-        return RedirectResponse("/login?error=1", status_code=303)
+        return RedirectResponse("/login.html?error=1", status_code=303)
 
     users = ld("users.json", {})
     pw_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -1320,7 +1320,7 @@ async def _do_login(request: Request):
         sv("users.json", users)
         audit("Auto-signup via login: " + email)
     elif user.get("pw") != pw_hash:
-        return RedirectResponse("/login?error=1", status_code=303)
+        return RedirectResponse("/login.html?error=1", status_code=303)
 
     audit("Login: " + email)
     target = data.get("next") or data.get("redirect") or "/settings"
@@ -1343,7 +1343,7 @@ def api_login_get(
     
     email = email.strip().lower()
     if not email:
-        return RedirectResponse("/login?error=1", status_code=303)
+        return RedirectResponse("/login.html?error=1", status_code=303)
     
     users = ld("users.json", {})
     pw_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -1359,7 +1359,7 @@ def api_login_get(
         sv("users.json", users)
         audit("Auto-signup via GET login: " + email)
     elif user.get("pw") != pw_hash:
-        return RedirectResponse("/login?error=1", status_code=303)
+        return RedirectResponse("/login.html?error=1", status_code=303)
     
     audit("Login via GET: " + email)
     
@@ -1368,6 +1368,42 @@ def api_login_get(
     resp.set_cookie("rf_email", email, max_age=60*60*24*30)
     return resp
 
+
+@app.post("/api/signup")
+async def api_signup(request: Request):
+    import hashlib
+    try:
+        d = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "detail": "Bad request"}, status_code=400)
+    email = (d.get("email") or "").strip().lower()
+    pw = d.get("password") or ""
+    name = (d.get("name") or email.split("@")[0]).strip()
+    if not email or "@" not in email:
+        return JSONResponse({"ok": False, "detail": "Valid email required"}, status_code=400)
+    if len(pw) < 6:
+        return JSONResponse({"ok": False, "detail": "Password must be at least 6 characters"}, status_code=400)
+    users = ld("users.json", {})
+    if email in users:
+        return JSONResponse({"ok": False, "detail": "Account already exists - please log in"}, status_code=400)
+    users[email] = {"name": name, "pw": hashlib.sha256(pw.encode()).hexdigest(), "created": now()}
+    sv("users.json", users)
+    audit("Signup: " + email)
+    return JSONResponse({"ok": True, "email": email})
+
+@app.get("/signup.html", include_in_schema=False)
+def signup_html_page():
+    from pathlib import Path as _P
+    f = _P(__file__).parent.parent.parent / "signup.html"
+    if not f.exists(): f = _P("signup.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>signup.html missing</h1>")
+
+@app.get("/forgot.html", include_in_schema=False)
+def forgot_html_page():
+    from pathlib import Path as _P
+    f = _P(__file__).parent.parent.parent / "forgot.html"
+    if not f.exists(): f = _P("forgot.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>forgot.html missing</h1>")
 
 @app.post("/api/auth/login")
 async def api_auth_login(request: Request): return await _do_login(request)

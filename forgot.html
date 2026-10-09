@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Password Reset | RevenueForge</title>
+<link rel="stylesheet" href="css/auth.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head><body>
+<div class="auth-wrap"><div class="auth-card">
+<div class="logo">Revenue<b>Forge</b></div>
+<h1>Reset your password</h1><p class="sub">Verified by our support team for your security</p>
+<label for="em">Account email</label>
+<input id="em" type="email" required placeholder="you@company.com">
+<div class="note">For account safety, password resets are verified by a human. Click the button below - it opens your email app with a pre-filled reset request. Our team confirms your identity and sends your new password within 24 hours.</div>
+<button class="btn-primary" type="button" id="go">Email Support Reset Request</button>
+<p class="auth-alt" style="margin-top:18px"><a href="/login.html">Back to login</a></p>
+</div></div>
+<script>
+document.getElementById('go').onclick=function(){
+  var em=document.getElementById('em').value.trim();
+  if(!em||em.indexOf('@')<0){alert('Enter your account email first.');return;}
+  location.href='mailto:support@revenueforge.app?subject='+encodeURIComponent('Password reset request - '+em)+
+    '&body='+encodeURIComponent('Please reset the password for account: '+em+'\n\nRequested: '+new Date().toLocaleString()+'\nI confirm this is my account.');
+};
+</script>
+</body></html>

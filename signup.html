@@ -1,123 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Request Access | RevenueForge</title>
-<meta name="description" content="Client portal access is invite-only. Request your access code via the contact page.">
-<meta property="og:title" content="Request Access | RevenueForge">
-<meta property="og:description" content="Client portal access is invite-only. Request your access code via the contact page.">
-<meta property="og:image" content="assets/logo.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Request Access | RevenueForge">
-<meta name="twitter:description" content="Client portal access is invite-only. Request your access code via the contact page.">
-<meta name="twitter:image" content="assets/logo.png">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"RevenueForge","url":"https://revenueforge.example","logo":"assets/logo.png","email":"adeolaayodeji4666@gmail.com","sameAs":["https://github.com/SilentGoodByeLabs"]}
-</script>
-
-<link rel="icon" type="image/png" href="assets/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="css/style.css">
-<script src="https://www.google.com/recaptcha/api.js" async defer></script></head>
-<body>
-<div id="header"></div>
-<section class="auth-wrap">
-  <div class="auth-box">
-    <h1>Request Access</h1>
-    <p class="sub">Client portal access is invite-only. Request a code via the contact page if you don't have one.</p>
-    <form id="signupForm">
-      <label for="name">Full name</label>
-      <input id="name" type="text" required autocomplete="name">
-      <label for="email">Email</label>
-      <input id="email" type="email" required autocomplete="email">
-      <label for="password">Password (min 8 characters)</label>
-      <input id="password" type="password" required autocomplete="new-password">
-      <label for="invite">Access code</label>
-      <input id="invite" type="text" required>
-      <input class="hp" id="website" type="text" tabindex="-1" autocomplete="off">
-      <div class="captcha-box">
-        <span class="q" id="captchaQ"></span>
-        <input id="captchaA" type="text" inputmode="numeric" required aria-label="CAPTCHA answer">
-        <button type="button" class="captcha-refresh" onclick="RFSecurity.newCaptcha()" aria-label="New CAPTCHA"><i class="fa-solid fa-rotate"></i></button>
-      </div>
-      <div style="margin-top:18px"><div class="g-recaptcha" data-sitekey="6Lc-5ogtAAAAALRP2NOwo5mPU0MUf1MITyOAwJW4"></div><button class="btn btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Create Account</button></div>
-      <div id="formMsg" class="form-msg"></div>
-    </form>
-    <p class="auth-alt">Already have an account? <a href="login.html">Log in</a></p>
-  </div>
-</section>
-<div id="footer"></div>
-<script src="js/config.js"></script>
-<script src="js/security.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/chatbot.js"></script>
-<script src="js/layout.js"></script>
-
-<style>
-  /* Prevent footer and containers from causing horizontal scroll on mobile */
-  footer, .footer, footer div, footer p {
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-    word-wrap: break-word !important;
-    overflow-x: hidden !important;
-  }
-  body { overflow-x: hidden !important; }
-  .container, .wrapper, main, section { max-width: 100% !important; box-sizing: border-box !important; }
-</style>
-
-
-<div id="rf-spinner"><div class="rf-spin-circle"></div><p>Searching 188 sources...</p></div>
-<style>
-#rf-spinner{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(6px);}
-.rf-spin-circle{width:52px;height:52px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rf-spin 0.8s linear infinite;box-shadow:0 4px 12px rgba(37,99,235,0.15);}
-@keyframes rf-spin{to{transform:rotate(360deg);}}
-#rf-spinner p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px;letter-spacing:0.3px;}
-</style>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Account | RevenueForge</title>
+<link rel="stylesheet" href="css/auth.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head><body>
+<div class="auth-wrap"><div class="auth-card">
+<div class="logo">Revenue<b>Forge</b></div>
+<h1>Create your account</h1><p class="sub">Start your 24-hour free trial - no card required</p>
+<form id="signupForm">
+<label for="nm">Full name</label>
+<input id="nm" type="text" required placeholder="Your name">
+<label for="em">Email address</label>
+<input id="em" type="email" required placeholder="you@company.com">
+<label for="pw">Password (min 6 characters)</label>
+<input id="pw" type="password" required minlength="6" placeholder="Choose a password">
+<label for="pw2">Confirm password</label>
+<input id="pw2" type="password" required minlength="6" placeholder="Repeat password">
+<div class="recaptcha-wrap"><div class="g-recaptcha" data-sitekey="6Lc-5ogtAAAAALRP2NOwo5mPU0MUf1MITyOAwJW4"></div></div>
+<button class="btn-primary" type="submit" id="sBtn">Create Account</button>
+<div id="formMsg" class="form-msg"></div>
+</form>
+<p class="auth-alt">Already have an account? <a href="/login.html">Log in</a></p>
+</div></div>
 <script>
-(function(){
-  const sp = document.getElementById('rf-spinner');
-  window.showRfSpinner = (msg) => { if(sp){ sp.querySelector('p').textContent = msg||'Searching 188 sources...'; sp.style.display='flex'; }};
-  window.hideRfSpinner = () => { if(sp) sp.style.display='none'; };
-  const origFetch = window.fetch;
-  window.fetch = function(...args) {
-    const url = typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';
-    if(url.includes('search-hiring')||url.includes('pooled-jobs')||url.includes('refresh')){
-      showRfSpinner('Searching 188 sources...');
-      return origFetch.apply(this,args).finally(hideRfSpinner);
-    }
-    return origFetch.apply(this,args);
-  };
-})();
-</script>
-
-
-<!-- rfGlobalSpin-v2 -->
-<div id="rfSpinOverlay"><div class="rfCircle"></div><p id="rfSpinText">Searching 188 sources...</p></div>
-<style>
-#rfSpinOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px)}
-.rfCircle{width:56px;height:56px;border:5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:rfSpinAnim .8s linear infinite;box-shadow:0 8px 20px rgba(37,99,235,.2)}
-@keyframes rfSpinAnim{to{transform:rotate(360deg)}}
-#rfSpinOverlay p{margin-top:20px;font-weight:600;color:#1e293b;font-size:16px}
-</style>
-<script>
-(function(){var ov=document.getElementById('rfSpinOverlay');var origFetch=window.fetch;window.fetch=function(){var args=arguments,url=typeof args[0]==='string'?args[0]:(args[0]&&args[0].url)||'';if(url.indexOf('search-hiring')>-1||url.indexOf('pooled-jobs')>-1||url.indexOf('refresh')>-1){if(ov)ov.style.display='flex';return origFetch.apply(this,args).then(function(r){if(ov)ov.style.display='none';return r},function(e){if(ov)ov.style.display='none';throw e});}return origFetch.apply(this,args);};})();
-</script>
-
-
-<script>
-/* captchaGuard - blocks submit until YOUR google captcha is ticked */
-document.addEventListener('submit',function(e){
+document.getElementById('signupForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var m=document.getElementById('formMsg');
+  var pw=document.getElementById('pw').value, pw2=document.getElementById('pw2').value;
+  if(pw!==pw2){m.className='form-msg err';m.textContent='Passwords do not match.';return;}
   var w=document.querySelector('.g-recaptcha');
-  if(w&&window.grecaptcha&&!grecaptcha.getResponse()){
-    e.preventDefault();
-    var m=document.getElementById('capErr');
-    if(!m){m=document.createElement('p');m.id='capErr';m.style.cssText='color:#b42318;font-weight:700;font-size:13px;margin:8px 0 0';w.parentNode.insertBefore(m,w.nextSibling);}
-    m.textContent='Please complete the captcha to continue.';
-  }
-},true);
+  if(w&&window.grecaptcha&&!grecaptcha.getResponse()){m.className='form-msg err';m.textContent='Please tick the "I am not a robot" box.';return;}
+  document.getElementById('sBtn').disabled=true;
+  fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:document.getElementById('nm').value,email:document.getElementById('em').value,password:pw})})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d.ok){location.href='/login.html?created=1';}
+    else{m.className='form-msg err';m.textContent=d.detail||'Signup failed.';document.getElementById('sBtn').disabled=false;}
+  })
+  .catch(function(){m.className='form-msg err';m.textContent='Network error - try again.';document.getElementById('sBtn').disabled=false;});
+});
 </script>
-</body>
-</html>
+</body></html>

@@ -1,129 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Client Login | RevenueForge</title>
-<meta name="description" content="Secure client portal access for RevenueForge users.">
-<link rel="icon" type="image/png" href="assets/logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="css/auth.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<style>
-:root{--bg:#0f172a;--panel:#1e293b;--line:#334155;--sky:#38bdf8;--sky2:#0ea5e9;--txt:#e2e8f0;--mut:#94a3b8;--err:#ef4444;--ok:#10b981}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:var(--txt)}
-.auth-wrap{width:100%;max-width:440px}
-.auth-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.logo-wrap{text-align:center;margin-bottom:32px}
-.logo{font-size:28px;font-weight:800;color:#fff}
-.logo b{color:var(--sky)}
-h1{font-size:24px;color:#fff;margin-bottom:8px;text-align:center}
-.sub{color:var(--mut);text-align:center;font-size:14px;margin-bottom:32px}
-label{display:block;font-size:13px;font-weight:600;color:var(--txt);margin-bottom:6px;margin-top:18px}
-input[type="email"],input[type="password"],input[type="text"]{width:100%;padding:12px 14px;background:#0f172a;border:1px solid var(--line);border-radius:8px;color:var(--txt);font-size:14px;transition:.2s}
-input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
-input.hp{position:absolute;left:-9999px}
-.captcha-box{margin-top:18px;padding:14px;background:#0f172a;border:1px solid var(--line);border-radius:8px}
-.captcha-box .q{display:block;font-size:14px;color:var(--sky);margin-bottom:8px;font-weight:600}
-.captcha-wrap{display:flex;gap:8px;align-items:center}
-.captcha-wrap input{flex:1}
-.captcha-refresh{background:var(--line);color:var(--txt);border:0;border-radius:6px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
-.captcha-refresh:hover{background:var(--sky);color:#0f172a}
-.recaptcha-wrap{margin-top:18px;display:flex;justify-content:center}
-.btn-primary{width:100%;margin-top:24px;padding:14px;background:var(--sky);color:#082f49;border:0;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-primary:hover{background:var(--sky2);transform:translateY(-1px)}
-.btn-primary:disabled{background:var(--line);color:var(--mut);cursor:not-allowed;transform:none}
-.form-msg{margin-top:14px;padding:10px;border-radius:6px;font-size:13px;text-align:center;display:none}
-.form-msg.err{background:rgba(239,68,68,.15);color:var(--err);display:block}
-.form-msg.ok{background:rgba(16,185,129,.15);color:var(--ok);display:block}
-.auth-alt{margin-top:24px;text-align:center;font-size:14px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
-.auth-alt a{color:var(--sky);text-decoration:none;font-weight:500}
-.auth-alt a:hover{color:var(--sky2);text-decoration:underline}
-.auth-alt span{color:var(--line)}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(8,47,73,.3);border-top-color:#082f49;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:480px){.auth-card{padding:28px 24px}h1{font-size:22px}}
-</style>
-</head>
-<body>
-<div class="auth-wrap">
-  <div class="auth-card">
-    <div class="logo-wrap">
-      <div class="logo">Revenue<b>Forge</b></div>
-    </div>
-    <h1>Client Login</h1>
-    <p class="sub">Access your professional dashboard</p>
-    <form id="loginForm" action="/api/login-get" method="GET">
-      <label for="em">Email address</label>
-      <input id="em" name="email" type="email" required autocomplete="email" placeholder="you@company.com">
-      
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Enter your password">
-      
-      <input class="hp" id="website" type="text" tabindex="-1" autocomplete="off">
-      
-      <label>Security verification</label>
-      <div class="captcha-box">
-        <span class="q" id="captchaQ"></span>
-        <div class="captcha-wrap">
-          <input id="captchaA" name="captcha" type="text" inputmode="numeric" required placeholder="Your answer" aria-label="CAPTCHA answer">
-          <button type="button" class="captcha-refresh" onclick="RFSecurity.newCaptcha()" aria-label="New CAPTCHA">
-            <i class="fa-solid fa-rotate"></i>
-          </button>
-        </div>
-      </div>
-      
-      <div class="recaptcha-wrap">
-        <div class="g-recaptcha" data-sitekey="6Lc-5ogtAAAAALRP2NOwo5mPU0MUf1MITyOAwJW4"></div>
-      </div>
-      
-      <input type="hidden" id="gRecaptchaResponse" name="g-recaptcha-response">
-      
-      <button class="btn-primary" type="submit" id="loginBtn">
-        <i class="fa-solid fa-right-to-bracket"></i>
-        <span>Log In</span>
-      </button>
-      
-      <div id="formMsg" class="form-msg"></div>
-    </form>
-    
-    <div class="auth-alt">
-      <a href="#" onclick="alert('Password reset link sent to your email');return false">Forgot password?</a>
-      <span>|</span>
-      <a href="/login">Create account</a>
-    </div>
-  </div>
-</div>
-
-<script src="js/config.js"></script>
-<script src="js/security.js"></script>
-<script src="js/auth.js"></script>
-
+</head><body>
+<div class="auth-wrap"><div class="auth-card">
+<div class="logo">Revenue<b>Forge</b></div>
+<h1>Welcome back</h1><p class="sub">Log in to your dashboard</p>
+<form id="loginForm" action="/api/login-get" method="GET">
+<label for="em">Email address</label>
+<input id="em" name="email" type="email" required autocomplete="email" placeholder="you@company.com">
+<label for="password">Password</label>
+<input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Your password">
+<input type="hidden" name="g-recaptcha-response" id="gResp">
+<div class="recaptcha-wrap"><div class="g-recaptcha" data-sitekey="6Lc-5ogtAAAAALRP2NOwo5mPU0MUf1MITyOAwJW4"></div></div>
+<button class="btn-primary" type="submit" id="loginBtn">Log In</button>
+<div id="formMsg" class="form-msg"></div>
+</form>
+<p class="auth-alt">New here? <a href="/signup.html">Create an account</a> &nbsp;·&nbsp; <a href="/forgot.html">Forgot password?</a></p>
+</div></div>
 <script>
 (function(){
-  var form = document.getElementById('loginForm');
-  var btn = document.getElementById('loginBtn');
-  var msg = document.getElementById('formMsg');
-  
-  form.addEventListener('submit', function(e){
-    var w = document.querySelector('.g-recaptcha');
-    if(w && window.grecaptcha){
-      var resp = grecaptcha.getResponse();
-      if(!resp){
-        e.preventDefault();
-        msg.className = 'form-msg err';
-        msg.textContent = 'Please complete the reCAPTCHA';
-        return;
-      }
-      document.getElementById('gRecaptchaResponse').value = resp;
-    }
-    
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span><span>Signing in...</span>';
+  var f=document.getElementById('loginForm'),m=document.getElementById('formMsg');
+  var q=new URLSearchParams(location.search);
+  if(q.get('error')){m.className='form-msg err';m.textContent='Invalid email or password. Try again or create an account.';}
+  if(q.get('created')){m.className='form-msg ok';m.textContent='Account created successfully - log in below.';}
+  f.addEventListener('submit',function(e){
+    var w=document.querySelector('.g-recaptcha');
+    if(w&&window.grecaptcha){var r=grecaptcha.getResponse();
+      if(!r){e.preventDefault();m.className='form-msg err';m.textContent='Please tick the "I am not a robot" box.';return;}
+      document.getElementById('gResp').value=r;}
+    document.getElementById('loginBtn').disabled=true;
   });
 })();
 </script>
-
-</body>
-</html>
+</body></html>
