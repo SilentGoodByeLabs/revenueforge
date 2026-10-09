@@ -1426,36 +1426,8 @@ async def api_signin(request: Request): return await _do_login(request)
 
 
 @app.get("/login")
-def login_page():
-    return HTMLResponse(
-        """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Login - RevenueForge</title>
-            <style>
-                body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f5f5f5; }
-                .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 400px; width: 100%; }
-                h1 { margin-top: 0; color: #333; }
-                input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-                button { width: 100%; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 16px; }
-                button:hover { background: #0052a3; }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <h1>Sign In</h1>
-                <form method="post" action="/login">
-                    <input type="email" name="email" placeholder="Email" required>
-                    <input type="password" name="password" placeholder="Password" required>
-                    <button type="submit">Sign In</button>
-                </form>
-            </div>
-        </body>
-        </html>
-        """
-    )
-
+def login_redirect():
+    return RedirectResponse("/login.html", status_code=302)
 
 
 @app.get("/portal")
