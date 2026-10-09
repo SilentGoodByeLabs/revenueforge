@@ -1457,20 +1457,30 @@ def favicon():
 @app.get("/login.html", include_in_schema=False)
 def login_html_page():
     from pathlib import Path as _P
-    f = _P("login.html")
-    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>login.html missing</h1>")
+    import os
+    base_dir = _P(__file__).parent.parent.parent
+    f = base_dir / "login.html"
+    if not f.exists():
+        f = _P("login.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>login.html missing at: " + str(f) + "</h1>")
 
 @app.get("/contact.html", include_in_schema=False)
 def contact_html_page():
     from pathlib import Path as _P
-    f = _P("contact.html")
-    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>contact.html missing</h1>")
+    base_dir = _P(__file__).parent.parent.parent
+    f = base_dir / "contact.html"
+    if not f.exists():
+        f = _P("contact.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>contact.html missing at: " + str(f) + "</h1>")
 
 @app.get("/marketplace.html", include_in_schema=False)
 def marketplace_html_page():
     from pathlib import Path as _P
-    f = _P("marketplace.html")
-    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>marketplace.html missing</h1>")
+    base_dir = _P(__file__).parent.parent.parent
+    f = base_dir / "marketplace.html"
+    if not f.exists():
+        f = _P("marketplace.html")
+    return HTMLResponse(f.read_text()) if f.exists() else HTMLResponse("<h1>marketplace.html missing at: " + str(f) + "</h1>")
 
 
 @app.get("/version")
