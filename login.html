@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>location.replace("signin.html"+location.search);</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Client Login | RevenueForge</title>
@@ -24,7 +23,7 @@
 <link rel="stylesheet" href="css/style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script></head>
 <body>
-<script>try{var s=JSON.parse(sessionStorage.getItem('rf_session')||'{}');if(s.email){var n=new URLSearchParams(location.search).get('next');location.href=n?n:('portal.html?authed='+encodeURIComponent(s.email));}}catch(e){}</script>
+<script>try{var s=JSON.parse(sessionStorage.getItem('rf_session')||'{}');if(s.email){var n=new URLSearchParams(location.search).get('next');location.href=n?n:('/portal?email='+encodeURIComponent(s.email));}}catch(e){}</script>
 <div id="header"></div>
 <section class="auth-wrap">
   <div class="auth-box">
