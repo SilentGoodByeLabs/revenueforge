@@ -5,6 +5,20 @@ from datetime import datetime
 DATA = Path(__file__).resolve().parents[2] / "data"
 DATA.mkdir(exist_ok=True)
 
+
+# Global Playwright browser instances (reuse for speed)
+_pw_instance = None
+_browser_instance = None
+
+def _get_browser():
+    global _pw_instance, _browser_instance
+    if _browser_instance is None:
+        from playwright.sync_api import sync_playwright
+        _pw_instance = sync_playwright().start()
+        _browser_instance = _pw_instance.chromium.launch(headless=True)
+    return _browser_instance
+
+
 def ld(n, d):
     p = DATA / n
     if p.exists():
@@ -230,31 +244,64 @@ def _rss_jobs(url, platform, maxn=15):
 
 
 def _linkedin_browser(q=""):
-    """LinkedIn using Playwright browser (bypasses blocks)"""
+    """Scrape LinkedIn jobs with better error handling"""
     out = []
     try:
         from playwright.sync_api import sync_playwright
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto(f"https://www.linkedin.com/jobs/search/?keywords={_up.quote(q)}", timeout=30000)
-            page.wait_for_selector('.base-card', timeout=15000)
-            cards = page.query_selector_all('.base-card')
-            for card in cards[:20]:
-                title_el = card.query_selector('.base-search-card__title')
-                link_el = card.query_selector('a.base-card__full-link')
-                if title_el and link_el:
-                    out.append({
-                        "title": title_el.inner_text().strip(),
-                        "url": link_el.get_attribute('href'),
-                        "source": "linkedin",
-                        "platform": "linkedin",
-                        "description": "",
-                        "score": 95
-                    })
-            browser.close()
-    except Exception:
-        pass
+        pw = sync_playwright().start()
+        browser = pw.chromium.launch(headless=True)
+        context = browser.new_context(user_agent=_UA2["User-Agent"])
+        page = context.new_page()
+        
+        # LinkedIn jobs search URL
+        url = "https://www.linkedin.com/jobs/search?keywords=" + (q or "developer") + "&location=Worldwide"
+        
+        try:
+            page.goto(url, timeout=30000)
+            page.wait_for_timeout(3000)
+            
+            # Find job cards
+            cards = page.query_selector_all('.job-search-card, .base-card, [data-entity-urn]')
+            
+            for card in cards[:25]:
+                try:
+                    # Get title
+                    title_el = card.query_selector('.base-search-card__title, h3, .job-card-list__title')
+                    if not title_el:
+                        continue
+                    title = title_el.inner_text().strip()
+                    
+                    # Get URL
+                    link_el = card.query_selector('a[href]')
+                    url = link_el.get_attribute('href') if link_el else ''
+                    
+                    # Get company
+                    company_el = card.query_selector('.base-search-card__subtitle, .job-search-card__company-name')
+                    company = company_el.inner_text().strip() if company_el else 'LinkedIn'
+                    
+                    if title and url and len(title) > 5:
+                        if q and q.lower() not in title.lower():
+                            continue
+                        # Clean URL
+                        if url.startswith('/'):
+                            url = 'https://www.linkedin.com' + url
+                        out.append(_mk2(title, url, 'linkedin', company))
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"LinkedIn page error: {e}", file=_sys.stderr)
+        finally:
+            try:
+                page.close()
+                context.close()
+                browser.close()
+                pw.stop()
+            except:
+                pass
+                
+    except Exception as e:
+        print(f"LinkedIn browser error: {e}", file=_sys.stderr)
+    
     return out
 
 def _indeed_browser(q=""):
@@ -263,7 +310,7 @@ def _indeed_browser(q=""):
     try:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = _get_browser()
             page = browser.new_page()
             page.goto(f"https://www.indeed.com/jobs?q={_up.quote(q)}", timeout=30000)
             page.wait_for_timeout(3000)
@@ -375,11 +422,18 @@ def gather_all(q=""):
     try: jobs=list(_orig_gather_all(q))
     except Exception: jobs=[]
     futs=[]
-    with _cf.ThreadPoolExecutor(max_workers=7) as ex:
-        futs=[ex.submit(f, q) for f in (_linkedin_browser,_indeed_browser,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra)]
-        for fu in _cf.as_completed(futs, timeout=120):
-            try: jobs += fu.result(timeout=45) or []
-            except Exception: pass
+    with _cf.ThreadPoolExecutor(max_workers=14) as ex:
+        futs=[ex.submit(f, q) for f in (_linkedin_browser,_indeed_browser,_arbeitnow,_gh_extra,_lever_extra,_ashby_extra,_rss_extra,_remoteok,_jobicy,_muse,_pyjobs,_gh_extra2,_lever_extra2,_ashby_extra2,_wwr_extra_cats,_remotive_extra_cats,_glassdoor,_ziprecruiter,_monster,_dice,_wellfound,_builtin,_fetch_all_registry)]
+        try:
+            for fu in _cf.as_completed(futs, timeout=300):
+                try: 
+                    result = fu.result(timeout=120)
+                    if result:
+                        jobs += result
+                except Exception as e:
+                    print(f"Warning: Task failed: {e}", file=_sys.stderr)
+        except _cf.TimeoutError:
+            print("Warning: Some tasks timed out, continuing with partial results", file=_sys.stderr)
     seen=set(); ded=[]
     for j in jobs:
         if 'platform' not in j and 'source' in j:
@@ -390,3 +444,236 @@ def gather_all(q=""):
     return ded
 
 SOURCE_COUNT = len(RSS_FEEDS) + len(GH_EXTRA) + len(LEVER_EXTRA) + len(ASHBY_EXTRA) + len(RSS_EXTRA) + 49
+
+
+# ================= EXTRA PLATFORMS v2 (real boards) =================
+import requests as _rq2
+_UA2 = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+
+def _mk2(title, url, source, desc="", score=70):
+    return {"title": title, "url": url, "source": source, "platform": source, "description": desc, "score": score}
+
+def _qmatch(q, blob):
+    if not q: return True
+    return any(w in blob for w in q.lower().split())
+
+def _remoteok(q=""):
+    try:
+        r = _rq2.get("https://remoteok.com/api", timeout=20, headers=_UA2)
+        arr = r.json()
+        out = []
+        for it in (arr[1:] if isinstance(arr, list) else []):
+            if not isinstance(it, dict): continue
+            ti = it.get("position", "")
+            de = (it.get("description") or "")[:400]
+            tags = " ".join(it.get("tags") or [])
+            if _qmatch(q, (ti + " " + de + " " + tags).lower()):
+                out.append(_mk2(ti, it.get("url", ""), "remoteok", de))
+        return out[:30]
+    except Exception:
+        return []
+
+def _jobicy(q=""):
+    try:
+        r = _rq2.get("https://jobicy.com/api/v2/remote-jobs?count=50", timeout=20, headers=_UA2)
+        out = []
+        for it in r.json().get("jobs", []):
+            ti = it.get("jobTitle", "")
+            de = (it.get("jobExcerpt") or "")[:400]
+            if _qmatch(q, (ti + " " + de).lower()):
+                out.append(_mk2(ti, it.get("url", ""), "jobicy", de))
+        return out[:30]
+    except Exception:
+        return []
+
+def _muse(q=""):
+    try:
+        r = _rq2.get("https://www.themuse.com/api/public/jobs?page=1", timeout=20, headers=_UA2)
+        out = []
+        for it in r.json().get("results", []):
+            ti = it.get("name", "")
+            de = (it.get("contents") or "")[:400]
+            if _qmatch(q, (ti + " " + de).lower()):
+                out.append(_mk2(ti, (it.get("refs") or {}).get("landing_page", ""), "themuse", de))
+        return out[:30]
+    except Exception:
+        return []
+
+def _pyjobs(q=""):
+    try:
+        import re as _re2
+        r = _rq2.get("https://www.python.org/jobs/feeds/rss/", timeout=20, headers=_UA2)
+        items = _re2.findall(r"<item>\s*<title>(.*?)</title>\s*<link>(.*?)</link>", r.text, _re2.S)
+        out = []
+        for ti, lk in items[:25]:
+            if _qmatch(q, ti.lower()):
+                out.append(_mk2(ti.strip(), lk.strip(), "python-jobs", ""))
+        return out
+    except Exception:
+        return []
+
+GH2 = ["adyen", "affirm", "airbnb", "airtable", "anthropic", "asana", "brex", "calendly", "chime", "cloudflare", "coinbase", "coinbase", "coursera", "databricks", "datadog", "datadog", "discord", "discord", "dropbox", "duolingo", "elastic", "figma", "figma", "fivetran", "gitlab", "gitlab", "gusto", "instacart", "intercom", "kayak", "khanacademy", "lyft", "medium", "mercury", "mongodb", "monzo", "netlify", "okta", "pinterest", "reddit", "ripple", "robinhood", "roblox", "scaleai", "sofi", "spacex", "stackblitz", "stripe", "stripe", "toast", "tripadvisor", "twilio", "twitch", "twitch", "typeform", "udemy", "vercel", "vercel", "wise", "zscaler"]
+
+LEVER2 = ["spotify"]
+
+ASHBY2 = ["attio", "cerebras", "clickup", "cohere", "cursor", "elevenlabs", "fireworks", "hex", "langchain", "linear", "llamaindex", "midjourney", "miro", "modal", "neon", "notion", "openai", "perplexity", "plaid", "plain", "posthog", "ramp", "runway", "sierra", "spoton", "supabase"]
+
+def _gh_extra2(q=""):
+    out = []
+    for token in GH2:
+        try:
+            r = _rq2.get("https://boards-api.greenhouse.io/v1/boards/" + token + "/jobs", timeout=15, headers=_UA2)
+            if r.status_code != 200: continue
+            for j in r.json().get("jobs", [])[:4]:
+                ti = j.get("title", "")
+                if _qmatch(q, ti.lower()):
+                    out.append(_mk2(ti, j.get("absolute_url", ""), "greenhouse/" + token, ""))
+        except Exception:
+            pass
+    return out
+
+def _lever_extra2(q=""):
+    out = []
+    for token in LEVER2:
+        try:
+            r = _rq2.get("https://api.lever.co/v0/postings/" + token + "?mode=json", timeout=15, headers=_UA2)
+            if r.status_code != 200: continue
+            for j in r.json()[:4]:
+                ti = j.get("text", "")
+                if _qmatch(q, ti.lower()):
+                    out.append(_mk2(ti, j.get("hostedUrl", ""), "lever/" + token, ""))
+        except Exception:
+            pass
+    return out
+
+def _ashby_extra2(q=""):
+    out = []
+    for token in ASHBY2:
+        try:
+            r = _rq2.post("https://api.ashbyhq.com/posting-api/job-board/" + token, json={}, timeout=15, headers=_UA2)
+            if r.status_code != 200: continue
+            for j in r.json().get("jobs", [])[:4]:
+                ti = j.get("title", "")
+                if _qmatch(q, ti.lower()):
+                    out.append(_mk2(ti, j.get("jobUrl", ""), "ashby/" + token, ""))
+        except Exception:
+            pass
+    return out
+
+def _wwr_extra_cats(q=""):
+    import re as _re3
+    cats = ["management","marketing","support","sales","finance","legal","hr","product","devops","copywriting"]
+    out = []
+    for c in cats:
+        try:
+            r = _rq2.get("https://weworkremotely.com/categories/remote-" + c + "-jobs.rss", timeout=15, headers=_UA2)
+            items = _re3.findall(r"<item>\s*<title>(.*?)</title>\s*<link>(.*?)</link>", r.text, _re3.S)
+            for ti, lk in items[:8]:
+                if _qmatch(q, ti.lower()):
+                    out.append(_mk2(ti.strip(), lk.strip(), "weworkremotely-" + c, ""))
+        except Exception:
+            pass
+    return out
+
+def _remotive_extra_cats(q=""):
+    try:
+        r = _rq2.get("https://remotive.com/api/remote-jobs?limit=20", timeout=20, headers=_UA2)
+        out = []
+        for it in r.json().get("job-posts", []):
+            ti = it.get("title", "")
+            cat = it.get("category", "general")
+            de = (it.get("description") or "")[:300]
+            if _qmatch(q, (ti + " " + de).lower()):
+                out.append(_mk2(ti, it.get("url", ""), "remotive/" + str(cat), de))
+        return out[:30]
+    except Exception:
+        return []
+
+
+def _browser_generic(name, url, card_sel, title_sel, q=""):
+    out = []
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as pw:
+            b = pw.chromium.launch(headless=True)
+            pg = b.new_page(user_agent=_UA2["User-Agent"])
+            pg.goto(url, timeout=30000)
+            pg.wait_for_timeout(2500)
+            for c in pg.query_selector_all(card_sel)[:20]:
+                te = c.query_selector(title_sel)
+                le = c.query_selector("a")
+                ti = te.inner_text().strip() if te else ""
+                lk = le.get_attribute("href") if le else ""
+                if ti and lk and len(ti) > 8:
+                    if lk.startswith("/"):
+                        lk = "https://" + url.split("/")[2] + lk
+                    if q and q.lower() not in ti.lower():
+                        continue
+                    out.append(_mk2(ti, lk, name, ""))
+            b.close()
+    except Exception:
+        pass
+    return out
+
+def _glassdoor(q=""):
+    return _browser_generic("glassdoor", "https://www.glassdoor.com/Job/jobs.htm?sc.keyword=" + (q or "developer"), ".jobCard", ".jobCard-header")
+
+def _ziprecruiter(q=""):
+    return _browser_generic("ziprecruiter", "https://www.ziprecruiter.com/jobs-search?search=" + (q or "developer"), "a.job_link", "a.job_link")
+
+def _monster(q=""):
+    return _browser_generic("monster", "https://www.monster.com/jobs/search/?q=" + (q or "developer"), ".job-card", ".job-card-title")
+
+def _dice(q=""):
+    return _browser_generic("dice", "https://www.dice.com/jobs?q=" + (q or "developer"), "div[data-testid='jobCard']", "a[title]")
+
+def _wellfound(q=""):
+    return _browser_generic("wellfound", "https://wellfound.com/jobs?search=" + (q or "developer"), ".job__info", ".job__title")
+
+def _builtin(q=""):
+    return _browser_generic("builtin", "https://builtin.com/jobs?search=" + (q or "developer"), ".job-tile", ".job-tile-title")
+
+
+def _fetch_all_registry(q=""):
+    """Fetch jobs from all platforms in the registry"""
+    import json
+    from pathlib import Path
+    out = []
+    try:
+        reg = json.loads(Path('data/platform_registry.json').read_text())
+        for platform in reg:
+            name = platform.get('name', '')
+            url = platform.get('url', '')
+            # Try to fetch from the platform
+            if 'greenhouse' in name:
+                token = name.split('/')[1]
+                try:
+                    r = _rq2.get(f'https://boards-api.greenhouse.io/v1/boards/{token}/jobs', timeout=10, headers=_UA2)
+                    if r.status_code == 200:
+                        for j in r.json().get('jobs', [])[:5]:
+                            ti = j.get('title', '')
+                            if _qmatch(q, ti.lower()):
+                                out.append(_mk2(ti, j.get('absolute_url', ''), name, ''))
+                except: pass
+            elif 'lever' in name:
+                token = name.split('/')[1]
+                try:
+                    r = _rq2.get(f'https://api.lever.co/v0/postings/{token}?mode=json', timeout=10, headers=_UA2)
+                    if r.status_code == 200:
+                        for j in r.json()[:5]:
+                            ti = j.get('text', '')
+                            if _qmatch(q, ti.lower()):
+                                out.append(_mk2(ti, j.get('hostedUrl', ''), name, ''))
+                except: pass
+            elif 'ashby' in name:
+                token = name.split('/')[1]
+                try:
+                    r = _rq2.post(f'https://api.ashbyhq.com/posting-api/job-board/{token}', json={}, timeout=10, headers=_UA2)
+                    if r.status_code == 200:
+                        for j in r.json().get('jobs', [])[:5]:
+                            ti = j.get('title', '')
+                            if _qmatch(q, ti.lower()):
+                                out.append(_mk2(ti, j.get('jobUrl', ''), name, ''))
+                except: pass
+    except: pass
+    return out

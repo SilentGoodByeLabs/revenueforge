@@ -3,3 +3,165 @@
 2026-09-15T21:09:47.740196  job agent search 'python automation' -> 30
 2026-09-17T17:46:37.265808  job agent search 'python' -> 30
 2026-09-17T19:00:31.300301  job agent search 'python' -> 30
+2026-09-17T19:55:22.480089  job agent search 'python' -> 30
+2026-09-18T01:19:17.237629  job agent search 'python' -> 30
+2026-10-01T22:16:38.722061  search-hiring -> 377 from 105+ sources
+2026-10-01T22:28:31.926731  view /
+2026-10-01T22:28:37.128835  view /command
+2026-10-02T18:45:54.342489  view /command
+2026-10-02T18:52:32.616498  view /
+2026-10-02T19:14:53.889920  run search -> 377 jobs
+2026-10-02T19:16:05.683809  run search -> 377 jobs
+2026-10-02T19:22:48.642028  view /
+2026-10-02T19:42:29.840237  view /
+2026-10-02T19:42:29.848851  view /command
+2026-10-02T20:13:33.029012  run search -> 317 jobs
+2026-10-02T20:13:39.219979  view /
+2026-10-02T20:13:39.228226  view /command
+2026-10-02T20:15:12.934297  view /command
+2026-10-02T20:16:31.935221  run search -> 317 jobs
+2026-10-02T20:16:31.964403  view /command
+2026-10-02T20:16:35.847741  run search -> 317 jobs
+2026-10-02T20:16:35.855432  view /command
+2026-10-02T20:16:37.565212  view /
+2026-10-02T21:37:01.390991  view /command
+2026-10-02T22:08:40.782774  view /
+2026-10-02T22:08:40.819614  view /command
+2026-10-03T18:23:01.872380  view /
+2026-10-03T18:23:16.709853  view /command
+2026-10-03T18:34:00.650507  view /command
+2026-10-03T18:48:44.829909  view /command
+2026-10-03T18:57:33.023517  view /command
+2026-10-03T19:03:11.453669  view /command
+2026-10-03T19:03:25.259646  view /command
+2026-10-03T19:03:26.004418  view /command
+2026-10-03T19:03:26.157461  view /command
+2026-10-03T19:03:26.366355  view /command
+2026-10-03T19:03:26.521507  view /command
+2026-10-03T19:03:26.693087  view /command
+2026-10-03T19:03:26.858033  view /command
+2026-10-03T19:03:26.997123  view /command
+2026-10-03T19:03:27.198699  view /command
+2026-10-03T19:03:27.699313  view /command
+2026-10-03T19:03:27.851575  view /command
+2026-10-03T19:03:27.894412  view /command
+2026-10-03T19:03:27.925115  view /command
+2026-10-03T19:03:28.059619  view /command
+2026-10-03T19:03:28.090620  view /command
+2026-10-03T19:03:28.173342  view /command
+2026-10-03T19:03:28.192088  view /command
+2026-10-03T19:03:28.276082  view /command
+2026-10-03T19:05:13.034601  view /security
+2026-10-03T19:05:25.009533  invite generated
+2026-10-03T19:05:45.963056  view /command
+2026-10-03T19:31:23.347466  view /command
+2026-10-03T19:31:26.659469  view /command
+2026-10-03T19:31:30.354627  run search -> 454 jobs
+2026-10-03T19:31:30.363614  view /command
+2026-10-03T19:53:04.616224  view /command
+2026-10-03T19:53:08.394616  view /command
+2026-10-03T19:55:32.871952  settings saved
+2026-10-03T19:59:02.260406  view /command
+2026-10-03T19:59:28.400716  view /command
+2026-10-03T20:01:29.724812  view /command
+2026-10-03T20:01:36.913516  run search -> 542 jobs
+2026-10-03T20:01:36.927084  view /command
+2026-10-03T20:01:51.548263  view /command
+2026-10-03T20:02:24.841393  view /command
+2026-10-03T20:02:27.121302  run search -> 550 jobs
+2026-10-03T20:02:27.133917  view /command
+2026-10-03T20:16:22.715983  view /command
+2026-10-03T20:29:20.098505  Pipeline: Senior Python Engineer
+2026-10-03T20:31:32.516549  Pipeline: Edfinity: Senior Software Engineer, remote
+2026-10-03T20:36:13.854463  view /command
+2026-10-03T20:39:43.901557  view /command
+2026-10-03T20:39:53.540868  manual live hunt triggered
+2026-10-03T20:46:27.371560  manual live hunt triggered
+2026-10-03T20:47:53.314722  view /command
+2026-10-03T20:54:11.848054  CV saved
+2026-10-03T21:05:54.799527  view /command
+2026-10-03T21:06:54.936514  view /command
+2026-10-03T21:07:55.042660  view /command
+2026-10-03T21:08:55.133011  view /command
+2026-10-03T21:09:19.541040  view /command
+2026-10-03T21:19:35.062994  view /command
+2026-10-03T21:43:25.048113  Pushed 1 jobs from localtest, total now: 1
+2026-10-03T21:53:17.505293  Pushed 1 jobs from localtest, total now: 1
+2026-10-05T16:39:31.169060  view /command
+2026-10-05T17:19:21.644685  Auto-signup via login: test@test.com
+2026-10-05T17:19:21.644728  Login: test@test.com
+2026-10-05T17:32:53.411780  Login: test@test.com
+2026-10-06T04:36:54.733236  Auto-signup: me@test.com
+2026-10-06T05:10:07.941617  Auto-signup via GET login: admin@gmail.com
+2026-10-06T05:10:07.941661  Login via GET: admin@gmail.com
+2026-10-06T05:10:12.645312  Auto-signup via GET login: test@example.com
+2026-10-06T05:10:12.645357  Login via GET: test@example.com
+2026-10-06T05:15:02.948404  view /command
+2026-10-06T05:15:43.419851  invite generated
+2026-10-06T11:56:39.119907  Login via GET: admin@gmail.com
+2026-10-06T16:31:43.224000  view /command
+2026-10-06T20:21:26.031030  view /security
+2026-10-06T20:21:26.802644  view /command
+2026-10-06T20:22:42.666888  engine toggled OFF
+2026-10-06T20:22:42.670386  CV saved
+2026-10-06T20:22:42.676480  Pipeline: ZZ-FULLTEST Job
+2026-10-06T20:22:42.685689  invite generated
+2026-10-06T20:22:42.691975  Pushed 0 jobs from unknown, total now: 1
+2026-10-06T20:22:42.707379  Auto-signup via GET login: fulltest@revenueforge.test
+2026-10-06T20:22:42.707533  Login via GET: fulltest@revenueforge.test
+2026-10-06T20:33:47.959934  view /command
+2026-10-06T20:34:01.030526  view /security
+2026-10-06T21:10:06.372984  view /security
+2026-10-06T21:10:06.478896  view /command
+2026-10-06T21:10:06.606103  engine toggled OFF
+2026-10-06T21:10:06.611626  CV saved
+2026-10-06T21:10:06.618818  Pipeline: ZZ-FULLTEST Job
+2026-10-06T21:10:06.627509  invite generated
+2026-10-06T21:10:06.631683  Pushed 0 jobs from unknown, total now: 1
+2026-10-06T21:10:06.644447  Login via GET: fulltest@revenueforge.test
+2026-10-06T22:37:25.820580  view /security
+2026-10-06T22:37:25.930490  view /command
+2026-10-06T22:37:26.016936  engine toggled OFF
+2026-10-06T22:37:26.019574  CV saved
+2026-10-06T22:37:26.026260  Pipeline: ZZ-FULLTEST
+2026-10-06T22:37:26.042595  invite generated
+2026-10-06T22:37:26.051182  Pushed 0 jobs from unknown, total now: 1
+2026-10-06T22:52:49.735676  view /security
+2026-10-06T22:52:49.834170  view /command
+2026-10-06T22:52:49.916181  engine toggled OFF
+2026-10-06T22:52:49.918369  CV saved
+2026-10-06T22:52:49.923217  Pipeline: ZZ
+2026-10-06T22:52:49.930568  invite generated
+2026-10-06T22:52:49.934671  Pushed 0 jobs from unknown, total now: 1
+2026-10-07T17:26:45.332127  view /security
+2026-10-07T17:44:13.929320  view /security
+2026-10-07T17:44:14.020112  view /command
+2026-10-07T17:44:14.082828  engine toggled OFF
+2026-10-07T17:44:14.085080  CV saved
+2026-10-07T17:44:14.089505  Pipeline: ZZ
+2026-10-07T17:44:14.109513  invite generated
+2026-10-07T17:44:14.113853  Pushed 0 jobs from unknown, total now: 1
+2026-10-07T17:48:56.027230  view /security
+2026-10-07T18:00:52.515046  view /security
+2026-10-07T18:00:52.646116  view /command
+2026-10-07T18:00:52.747927  engine toggled OFF
+2026-10-07T18:00:52.752034  CV saved
+2026-10-07T18:00:52.758899  Pipeline: ZZ
+2026-10-07T18:00:52.772290  invite generated
+2026-10-07T18:00:52.784160  Pushed 0 jobs from unknown, total now: 1
+2026-10-07T18:07:59.694806  view /command
+2026-10-07T18:34:22.636984  view /command
+2026-10-07T18:34:58.163105  CV saved
+2026-10-07T18:55:52.991738  view /security
+2026-10-07T18:55:53.101618  view /command
+2026-10-07T18:55:53.202759  engine toggled OFF
+2026-10-07T18:55:53.205927  CV saved
+2026-10-07T18:55:53.214626  Pipeline: ZZ
+2026-10-07T18:55:53.230490  invite generated
+2026-10-07T18:55:53.241171  Pushed 0 jobs from unknown, total now: 1
+2026-10-08T19:10:39.711318  view /command
+2026-10-09T07:21:58.230070  Login via GET: test@test.com
+2026-10-09T07:22:29.496007  Login via GET: test@test.com
+2026-10-09T07:40:20.235687  Login via GET: test@test.com
+2026-10-09T14:56:22.984131  Signup: realtest@revenueforge.test
+2026-10-09T14:56:23.006250  Login via GET: realtest@revenueforge.test

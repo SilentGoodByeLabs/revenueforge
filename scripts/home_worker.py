@@ -26,6 +26,24 @@ def run_cycle():
         log(f"Found {len(jobs)} unique jobs")
         
         if jobs:
+            # Save to local cache for UI
+            import json
+            from datetime import datetime
+            cache_file = Path("data/last_search.json")
+            cache_data = {
+                "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "jobs": jobs,
+                "query": "auto-hunt"
+            }
+            cache_file.write_text(json.dumps(cache_data, indent=2))
+            log(f"Saved {len(jobs)} jobs to cache")
+            
+            # Save to jobs.json for UI
+            jobs_file = Path("data/jobs.json")
+            jobs_file.write_text(json.dumps(jobs, indent=2))
+            log(f"Saved {len(jobs)} jobs to jobs.json")
+            
+            # Push to cloud
             log("Pushing to cloud...")
             push_jobs(jobs)
             log("Push complete")
@@ -40,9 +58,20 @@ def main():
     log(f"Scraping {SOURCE_COUNT} sources from home IP")
     
     while True:
-        run_cycle()
-        log("Sleeping 30 minutes...")
-        time.sleep(1800)  # 30 minutes
+        try:
+            run_cycle()
+        except Exception as e:
+            log(f"FATAL ERROR in cycle: {type(e).__name__}: {e}")
+            log("Will retry in 30 minutes...")
+        freq = 10
+        try:
+            import json as _j
+            _s = _j.loads(Path("data/settings.json").read_text())
+            freq = int(_s.get("frequency", 10))
+        except Exception:
+            freq = 10
+        log(f"Sleeping {freq} minutes...")
+        time.sleep(freq * 60)
 
 if __name__ == "__main__":
     main()

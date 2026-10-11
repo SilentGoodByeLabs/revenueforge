@@ -19,6 +19,15 @@ except Exception:
 
 
 app = FastAPI(title="RevenueForge Control Center")
+
+# Mount static directories
+from starlette.staticfiles import StaticFiles
+from pathlib import Path as _Path
+if _Path("css").exists():
+    app.mount("/css", StaticFiles(directory="css"), name="css")
+if _Path("assets").exists():
+    app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -1079,144 +1088,121 @@ def _long_proposal(job, company, reqs, cv):
     if cv.get("links"): p.append(cv.get("links"))
     return "\n".join(p)
 
+
+PROPOSAL_TEMPLATE = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proposal Generator | RevenueForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+header{background:#1e293b;padding:16px 24px;border-radius:12px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:22px;color:#fff}header a{color:#38bdf8;text-decoration:none;font-size:14px}
+.container{max-width:800px;margin:0 auto}.card{background:#1e293b;padding:24px;border-radius:12px;margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px;color:#94a3b8}
+input,textarea{width:100%;padding:12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px}
+input:focus,textarea:focus{outline:none;border-color:#38bdf8}textarea{min-height:100px;resize:vertical}
+.btn{padding:12px 24px;background:#38bdf8;color:#082f49;border:0;border-radius:8px;font-weight:700;cursor:pointer;margin-top:20px;margin-right:8px}
+.btn:hover{background:#0ea5e9}.output{background:#0f172a;padding:20px;border-radius:8px;white-space:pre-wrap;line-height:1.8;margin-top:20px}
+@media(max-width:600px){header{flex-direction:column;gap:12px;text-align:center}}
+</style></head><body>
+<header><h1>Proposal Generator</h1><a href="/portal">Back to Portal</a></header>
+<div class="container"><form method="get">
+<div class="card"><h2>Job Details</h2>
+<label>Job Title</label><input name="job" value="__JOB__" placeholder="Senior Python Developer">
+<label>Company</label><input name="company" value="__COMPANY__" placeholder="Acme Corp">
+<label>Requirements (one per line)</label><textarea name="reqs" placeholder="5+ years Python">__REQS__</textarea></div>
+<button type="submit" class="btn">Generate Proposal</button>
+</form>__OUTPUT__</div></body></html>"""
+
 @app.get("/proposal", response_class=HTMLResponse)
-def proposal(job: str = "", company: str = "", reqs: str = ""):
+def proposal_page(job: str = "", company: str = "", reqs: str = ""):
     cv = ld("cv.json", {})
-    body = ""
+    html = PROPOSAL_TEMPLATE
+    html = html.replace("__JOB__", esc(job)).replace("__COMPANY__", esc(company)).replace("__REQS__", esc(reqs))
     if job:
         txt = _long_proposal(job, company, reqs, cv)
-        words = len(txt.split())
-        body = "<div id='ptxt' style='background:#fff;padding:30px;border-radius:8px;white-space:pre-wrap;line-height:1.8'>" + esc(txt) + "</div>"
-        body += "<p style='margin-top:10px;color:#666'>Length: " + str(words) + " words (professional long-form)</p>"
-        body += "<button onclick='navigator.clipboard.writeText(document.getElementById(&quot;ptxt&quot;).innerText)' style='margin:10px 6px 0 0;padding:10px 20px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Copy</button>"
-        body += "<button onclick='window.print()' style='padding:10px 20px;background:#16a34a;color:#fff;border:0;border-radius:5px;cursor:pointer'>Print</button>"
-    form = "<form method='get' style='background:#fff;padding:20px;border-radius:8px;margin-bottom:20px'>"
-    form += "<label>Job Title:<br><input name='job' value='" + esc(job) + "' style='width:100%;padding:8px;margin:6px 0'></label>"
-    form += "<label>Company:<br><input name='company' value='" + esc(company) + "' style='width:100%;padding:8px;margin:6px 0'></label>"
-    form += "<label>Requirements (one per line):<br><textarea name='reqs' rows='5' style='width:100%;padding:8px;margin:6px 0'>" + esc(reqs) + "</textarea></label>"
-    form += "<button type='submit' style='padding:12px 24px;background:#3498db;color:#fff;border:0;border-radius:5px;cursor:pointer'>Generate Professional Proposal</button></form>"
-    return page("/proposal", "Proposal Generator", form + body)
+        html = html.replace("__OUTPUT__", "<div class='output'>" + esc(txt) + "</div><button class='btn' onclick='window.print()'>Print Proposal</button>")
+    else:
+        html = html.replace("__OUTPUT__", "")
+    return HTMLResponse(html)
+
+
+
+CVBUILDER_TEMPLATE = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CV Builder | RevenueForge</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+header{background:#1e293b;padding:16px 24px;border-radius:12px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:22px;color:#fff}header a{color:#38bdf8;text-decoration:none;font-size:14px}
+.container{max-width:800px;margin:0 auto}.card{background:#1e293b;padding:24px;border-radius:12px;margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px;color:#94a3b8}
+input,textarea{width:100%;padding:12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px}
+input:focus,textarea:focus{outline:none;border-color:#38bdf8}textarea{min-height:100px;resize:vertical}
+.btn{padding:12px 24px;background:#38bdf8;color:#082f49;border:0;border-radius:8px;font-weight:700;cursor:pointer;margin-top:20px;margin-right:8px}
+.btn:hover{background:#0ea5e9}
+@media(max-width:600px){header{flex-direction:column;gap:12px;text-align:center}}
+</style></head><body>
+<header><h1>CV Builder</h1><a href="/portal">Back to Portal</a></header>
+<div class="container"><form id="cvForm" enctype="multipart/form-data">
+<div class="card"><h2>Personal Info</h2>
+<label>Full Name</label><input name="name" value="__NAME__">
+<label>Professional Title</label><input name="title" value="__TITLE__">
+<label>Email</label><input name="email" value="__EMAIL__">
+<label>Phone</label><input name="phone" value="__PHONE__">
+<label>Photo</label><input type="file" name="photo" accept="image/*"></div>
+<div class="card"><h2>Summary</h2><textarea name="summary">__SUMMARY__</textarea></div>
+<div class="card"><h2>Skills</h2><textarea name="skills">__SKILLS__</textarea></div>
+<div class="card"><h2>Experience</h2><textarea name="experience">__EXPERIENCE__</textarea></div>
+<div class="card"><h2>Education</h2><textarea name="education">__EDUCATION__</textarea></div>
+<div class="card"><h2>Certifications</h2><textarea name="certs">__CERTS__</textarea></div>
+<button type="submit" class="btn">Save CV</button>
+<button type="button" class="btn" onclick="window.print()">Print / Save PDF</button>
+</form></div>
+<script>
+document.getElementById('cvForm').addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(this);fetch('/api/save-cv',{method:'POST',body:fd}).then(function(r){return r.json()}).then(function(d){if(d.ok){alert('CV saved!');location.reload()}else{alert('Error: '+(d.detail||'Unknown'))}}).catch(function(){alert('Network error')});});
+</script></body></html>"""
 
 @app.get("/cvbuilder", response_class=HTMLResponse)
-def cvbuilder(job: str = "", req: str = ""):
+def cvbuilder_page():
     cv = ld("cv.json", {})
-    reqs = [r.strip() for r in req.split("|") if r.strip()] if req else []
-    skills_default = str(ld("profile.json", {}).get("skills", ""))
-    
-    html = "<div style='max-width: 800px; margin: 20px auto; padding: 20px; background: white;'>"
-    html += "<h1>Edit Your CV</h1>"
-    html += "<p>Fill in your professional information. The CV will be formatted automatically.</p>"
-    
-    if job:
-        html += "<div style='background: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px;'>"
-        html += "<strong>Tailoring for:</strong> " + esc(job)
-        if reqs:
-            html += "<br><strong>Requirements:</strong> " + esc(", ".join(reqs[:3]))
-        html += "</div>"
-    
-    html += "<form method='post' action='/api/save-cv' enctype='multipart/form-data'>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px;'>Basic Information</h2>"
-    html += "<label>Full Name:<br><input name='name' value='" + esc(cv.get("name", "")) + "' style='width:100%;padding:8px;margin-bottom:10px'></label><br>"
-    html += "<label>Email:<br><input name='email' type='email' value='" + esc(cv.get("email", "")) + "' style='width:100%;padding:8px;margin-bottom:10px'></label><br>"
-    html += "<label>Phone:<br><input name='phone' value='" + esc(cv.get("phone", "")) + "' style='width:100%;padding:8px;margin-bottom:10px'></label><br>"
-    html += "<label>City/Country:<br><input name='city' value='" + esc(cv.get("city", "")) + "' style='width:100%;padding:8px;margin-bottom:10px'></label><br>"
-    html += "<label>Links (LinkedIn/GitHub/Portfolio):<br><input name='links' value='" + esc(cv.get("links", "")) + "' style='width:100%;padding:8px;margin-bottom:10px'></label><br>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Professional Summary</h2>"
-    html += "<textarea name='summary' rows='4' style='width:100%;padding:8px;margin-bottom:10px'>" + esc(cv.get("summary", "")) + "</textarea><br>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Skills (comma-separated)</h2>"
-    html += "<textarea name='skills' rows='3' style='width:100%;padding:8px;margin-bottom:10px'>" + esc(cv.get("skills", skills_default)) + "</textarea><br>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Experience (one per line: Role | Company | Dates | Achievement)</h2>"
-    html += "<textarea name='experience' rows='8' id='expbox' style='width:100%;padding:8px;margin-bottom:10px'>" + esc(cv.get("experience", "")) + "</textarea><br>"
-    
-    if reqs:
-        html += "<div style='background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;'>"
-        html += "<strong>💡 Requirement Helper - Click to add matching bullets:</strong><ul>"
-        for r in reqs[:6]:
-            sug = "Delivered work matching: " + r
-            html += "<li>" + esc(r) + " <button type='button' onclick=\"addBullet(this.innerText)\" data-text=\"" + esc("Delivered work matching: " + r) + "\">" + "+ Add" + "</button></li>"
-        html += "</ul></div>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Education (one per line)</h2>"
-    html += "<textarea name='education' rows='3' style='width:100%;padding:8px;margin-bottom:10px'>" + esc(cv.get("education", "")) + "</textarea><br>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Certifications (one per line)</h2>"
-    html += "<textarea name='certs' rows='3' style='width:100%;padding:8px;margin-bottom:10px'>" + esc(cv.get("certs", "")) + "</textarea><br>"
-    
-    html += "<h2 style='border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px;'>Profile Photo (optional)</h2>"
-    html += "<input type='file' name='photo' accept='image/*' style='margin-bottom:20px'><br>"
-    
-    html += "<button type='submit' style='padding:12px 24px;background:#3498db;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px'>💾 Save CV</button> "
-    html += "<a href='/cv' style='margin-left:20px;padding:12px 24px;background:#2ecc71;color:white;text-decoration:none;border-radius:5px'>👁️ Preview CV</a>"
-    
-    html += """
-    <div style='margin-top:30px;display:flex;gap:15px;flex-wrap:wrap'>
-      <button type='button' onclick='showPreview()' style='padding:14px 28px;background:#0066cc;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600'>
-        <i class='fa-solid fa-eye'></i> Preview CV
-      </button>
-      <button type='button' onclick='printCV()' style='padding:14px 28px;background:#16a34a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600'>
-        <i class='fa-solid fa-print'></i> Print / Save PDF
-      </button>
-    </div>
-    """
-    
-    # Add modal + JavaScript
-    html += """
-    <div id='cvModal' style='display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;padding:40px 20px'>
-      <div style='background:white;max-width:850px;margin:0 auto;padding:50px;border-radius:10px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.3)'>
-        <button onclick='document.getElementById("cvModal").style.display="none"' style='position:absolute;top:15px;right:15px;background:#e2e8f0;border:0;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px'>Close</button>
-        <div id='cvContent'></div>
-        <button onclick='window.print()' style='margin-top:30px;padding:14px 28px;background:#16a34a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:15px'>Print Now</button>
-      </div>
-    </div>
-    <style>
-      @media print {
-        body > *:not(#cvModal) { display: none !important; }
-        #cvModal { position: static !important; background: white !important; padding: 0 !important; }
-        #cvModal button { display: none !important; }
-      }
-    </style>
-    <script>
-    function showPreview() {
-      var name = document.querySelector('input[name="name"]').value || 'Your Name';
-      var email = document.querySelector('input[name="email"]').value || '';
-      var phone = document.querySelector('input[name="phone"]').value || '';
-      var city = document.querySelector('input[name="city"]').value || '';
-      var links = document.querySelector('input[name="links"]').value || '';
-      var summary = document.querySelector('textarea[name="summary"]').value || '';
-      var skills = document.querySelector('textarea[name="skills"]').value || '';
-      var exp = document.querySelector('textarea[name="experience"]').value || '';
-      var edu = document.querySelector('textarea[name="education"]').value || '';
-      var certs = document.querySelector('textarea[name="certs"]').value || '';
-      
-      var html = '<h1 style="margin:0 0 10px 0;font-size:36px;color:#0f172a;border-bottom:3px solid #0066cc;padding-bottom:15px">' + name + '</h1>';
-      html += '<p style="margin:0 0 30px 0;font-size:16px;color:#475569">' + (email ? email + ' | ' : '') + (phone ? phone + ' | ' : '') + city + '</p>';
-      
-      if (summary) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Professional Summary</h2><p style="line-height:1.7">' + summary + '</p>';
-      if (skills) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Skills</h2><p style="line-height:1.7">' + skills + '</p>';
-      if (exp) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Experience</h2><div style="white-space:pre-line;line-height:1.8">' + exp + '</div>';
-      if (edu) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Education</h2><div style="white-space:pre-line;line-height:1.8">' + edu + '</div>';
-      if (certs) html += '<h2 style="color:#0066cc;font-size:18px;margin-top:25px;border-bottom:1px solid #cbd5e1;padding-bottom:5px">Certifications</h2><div style="white-space:pre-line;line-height:1.8">' + certs + '</div>';
-      
-      document.getElementById('cvContent').innerHTML = html;
-      document.getElementById('cvModal').style.display = 'block';
-    }
-    
-    function printCV() {
-      showPreview();
-      setTimeout(function() { window.print(); }, 500);
-    }
-    </script>
-    """
+    html = CVBUILDER_TEMPLATE
+    for k in ["name","title","email","phone","summary","skills","experience","education","certs"]:
+        html = html.replace("__"+k.upper()+"__", esc(str(cv.get(k,""))))
+    return HTMLResponse(html)
 
-    html += "</form></div>"
-    
-    html += "<script>function addBullet(txt){var b=document.getElementById('expbox');b.value = b.value + (b.value ? '\\n' : '') + txt;}</script>"
-    
-    return page("/cvbuilder", "CV Builder", html)
+
+@app.get("/cv", response_class=HTMLResponse)
+def cv_preview():
+    import base64, os
+    cv = ld("cv.json", {})
+    name = cv.get("name") or "Your Full Name"
+    title = cv.get("title") or "Professional"
+    email = cv.get("email") or ""; phone = cv.get("phone") or ""
+    city = cv.get("city") or ""; links = cv.get("links") or ""
+    summary = cv.get("summary") or ""; skills = cv.get("skills") or ""
+    experience = cv.get("experience") or ""; education = cv.get("education") or ""
+    certs = cv.get("certs") or ""; photo = cv.get("photo") or ""
+    photo_html = ""
+    if photo:
+        if photo.startswith("data:"):
+            photo_html = "<img src='" + photo + "' class='pphoto'>"
+        else:
+            pth = os.path.join("data", photo) if not os.path.isabs(photo) else photo
+            if os.path.exists(pth):
+                with open(pth, "rb") as f:
+                    photo_html = "<img src='data:image/png;base64," + base64.b64encode(f.read()).decode() + "' class='pphoto'>"
+    exp_html = ""
+    for line in [l for l in experience.split("\n") if l.strip()]:
+        parts = [p.strip() for p in line.split("|")]
+        if len(parts) >= 3:
+            ach = ("<p style='margin:4px 0 0 0;color:#444'>" + esc(parts[3]) + "</p>") if len(parts) > 3 and parts[3] else ""
+@app.get("/cvbuilder", response_class=HTMLResponse)
+def cvbuilder_page():
+    cv = ld("cv.json", {})
+    html = CVBUILDER_TEMPLATE
+    for k in ["name","title","email","phone","summary","skills","experience","education","certs"]:
+        html = html.replace("__"+k.upper()+"__", esc(str(cv.get(k,""))))
+    return HTMLResponse(html)
+
 
 
 @app.get("/cv", response_class=HTMLResponse)
