@@ -28,8 +28,7 @@ if _Path("css").exists():
 if _Path("assets").exists():
     app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
-                   allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
 
@@ -1416,14 +1415,14 @@ def login_redirect():
     return RedirectResponse("/login.html", status_code=302)
 
 
-@app.get("/portal")
+@app.get("/portal", response_class=HTMLResponse)
 def portal_page():
-    from pathlib import Path
-    portal_file = Path("portal.html")
-    if portal_file.exists():
-        return HTMLResponse(portal_file.read_text())
-    else:
-        return HTMLResponse("<h1>Portal page not found</h1>")
+    from pathlib import Path as _P
+    f = _P("portal.html")
+    if f.exists():
+        return HTMLResponse(f.read_text())
+    return HTMLResponse("<h1>portal.html not found</h1>")
+
 
 @app.post("/api/auth/session")
 async def api_auth_session(request: Request): return await _do_login(request)
@@ -1481,3 +1480,61 @@ def marketplace_html_page():
 def rf_version():
     import os as _os
     return {"build": _os.environ.get("RENDER_GIT_COMMIT", "local-dev"), "status": "ok"}
+
+
+@app.get("/pipemgr", response_class=HTMLResponse)
+def pipemgr_page():
+    e = lambda s: str(s).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+    data = ld("pipeline.json", [])
+    rows = ""
+    if isinstance(data, list):
+        for i, j in enumerate(data):
+            t = j.get("title", j.get("job", j.get("role", "?"))) if isinstance(j, dict) else str(j)
+            s = j.get("stage", j.get("status", "")) if isinstance(j, dict) else ""
+            rows += '<tr><td>' + str(i) + '</td><td>' + e(t) + '</td><td>' + e(s) + '</td><td><form method="post" action= onsubmit="return confirm(&quot;Delete this job from pipeline?&quot;)"><input type="hidden" name="idx" value="' + str(i) + '"><button style="background:#ef4444;color:#fff;border:0;border-radius:6px;padding:6px 14px;cursor:pointer">Delete</button></form></td></tr>'
+    elif isinstance(data, dict):
+        for k, j in data.items():
+            t = j.get("title", j.get("job", k)) if isinstance(j, dict) else str(j)
+            s = j.get("stage", j.get("status", "")) if isinstance(j, dict) else ""
+            rows += '<tr><td>' + e(k) + '</td><td>' + e(t) + '</td><td>' + e(s) + '</td><td><form method="post" action= onsubmit="return confirm(&quot;Delete this job from pipeline?&quot;)"><input type="hidden" name="idx" value="' + e(k) + '"><button style="background:#ef4444;color:#fff;border:0;border-radius:6px;padding:6px 14px;cursor:pointer">Delete</button></form></td></tr>'
+    page = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pipeline Manager | RevenueForge</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+header{background:#1e293b;padding:16px 24px;border-radius:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:20px;color:#fff}header a{color:#38bdf8;text-decoration:none;font-size:14px}
+.wrap{max-width:900px;margin:0 auto}.card{background:#1e293b;border-radius:12px;padding:20px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;text-align:left;border-bottom:1px solid #334155}
+th{color:#94a3b8;font-size:12px;text-transform:uppercase}.empty{color:#94a3b8;padding:20px;text-align:center}</style></head><body>
+<header><h1>Pipeline Manager</h1><a href="/pipeline">Back to Pipeline</a></header>
+<div class="wrap"><div class="card"><table><tr><th>#</th><th>Job</th><th>Stage</th><th>Action</th></tr>__ROWS__</table>__EMPTY__</div>
+<p style="color:#64748b;font-size:12px;margin-top:14px">__COUNT__ entries - deleting removes the job from your pipeline data permanently.</p></div></body></html>"""
+    page = page.replace("__ROWS__", rows)
+    page = page.replace("__EMPTY__", "" if rows else '<div class="empty">Pipeline is empty</div>')
+    page = page.replace("__COUNT__", str(len(data)))
+    return HTMLResponse(page)
+
+
+@app.post()
+async def pipeline_delete(request: Request):
+    # Block if not from localhost/private console
+    host = request.headers.get("host", "")
+    if "localhost" not in host and "127.0.0.1" not in host:
+        return JSONResponse({"error": "Not authorized"}, status_code=403)
+    form = await request.form()
+    idx = str(form.get("idx", ""))
+    data = ld("pipeline.json", [])
+    removed = False
+    if isinstance(data, list):
+        try:
+            i = int(idx)
+            if 0 <= i < len(data):
+                data.pop(i); removed = True
+        except Exception:
+            pass
+    elif isinstance(data, dict):
+        if idx in data:
+            del data[idx]; removed = True
+    if removed:
+        sv("pipeline.json", data)
+        audit("pipeline delete: " + idx)
+    return RedirectResponse("/pipemgr", status_code=303)
+
