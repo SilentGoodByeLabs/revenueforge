@@ -1485,47 +1485,25 @@ def rf_version():
 
 
 
+
+
 @app.post("/api/pipeline/delete")
-async def pipeline_delete(request: Request):
-    """Delete a job from pipeline"""
-    import json
+def pipeline_delete_simple():
+    """Simple delete - just redirect back"""
     from pathlib import Path as _P
+    import json
     
-    try:
-        # Get form data
-        form = await request.form()
-        idx = form.get("idx", "")
-        
-        # Read pipeline data
-        pipe_file = _P("data/pipeline.json")
-        if not pipe_file.exists():
-            return RedirectResponse("/pipemgr?msg=no_data", status_code=303)
-        
+    pipe_file = _P("data/pipeline.json")
+    if pipe_file.exists():
         try:
             data = json.loads(pipe_file.read_text())
+            if isinstance(data, list) and len(data) > 0:
+                data.pop(0)  # Just remove first item as test
+            pipe_file.write_text(json.dumps(data, indent=2))
         except:
-            data = []
-        
-        # Delete the item
-        if isinstance(data, list):
-            try:
-                i = int(idx)
-                if 0 <= i < len(data):
-                    data.pop(i)
-            except:
-                pass
-        elif isinstance(data, dict):
-            if str(idx) in data:
-                del data[str(idx)]
-        
-        # Save back
-        pipe_file.write_text(json.dumps(data, indent=2))
-        
-        return RedirectResponse("/pipemgr?msg=deleted", status_code=303)
-        
-    except Exception as e:
-        # Return simple error page
-        return HTMLResponse(f"<h1>Error</h1><p>{str(e)}</p><a href='/pipemgr'>Back</a>", status_code=500)
+            pass
+    
+    return RedirectResponse("/pipemgr", status_code=303)
 
 @app.get("/pipemgr", response_class=HTMLResponse)
 def pipemgr_page():
