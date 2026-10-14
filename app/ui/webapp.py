@@ -1483,6 +1483,50 @@ def rf_version():
     return {"build": _os.environ.get("RENDER_GIT_COMMIT", "local-dev"), "status": "ok"}
 
 
+
+
+@app.post("/api/pipeline/delete")
+async def pipeline_delete(request: Request):
+    """Delete a job from pipeline"""
+    import json
+    from pathlib import Path as _P
+    
+    try:
+        # Get form data
+        form = await request.form()
+        idx = form.get("idx", "")
+        
+        # Read pipeline data
+        pipe_file = _P("data/pipeline.json")
+        if not pipe_file.exists():
+            return RedirectResponse("/pipemgr?msg=no_data", status_code=303)
+        
+        try:
+            data = json.loads(pipe_file.read_text())
+        except:
+            data = []
+        
+        # Delete the item
+        if isinstance(data, list):
+            try:
+                i = int(idx)
+                if 0 <= i < len(data):
+                    data.pop(i)
+            except:
+                pass
+        elif isinstance(data, dict):
+            if str(idx) in data:
+                del data[str(idx)]
+        
+        # Save back
+        pipe_file.write_text(json.dumps(data, indent=2))
+        
+        return RedirectResponse("/pipemgr?msg=deleted", status_code=303)
+        
+    except Exception as e:
+        # Return simple error page
+        return HTMLResponse(f"<h1>Error</h1><p>{str(e)}</p><a href='/pipemgr'>Back</a>", status_code=500)
+
 @app.get("/pipemgr", response_class=HTMLResponse)
 def pipemgr_page():
     e = lambda s: str(s).replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
@@ -1513,37 +1557,4 @@ th{color:#94a3b8;font-size:12px;text-transform:uppercase}.empty{color:#94a3b8;pa
     page = page.replace("__COUNT__", str(len(data)))
     return HTMLResponse(page)
 
-
-@app.post("/api/pipeline/delete")
-async def pipeline_delete(request: Request):
-    try:
-        form = await request.form()
-        idx = form.get("idx", "")
-        if not idx:
-            return RedirectResponse("/pipemgr", status_code=303)
-        
-        from pathlib import Path as _P
-        import json
-        pipe_file = _P("data/pipeline.json")
-        
-        if not pipe_file.exists():
-            return RedirectResponse("/pipemgr", status_code=303)
-        
-        data = json.loads(pipe_file.read_text())
-        
-        if isinstance(data, list):
-            try:
-                i = int(idx)
-                if 0 <= i < len(data):
-                    data.pop(i)
-            except (ValueError, IndexError):
-                pass
-        elif isinstance(data, dict):
-            if str(idx) in data:
-                del data[str(idx)]
-        
-        pipe_file.write_text(json.dumps(data, indent=2))
-        return RedirectResponse("/pipemgr", status_code=303)
-    except Exception as e:
-        return RedirectResponse("/pipemgr", status_code=303)
 
