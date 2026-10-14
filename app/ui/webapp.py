@@ -42,8 +42,9 @@ PUBLIC_ONLY = {"/login","/login.html","/portal","/marketplace.html","/contact.ht
 
 
 MARKETING = """<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RevenueForge - Land Your Next Role Faster</title>
-<style>:root{--bg:#0f172a;--panel:#1e293b;--line:#334155;--sky:#38bdf8;--sky2:#0ea5e9;--txt:#e2e8f0;--mut:#94a3b8}*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}nav{display:flex;justify-content:space-between;align-items:center;padding:16px 6%;background:rgba(15,23,42,.95);position:sticky;top:0;border-bottom:1px solid var(--line);z-index:10}.logo{font-size:22px;font-weight:800;color:#fff}.logo b{color:var(--sky)}nav .links a{color:var(--mut);text-decoration:none;margin:0 14px;font-size:14px}nav .links a:hover{color:var(--sky)}.btn{display:inline-block;background:var(--sky);color:#082f49;padding:12px 26px;border-radius:8px;font-weight:700;text-decoration:none}.btn:hover{background:var(--sky2)}.btn.ghost{background:transparent;color:var(--sky);border:1px solid var(--sky)}header.hero{padding:90px 6% 70px;text-align:center;background:linear-gradient(180deg,#0f172a,#12233c)}.hero h1{font-size:50px;line-height:1.15;color:#fff;max-width:900px;margin:0 auto 18px}.hero h1 span{color:var(--sky)}.hero p{color:var(--mut);font-size:19px;max-width:700px;margin:0 auto 30px}.stats{display:flex;gap:44px;justify-content:center;flex-wrap:wrap;margin-top:46px}.stat b{display:block;font-size:30px;color:#fff}.stat span{color:var(--mut);font-size:13px}.stars{color:#fbbf24;letter-spacing:2px}section{padding:70px 6%}h2.sec{text-align:center;font-size:34px;color:#fff;margin-bottom:12px}p.sub{text-align:center;color:var(--mut);max-width:640px;margin:0 auto 44px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;max-width:1150px;margin:0 auto}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}.card h3{color:var(--sky);margin-bottom:8px;font-size:19px}.card p{color:var(--mut);font-size:15px}.tcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:12px}.who{display:flex;align-items:center;gap:12px}.av{width:44px;height:44px;border-radius:50%;background:var(--sky);color:#082f49;display:flex;align-items:center;justify-content:center;font-weight:800}.who b{color:#fff;display:block;font-size:15px}.who span{color:var(--mut);font-size:13px}.quote{color:var(--txt);font-size:15px;font-style:italic}.price{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px;text-align:center}.price.hot{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky),0 10px 40px rgba(56,189,248,.15)}.amt{font-size:40px;color:#fff;font-weight:800;margin:10px 0}.amt small{font-size:15px;color:var(--mut);font-weight:400}.price ul{list-style:none;text-align:left;margin:18px 0;color:var(--mut);font-size:14px}.price li{padding:6px 0;border-bottom:1px dashed var(--line)}.price li:before{content:"\2713  ";color:var(--sky);font-weight:700}.tag{display:inline-block;background:var(--sky);color:#082f49;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-bottom:8px}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;max-width:1000px;margin:0 auto}.step{text-align:center;padding:20px}.step .n{width:46px;height:46px;margin:0 auto 14px;border-radius:50%;background:var(--sky);color:#082f49;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:20px}footer{background:#020617;border-top:1px solid var(--line);padding:50px 6% 30px;color:var(--mut);font-size:14px}.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;max-width:1150px;margin:0 auto 30px}.fgrid b{color:#fff;display:block;margin-bottom:10px}.fgrid a{display:block;color:var(--mut);text-decoration:none;padding:3px 0}.fgrid a:hover{color:var(--sky)}.fbot{border-top:1px solid var(--line);padding-top:20px;text-align:center;font-size:13px}</style></head><body>
-<nav><div class="logo">Revenue<b>Forge</b></div><div class="links"><a href="#features">Features</a><a href="#testimonials">Testimonials</a><a href="#pricing">Pricing</a><a href="/contact.html">Contact</a></div><a class="btn" href="/login.html">Get Started</a></nav>
+<style>:root{--bg:#0f172a;--panel:#1e293b;--line:#334155;--sky:#38bdf8;--sky2:#0ea5e9;--txt:#e2e8f0;--mut:#94a3b8}*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}nav{display:flex;justify-content:space-between;align-items:center;padding:16px 6%;background:rgba(15,23,42,.95);position:sticky;top:0;border-bottom:1px solid var(--line);z-index:10}.logo{font-size:22px;font-weight:800;color:#fff}.logo b{color:var(--sky)}nav .links a{color:var(--mut);text-decoration:none;margin:0 14px;font-size:14px}nav .links a:hover{color:var(--sky)}.btn{display:inline-block;background:var(--sky);color:#082f49;padding:12px 26px;border-radius:8px;font-weight:700;text-decoration:none}.btn:hover{background:var(--sky2)}.btn.ghost{background:transparent;color:var(--sky);border:1px solid var(--sky)}header.hero{padding:90px 6% 70px;text-align:center;background:linear-gradient(180deg,#0f172a,#12233c)}.hero h1{font-size:50px;line-height:1.15;color:#fff;max-width:900px;margin:0 auto 18px}.hero h1 span{color:var(--sky)}.hero p{color:var(--mut);font-size:19px;max-width:700px;margin:0 auto 30px}.stats{display:flex;gap:44px;justify-content:center;flex-wrap:wrap;margin-top:46px}.stat b{display:block;font-size:30px;color:#fff}.stat span{color:var(--mut);font-size:13px}.stars{color:#fbbf24;letter-spacing:2px}section{padding:70px 6%}h2.sec{text-align:center;font-size:34px;color:#fff;margin-bottom:12px}p.sub{text-align:center;color:var(--mut);max-width:640px;margin:0 auto 44px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;max-width:1150px;margin:0 auto}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}.card h3{color:var(--sky);margin-bottom:8px;font-size:19px}.card p{color:var(--mut);font-size:15px}.tcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:12px}.who{display:flex;align-items:center;gap:12px}.av{width:44px;height:44px;border-radius:50%;background:var(--sky);color:#082f49;display:flex;align-items:center;justify-content:center;font-weight:800}.who b{color:#fff;display:block;font-size:15px}.who span{color:var(--mut);font-size:13px}.quote{color:var(--txt);font-size:15px;font-style:italic}.price{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px;text-align:center}.price.hot{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky),0 10px 40px rgba(56,189,248,.15)}.amt{font-size:40px;color:#fff;font-weight:800;margin:10px 0}.amt small{font-size:15px;color:var(--mut);font-weight:400}.price ul{list-style:none;text-align:left;margin:18px 0;color:var(--mut);font-size:14px}.price li{padding:6px 0;border-bottom:1px dashed var(--line)}.price li:before{content:"\2713  ";color:var(--sky);font-weight:700}.tag{display:inline-block;background:var(--sky);color:#082f49;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-bottom:8px}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;max-width:1000px;margin:0 auto}.step{text-align:center;padding:20px}.step .n{width:46px;height:46px;margin:0 auto 14px;border-radius:50%;background:var(--sky);color:#082f49;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:20px}footer{background:#020617;border-top:1px solid var(--line);padding:50px 6% 30px;color:var(--mut);font-size:14px}.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;max-width:1150px;margin:0 auto 30px}.fgrid b{color:#fff;display:block;margin-bottom:10px}.fgrid a{display:block;color:var(--mut);text-decoration:none;padding:3px 0}.fgrid a:hover{color:var(--sky)}.fbot{border-top:1px solid var(--line);padding-top:20px;text-align:center;font-size:13px}.mbtn{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer;padding:4px 8px}#mmenu{display:none;background:#1e293b;border-top:1px solid #334155;padding:8px 6%;width:100%}#mmenu a{display:block;padding:13px 4px;color:#e2e8f0;text-decoration:none;border-bottom:1px solid #334155}@media(max-width:768px){nav{flex-wrap:wrap;height:auto!important;padding:12px 4%!important}nav .links{display:none!important}.mbtn{display:block!important}}</style></head><body>
+<nav><button class="mbtn" onclick="var m=document.getElementById('mmenu');m.style.display=(m.style.display==='block')?'none':'block'">&#9776;</button><div class="logo">Revenue<b>Forge</b></div><div class="links"><a href="#features">Features</a><a href="#testimonials">Testimonials</a><a href="#pricing">Pricing</a><a href="/contact.html">Contact</a></div><a class="btn" href="/login.html">Get Started</a></nav>
+<div id="mmenu"><a href="#features">Features</a><a href="#testimonials">Testimonials</a><a href="#pricing">Pricing</a><a href="/contact.html">Contact</a><a href="/login.html">Get Started</a></div>
 <header class="hero"><h1>Land your next role <span>3x faster</span> with AI-powered job hunting</h1><p>RevenueForge searches 291+ platforms in real time, writes professional proposals for you, and builds a print-ready CV - all in one place.</p><div><a class="btn" href="/login.html">Start 24-Hour Free Trial</a> <a class="btn ghost" href="/marketplace.html">Browse Marketplace</a></div>
 <div class="stats"><div class="stat"><b>291+</b><span>Live job sources</span></div><div class="stat"><b>4.9 <span class="stars">&#9733;</span></b><span>Average user rating</span></div><div class="stat"><b>1,200+</b><span>Placements supported</span></div><div class="stat"><b>24h</b><span>Free trial, no card</span></div></div></header>
 <section id="features"><h2 class="sec">Everything you need to get hired</h2><p class="sub">One platform for search, applications, and offers - built for professionals who value their time.</p><div class="grid">
@@ -1513,28 +1514,36 @@ th{color:#94a3b8;font-size:12px;text-transform:uppercase}.empty{color:#94a3b8;pa
     return HTMLResponse(page)
 
 
-@app.post()
+@app.post("/api/pipeline/delete")
 async def pipeline_delete(request: Request):
-    # Block if not from localhost/private console
-    host = request.headers.get("host", "")
-    if "localhost" not in host and "127.0.0.1" not in host:
-        return JSONResponse({"error": "Not authorized"}, status_code=403)
-    form = await request.form()
-    idx = str(form.get("idx", ""))
-    data = ld("pipeline.json", [])
-    removed = False
-    if isinstance(data, list):
-        try:
-            i = int(idx)
-            if 0 <= i < len(data):
-                data.pop(i); removed = True
-        except Exception:
-            pass
-    elif isinstance(data, dict):
-        if idx in data:
-            del data[idx]; removed = True
-    if removed:
-        sv("pipeline.json", data)
-        audit("pipeline delete: " + idx)
-    return RedirectResponse("/pipemgr", status_code=303)
+    try:
+        form = await request.form()
+        idx = form.get("idx", "")
+        if not idx:
+            return RedirectResponse("/pipemgr", status_code=303)
+        
+        from pathlib import Path as _P
+        import json
+        pipe_file = _P("data/pipeline.json")
+        
+        if not pipe_file.exists():
+            return RedirectResponse("/pipemgr", status_code=303)
+        
+        data = json.loads(pipe_file.read_text())
+        
+        if isinstance(data, list):
+            try:
+                i = int(idx)
+                if 0 <= i < len(data):
+                    data.pop(i)
+            except (ValueError, IndexError):
+                pass
+        elif isinstance(data, dict):
+            if str(idx) in data:
+                del data[str(idx)]
+        
+        pipe_file.write_text(json.dumps(data, indent=2))
+        return RedirectResponse("/pipemgr", status_code=303)
+    except Exception as e:
+        return RedirectResponse("/pipemgr", status_code=303)
 
